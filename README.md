@@ -18,6 +18,13 @@ In alternativa: **Sources → + → Remote**, quindi incolla:
 
 Per le release del ramo `dev` potrebbe essere necessario attivare le **pre-release** nelle impostazioni della sorgente.
 
+
+## Elenco patch pubblicate
+
+<!-- PATCHES_START EXPANDED -->
+_L'elenco sarà generato dal workflow alla prima release._
+<!-- PATCHES_END -->
+
 ## Sviluppo e pubblicazione
 Il repository deriva dal [template Morphe](https://github.com/MorpheApp/morphe-patches-template).
 Le modifiche si eseguono sul ramo `dev`; il workflow originale `.github/workflows/release.yml` gestisce build e release tramite semantic-release.
