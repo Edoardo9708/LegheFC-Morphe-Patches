@@ -14,25 +14,21 @@ L'implementazione della modifica installer proviene da [Morphe Patches Library](
 
 ## Diagnostica su dispositivo
 
-La patch **Leghe FC - Diagnostica sblocco v2** è un test opzionale
-(disabilitato per impostazione predefinita) per Leghe FC 13.2.1.
+**Leghe FC - Diagnostica timer v3** osserva il percorso `Y()` della
+pubblicità premiata e mostra un messaggio tipo
+`LAB Y: secondi residui = 899` calcolato usando la scadenza realmente
+memorizzata in `LXJl.D` meno `System.currentTimeMillis()`.
+Il numero è un esempio, non un valore garantito.
 
-Si limita a mostrare il messaggio `LAB: sblocco 5 minuti (X)` oppure
-`LAB: sblocco 15 minuti (Y)` **prima della chiusura normale**
-di `GoPremiumActivity`, dopo che il risultato è già stato preparato.
-Non modifica gli acquisti, i privilegi Premium, le scadenze o le pubblicità.
+Questa patch non cambia la durata, lo stato degli acquisti, il Premium
+o il flusso degli annunci. È sperimentale: la compilazione non sostituisce
+il test sul dispositivo. Mostra i dati solo sul telefono, senza ADB.
 
-Il sito di inserimento è stato confrontato con le istruzioni del DEX
-originale: nei due metodi, dopo `setResult` i registri temporanei `v0/v1`
-non sono più necessari. **La build GitHub non verifica il comportamento
-runtime**, quindi questa patch rimane sperimentale.
+Per provarla, aggiorna la sorgente in Morphe e seleziona due patch:
+**Leghe FC - LAB e Play Store** + **Leghe FC - Diagnostica timer v3**.
 
-La precedente patch **Diagnostica sblocco** di `v1.0.0-dev.3` è stata ritirata
-perché interferiva con il flusso di pubblicità: non riutilizzarla.
-
-Per provarla solo dal telefono: Morphe → Sources → Update,
-quindi seleziona **Leghe FC - LAB e Play Store** e
-**Leghe FC - Diagnostica sblocco v2**, senza altre patch universali.
+La diagnostica originale della release `v1.0.0-dev.3` è difettosa e ritirata;
+non usarla.
 
 ## Aggiunta a Morphe Manager
 [Apri la sorgente in Morphe Manager](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches)
