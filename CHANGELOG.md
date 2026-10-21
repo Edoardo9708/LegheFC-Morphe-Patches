@@ -1,3 +1,9 @@
+## [1.0.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-10-21)
+
+### 🐛 Bug Fixes
+
+* withdraw faulty rewarded diagnostic patch ([ba6f8a4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/ba6f8a4c06cf2c8934cf7f6330c692c1cb3fe1df))
+
 ## [1.0.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-10-21)
 
 ### ✨ New Features

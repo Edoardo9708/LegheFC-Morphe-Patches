@@ -1,33 +1,7 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.3",
+  "version": "1.0.0-dev.4",
   "patches": [
-    {
-      "name": "Leghe FC - Diagnostica sblocco",
-      "description": "Dopo uno sblocco temporaneo, mostra l'orario di scadenza del percorso 5/15 minuti direttamente sul telefono.",
-      "default": false,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "it.quadronica.leghe",
-          "name": "Leghe FC",
-          "description": null,
-          "apkFileType": null,
-          "appIconColor": null,
-          "signatures": null,
-          "targets": [
-            {
-              "version": "13.2.1",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": null,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
     {
       "name": "Leghe FC - LAB e Play Store",
       "description": "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",

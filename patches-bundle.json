@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-21T19:16:09",
-  "description": "## [1.0.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-10-21)\n\n### ✨ New Features\n\n* show rewarded access expiry as on-device debug toast ([6f6e6da](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6f6e6da3d91d41adbf4321e8a70ea133d147c997))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.3/patches-1.0.0-dev.3.mpp",
+  "created_at": "2026-10-21T19:26:46",
+  "description": "## [1.0.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-10-21)\n\n### 🐛 Bug Fixes\n\n* withdraw faulty rewarded diagnostic patch ([ba6f8a4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/ba6f8a4c06cf2c8934cf7f6330c692c1cb3fe1df))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.4/patches-1.0.0-dev.4.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.3"
+  "version": "1.0.0-dev.4"
 }
