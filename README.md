@@ -22,7 +22,22 @@ Per le release del ramo `dev` potrebbe essere necessario attivare le **pre-relea
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-_L'elenco sarà generato dal workflow alla prima release._
+> **[v1.0.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 13.2.1 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Leghe FC - Etichetta LAB](#leghe-fc-etichetta-lab) | Rinomina l'app in Leghe FC LAB (solo test visivo). |  |
+
+</details>
+
 <!-- PATCHES_END -->
 
 ## Sviluppo e pubblicazione
