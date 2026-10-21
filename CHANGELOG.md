@@ -1,3 +1,9 @@
+## [1.0.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-10-21)
+
+### ✨ New Features
+
+* show rewarded access expiry as on-device debug toast ([6f6e6da](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6f6e6da3d91d41adbf4321e8a70ea133d147c997))
+
 ## [1.0.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-10-21)
 
 ### ✨ New Features
