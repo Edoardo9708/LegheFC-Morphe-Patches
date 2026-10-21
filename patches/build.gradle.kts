@@ -17,6 +17,8 @@ val patchListGeneratorClasspath = configurations.create("patchListGeneratorClass
 dependencies {
     compileOnly(libs.gson)
     patchListGeneratorClasspath(libs.gson)
+    // L'implementazione ufficiale di Change installer source, senza duplicare il codice.
+    implementation("app.morphe:morphe-patches-library:1.9.0-dev.4")
 }
 
 tasks {

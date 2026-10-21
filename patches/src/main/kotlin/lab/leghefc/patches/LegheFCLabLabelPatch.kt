@@ -3,16 +3,22 @@ package lab.leghefc.patches
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.resourcePatch
+import app.morphe.patches.all.misc.fix.changepackageinstaller.changePackageInstallerPatch
 import org.w3c.dom.Element
 
 /**
- * Esperimento limitato alla modifica dell'etichetta dell'app.
- * Non altera acquisti, privilegi Premium, login o comunicazioni di rete.
+ * Esperimento per Leghe FC 13.2.1:
+ * - modifica l'etichetta del launcher;
+ * - modifica le risposte ai controlli locali della sorgente di installazione
+ *   usando la patch Morphe ufficiale (GPLv3 e relativi NOTICE).
+ *
+ * Non modifica l'install source reale registrato da Android, gli acquisti
+ * o la convalida di licenze e abbonamenti sul server.
  */
 @Suppress("unused")
 val legheFcLabLabelPatch = resourcePatch(
-    name = "Leghe FC - Etichetta LAB",
-    description = "Rinomina l'app in Leghe FC LAB (solo test visivo).",
+    name = "Leghe FC - LAB e Play Store",
+    description = "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",
     default = false
 ) {
     compatibleWith(
@@ -22,6 +28,10 @@ val legheFcLabLabelPatch = resourcePatch(
             targets = listOf(AppTarget(version = "13.2.1"))
         )
     )
+
+    // Patch bytecode pubblicata da MorpheApp/morphe-patches-library.
+    // Viene eseguita prima della modifica del manifest.
+    dependsOn(changePackageInstallerPatch { "com.android.vending" })
 
     execute {
         document("AndroidManifest.xml").use { manifest ->
