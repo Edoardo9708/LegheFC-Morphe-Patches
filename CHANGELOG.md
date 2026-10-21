@@ -1,3 +1,9 @@
+## [1.0.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-10-21)
+
+### ✨ New Features
+
+* combine installer-source spoof with Leghe FC LAB label ([d55de74](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d55de74c55479f4911411321db794cb3cf99e1e3))
+
 ## 1.0.0-dev.1 (2026-10-21)
 
 ### 🐛 Bug Fixes

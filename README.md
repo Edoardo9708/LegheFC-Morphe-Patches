@@ -23,7 +23,22 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-_Il workflow genera qui l'elenco della release corrente._
+> **[v1.0.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 13.2.1 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Leghe FC - LAB e Play Store](#leghe-fc-lab-e-play-store) | Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali. |  |
+
+</details>
+
 <!-- PATCHES_END -->
 
 ## Sviluppo e pubblicazione
