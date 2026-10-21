@@ -1,3 +1,9 @@
+## [1.0.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-10-21)
+
+### ✨ New Features
+
+* add safer reward completion diagnostics with post-result toast ([dda6197](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/dda61973b39a3c9d82bbebbb00f6717c3b166764))
+
 ## [1.0.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2026-10-21)
 
 ### 🐛 Bug Fixes
