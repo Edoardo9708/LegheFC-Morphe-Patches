@@ -1,3 +1,9 @@
+## [1.0.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-10-21)
+
+### ✨ New Features
+
+* show actual remaining rewarded-access seconds after Y ([f89302f](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f89302fcb89bc4cd58fc4f6f103649bbccaeae4b))
+
 ## [1.0.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2026-10-21)
 
 ### ✨ New Features

@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.5",
+  "version": "1.0.0-dev.6",
   "patches": [
     {
-      "name": "Leghe FC - Diagnostica sblocco v2",
-      "description": "Mostra 5/15 minuti solo quando il percorso di sblocco conclude con successo. Non modifica lo stato Premium.",
+      "name": "Leghe FC - Diagnostica timer v3",
+      "description": "Dopo la pubblicita premiata mostra i secondi residui dello sblocco temporaneo salvato dall'app.",
       "default": false,
       "category": null,
       "compatiblePackages": [
