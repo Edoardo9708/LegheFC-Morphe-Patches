@@ -14,14 +14,25 @@ L'implementazione della modifica installer proviene da [Morphe Patches Library](
 
 ## Diagnostica su dispositivo
 
-**Patch diagnostica ritirata:** la prova `Leghe FC - Diagnostica sblocco`
-pubblicata in `v1.0.0-dev.3` alterava il normale percorso della pubblicità
-premiata su Leghe FC 13.2.1. Non selezionarla.
+La patch **Leghe FC - Diagnostica sblocco v2** è un test opzionale
+(disabilitato per impostazione predefinita) per Leghe FC 13.2.1.
 
-Per il momento usa esclusivamente **Leghe FC - LAB e Play Store**
-(già verificata sul dispositivo). Una nuova diagnostica verrà pubblicata
-soltanto dopo aver validato l'inserimento nel bytecode, senza modificare
-il flusso di apertura della pubblicità.
+Si limita a mostrare il messaggio `LAB: sblocco 5 minuti (X)` oppure
+`LAB: sblocco 15 minuti (Y)` **prima della chiusura normale**
+di `GoPremiumActivity`, dopo che il risultato è già stato preparato.
+Non modifica gli acquisti, i privilegi Premium, le scadenze o le pubblicità.
+
+Il sito di inserimento è stato confrontato con le istruzioni del DEX
+originale: nei due metodi, dopo `setResult` i registri temporanei `v0/v1`
+non sono più necessari. **La build GitHub non verifica il comportamento
+runtime**, quindi questa patch rimane sperimentale.
+
+La precedente patch **Diagnostica sblocco** di `v1.0.0-dev.3` è stata ritirata
+perché interferiva con il flusso di pubblicità: non riutilizzarla.
+
+Per provarla solo dal telefono: Morphe → Sources → Update,
+quindi seleziona **Leghe FC - LAB e Play Store** e
+**Leghe FC - Diagnostica sblocco v2**, senza altre patch universali.
 
 ## Aggiunta a Morphe Manager
 [Apri la sorgente in Morphe Manager](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches)
