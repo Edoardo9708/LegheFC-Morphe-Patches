@@ -82,6 +82,7 @@ val suggestedLineupBuyPathLogPatch = bytecodePatch(
                 invoke-static {v6, v7}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                 # INSERISCI QUI
+                invoke-virtual {v0, v1, v2}, Landroidx/fragment/app/DialogFragment;->show(Landroidx/fragment/app/FragmentManager;Ljava/lang/String;)V
 
                 sget-object v6, Lkotlin/Unit;->INSTANCE:Lkotlin/Unit;
                 return-object v6
