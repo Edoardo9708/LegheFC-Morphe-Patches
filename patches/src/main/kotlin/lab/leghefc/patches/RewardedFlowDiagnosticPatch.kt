@@ -9,22 +9,19 @@ import app.morphe.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.Opcode
 
 /**
- * Leghe FC 13.2.1 (build 445): esercizio indipendente di iput/iget boolean.
+ * Leghe FC 13.2.1 (build 445): diagnostica di sola lettura del campo Lkqgs.B.
  *
- * Nel costruttore Lkqgs.<init> verificato nel DEX originale:
- *   registersSize=5, insSize=5, p0..p4, una sola return-void.
- * Tutti i campi sono gia' inizializzati prima del return. A quel punto
- * p1/p2 non sono piu' utilizzati e possono servire da registri di test.
+ * Intercetta Lkqgs.<init> prima di return-void, dopo l'inizializzazione
+ * originale dei campi, e legge B direttamente dall'istanza (p0).
+ * Il valore originale viene stampato come "B = true/false" in Logcat.
  *
- * L'esperimento crea un oggetto android.util.MutableBoolean separato,
- * ne scrive value=true con iput-boolean, lo rilegge con iget-boolean
- * e stampa il risultato su Logcat con tag LegheFC-BOOL.
- * NON scrive Lkqgs.B, non cambia timer, pubblicita' o abbonamenti.
+ * In questo punto p1 e p2 non sono piu' usati dalle istruzioni originali.
+ * Non viene mai scritto Lkqgs.B e non vengono alterati timer, annunci o accessi.
  */
 @Suppress("unused")
 val booleanFieldDiagnosticPatch = bytecodePatch(
-    name = "Leghe FC - Test iput/iget boolean",
-    description = "Scrive e rilegge un booleano di prova in un oggetto separato. Logcat: LegheFC-BOOL.",
+    name = "Leghe FC - Diagnostica stato B",
+    description = "Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B.",
     default = false
 ) {
     compatibleWith(
@@ -41,8 +38,7 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
             name = "<init>"
         ).method
 
-        // Inserimento prima del return: dopo tutte le iput originali.
-        // p1 e p2 non sono piu' vivi in questo preciso punto del metodo.
+        // Dopo tutte le assegnazioni del costruttore; prima del suo return.
         val beforeReturn = method.indexOfFirstInstructionOrThrow {
             opcode == Opcode.RETURN_VOID
         }
@@ -50,19 +46,13 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
         method.addInstructions(
             beforeReturn,
             """
-                new-instance p1, Landroid/util/MutableBoolean;
-                const/4 p2, 0x0
-                invoke-direct {p1, p2}, Landroid/util/MutableBoolean;-><init>(Z)V
-
-                const/4 p2, 0x1
-                iput-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
-                iget-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
-
-                iput-boolean p2, p0, Lkqgs;->B:Z
-
+                iget-boolean p2, p0, Lkqgs;->B:Z
                 invoke-static {p2}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                 move-result-object p2
-                const-string p1, "LegheFC-BOOL"
+                const-string p1, "B = "
+                invoke-virtual {p1, p2}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object p2
+                const-string p1, "LegheFC-B"
                 invoke-static {p1, p2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
             """.trimIndent()
         )
