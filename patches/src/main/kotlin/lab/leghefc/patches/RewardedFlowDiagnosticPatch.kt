@@ -46,6 +46,16 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
         method.addInstructions(
             beforeReturn,
             """
+                new-instance p1, Landroid/util/MutableBoolean;
+                const/4 p2, 0x0
+                invoke-direct {p1, p2}, Landroid/util/MutableBoolean;-><init>(Z)V
+
+                const/4 p2, 0x1
+                iput-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
+                iget-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
+
+                iput-boolean p2, p0, Lkqgs;->B:Z
+            
                 iget-boolean p2, p0, Lkqgs;->B:Z
                 invoke-static {p2}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                 move-result-object p2
@@ -54,6 +64,7 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
                 move-result-object p2
                 const-string p1, "LegheFC-B"
                 invoke-static {p1, p2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
             """.trimIndent()
         )
     }
