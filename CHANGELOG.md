@@ -1,3 +1,9 @@
+## [1.0.0-dev.18](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.17...v1.0.0-dev.18) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* build and inspect real Lkmpl instance in isolated diagnostic list ([df3571e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/df3571e9627e777fb31faeaf4bc2a2811be49171))
+
 ## [1.0.0-dev.17](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2026-10-22)
 
 ### 🐛 Bug Fixes

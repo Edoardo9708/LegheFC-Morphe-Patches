@@ -41,7 +41,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.17](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.17)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.0.0-dev.18](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.18)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -53,7 +53,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Log A/C e test di ArrayList separata con 3 String e 2 Long. Tag: LegheFC-LXJX. |  |
+| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Log A/C e lista di prova con un vero Lkmpl (a,b,c,1,2). Tag: LegheFC-LXJX. |  |
 | [Leghe FC - Fix apertura app e nome LAB](#leghe-fc-fix-apertura-app-e-nome-lab) | Risolve il controllo locale della sorgente di installazione e mostra il nome Leghe FC LAB. |  |
 | [Leghe FC - Unlock percentages](#leghe-fc-unlock-percentages) | Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B). |  |
 
