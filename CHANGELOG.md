@@ -1,3 +1,9 @@
+## [1.0.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* test call ([d95629a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d95629a080e058e44a5c6c14cdb67ef2c4534d8c))
+
 ## [1.0.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2026-10-22)
 
 ### 🐛 Bug Fixes

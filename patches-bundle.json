@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-22T11:54:28",
-  "description": "## [1.0.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* return added ([1c22a1b](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1c22a1be192fd9046389a5dd82315e355e1b1311))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.12/patches-1.0.0-dev.12.mpp",
+  "created_at": "2026-10-22T12:01:15",
+  "description": "## [1.0.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* test call ([d95629a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d95629a080e058e44a5c6c14cdb67ef2c4534d8c))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.13/patches-1.0.0-dev.13.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.12"
+  "version": "1.0.0-dev.13"
 }
