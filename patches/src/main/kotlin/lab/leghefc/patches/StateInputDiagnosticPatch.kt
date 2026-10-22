@@ -5,6 +5,10 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
+import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
+import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
@@ -25,15 +29,16 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  * - v1 = A (List); v0 = C (Set)
  * - v4 e v5 non sono piu' usati dal codice originale in questo punto.
  *
- * Crea anche una ArrayList dimostrativa separata (3 String + 2 Long).
- * Non la passa a Lkqgs: nessuna modifica alle collezioni o verifiche Premium.
+ * Crea una ArrayList dimostrativa con UN oggetto Lkmpl reale, inizializzato
+ * con 3 String (a,b,c) e 2 long (1,2). Rilegge l'oggetto dalla lista
+ * e stampa i suoi 5 campi. La lista rimane separata dallo stato Premium.
  * ATTENZIONE: i log possono contenere dati account/acquisti: oscurarli
  * prima di condividerli.
  */
 @Suppress("unused")
 val stateInputDiagnosticPatch = bytecodePatch(
     name = "Leghe FC - Diagnostica ingresso LXJX",
-    description = "Log A/C e test di ArrayList separata con 3 String e 2 Long. Tag: LegheFC-LXJX.",
+    description = "Log A/C e lista di prova con un vero Lkmpl (a,b,c,1,2). Tag: LegheFC-LXJX.",
     default = false
 ) {
     compatibleWith(
@@ -156,36 +161,8 @@ val stateInputDiagnosticPatch = bytecodePatch(
         method.addInstructions(
             afterInputsReady,
             """
-                # Solo demo: non sostituisce A (v1) ne' crea un Lkmpl.
-                # v4 e v5 sono temporanei e vengono sovrascritti qui.
-                new-instance v4, Ljava/util/ArrayList;
-                invoke-direct {v4}, Ljava/util/ArrayList;-><init>()V
-
-                const-string v5, "a"
-                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-                const-string v5, "b"
-                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-                const-string v5, "c"
-                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-
-                # Boxing tramite parse: 2 valori Long autentici.
-                const-string v5, "1"
-                invoke-static {v5}, Ljava/lang/Long;->valueOf(Ljava/lang/String;)Ljava/lang/Long;
-                move-result-object v5
-                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-
-                const-string v5, "2"
-                invoke-static {v5}, Ljava/lang/Long;->valueOf(Ljava/lang/String;)Ljava/lang/Long;
-                move-result-object v5
-                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-
-                invoke-static {v4}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
-                move-result-object v4
-                const-string v5, "DEMO ArrayList (3 String + 2 Long; NON Lkmpl) = "
-                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
-                move-result-object v4
-                const-string v5, "LegheFC-LXJX"
-                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                # Metodo separato con 11 registri: non tocca v0/v1 o il controllo Premium.
+                invoke-static {}, LXJX;->patch_logLkmplDemo()V
 
                 invoke-interface {v1}, Ljava/util/List;->size()I
                 move-result v4
@@ -235,6 +212,101 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 const-string v5, "LegheFC-LXJX"
                 invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
             """.trimIndent()
+        )
+
+
+        // Metodo ausiliario STATIC creato nel DEX: dispone di 11 registri suoi.
+        // Legge il vero Lkmpl dalla ArrayList prima di stamparne i campi.
+        val demoMethodName = "patch_logLkmplDemo"
+        val targetClass = mutableClassDefBy("LXJX;")
+        require(targetClass.methods.none { it.name == demoMethodName }) {
+            "Il metodo demo Lkmpl esiste gia'"
+        }
+        targetClass.methods.add(
+            ImmutableMethod(
+                "LXJX;",
+                demoMethodName,
+                emptyList(),
+                "V",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null,
+                null,
+                MutableMethodImplementation(11)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        # Contenitore con un elemento Lkmpl, separato da A.
+                        new-instance v0, Ljava/util/ArrayList;
+                        invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+
+                        # Costruttore: (long 1, String a, String b, long 2, String c).
+                        new-instance v1, Lkmpl;
+                        const-wide/16 v2, 0x1
+                        const-string v4, "a"
+                        const-string v5, "b"
+                        const-wide/16 v6, 0x2
+                        const-string v8, "c"
+                        invoke-direct/range {v1 .. v8}, Lkmpl;-><init>(JLjava/lang/String;Ljava/lang/String;JLjava/lang/String;)V
+
+                        invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                        # Conferma la dimensione reale della lista.
+                        const-string v9, "LegheFC-LXJX"
+                        invoke-virtual {v0}, Ljava/util/ArrayList;->size()I
+                        move-result v3
+                        invoke-static {v3}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                        move-result-object v3
+                        const-string v4, "DEMO Lkmpl: lista.size = "
+                        invoke-virtual {v4, v3}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v4
+                        invoke-static {v9, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        # Recupera davvero il primo oggetto dalla lista.
+                        const/4 v3, 0x0
+                        invoke-virtual {v0, v3}, Ljava/util/ArrayList;->get(I)Ljava/lang/Object;
+                        move-result-object v3
+                        check-cast v3, Lkmpl;
+
+                        # I campi di Lkmpl sono public final; leggiamo i dati reali.
+                        iget-object v4, v3, Lkmpl;->A:Ljava/lang/String;
+                        const-string v5, "DEMO Lkmpl.A = "
+                        invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v5
+                        invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        iget-object v4, v3, Lkmpl;->B:Ljava/lang/String;
+                        const-string v5, "DEMO Lkmpl.B = "
+                        invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v5
+                        invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        iget-object v4, v3, Lkmpl;->C:Ljava/lang/String;
+                        const-string v5, "DEMO Lkmpl.C = "
+                        invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v5
+                        invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        iget-wide v4, v3, Lkmpl;->D:J
+                        invoke-static {v4, v5}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
+                        move-result-object v4
+                        const-string v5, "DEMO Lkmpl.D = "
+                        invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v5
+                        invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        iget-wide v4, v3, Lkmpl;->E:J
+                        invoke-static {v4, v5}, Ljava/lang/String;->valueOf(J)Ljava/lang/String;
+                        move-result-object v4
+                        const-string v5, "DEMO Lkmpl.E = "
+                        invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v5
+                        invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        return-void
+                    """.trimIndent()
+                )
+            }
         )
 
     }
