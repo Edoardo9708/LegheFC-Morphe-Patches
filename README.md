@@ -41,9 +41,9 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.10)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.0.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.11)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
 <details open>
-<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -54,6 +54,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Leghe FC - Diagnostica collezioni A/C](#leghe-fc-diagnostica-collezioni-a-c) | Log in sola lettura di A.size, A, C.size e C alla creazione dello stato. Logcat: tag:LegheFC-AC. |  |
+| [Leghe FC - Diagnostica pulsante consigliata](#leghe-fc-diagnostica-pulsante-consigliata) | Scrive un log quando il pulsante Formazione consigliata entra nel ramo Premium. Logcat: tag:LegheFC-SUG. |  |
 | [Leghe FC - Diagnostica stato B](#leghe-fc-diagnostica-stato-b) | Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B. |  |
 | [Leghe FC - LAB e Play Store](#leghe-fc-lab-e-play-store) | Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali. |  |
 

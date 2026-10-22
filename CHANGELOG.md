@@ -1,3 +1,9 @@
+## [1.0.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.10...v1.0.0-dev.11) (2026-10-22)
+
+### ✨ New Features
+
+* log recommended lineup Premium navigation branch ([95dab63](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/95dab630f8cd518a82aaa385439f9f2d251b00c2))
+
 ## [1.0.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2026-10-22)
 
 ### ✨ New Features
