@@ -58,6 +58,8 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
                 iput-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
                 iget-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
 
+                iput-boolean p2, p0, Lkqgs;->B:Z
+
                 invoke-static {p2}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                 move-result-object p2
                 const-string p1, "LegheFC-BOOL"
