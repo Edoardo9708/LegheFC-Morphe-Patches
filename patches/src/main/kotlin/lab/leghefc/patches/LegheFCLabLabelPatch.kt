@@ -17,8 +17,8 @@ import org.w3c.dom.Element
  */
 @Suppress("unused")
 val legheFcLabLabelPatch = resourcePatch(
-    name = "Leghe FC - LAB e Play Store",
-    description = "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",
+    name = "Leghe FC - Fix apertura app e nome LAB",
+    description = "Risolve il controllo locale della sorgente di installazione e mostra il nome Leghe FC LAB.",
     default = false
 ) {
     compatibleWith(

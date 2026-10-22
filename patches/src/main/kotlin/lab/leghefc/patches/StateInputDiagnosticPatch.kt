@@ -25,14 +25,15 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  * - v1 = A (List); v0 = C (Set)
  * - v4 e v5 non sono piu' usati dal codice originale in questo punto.
  *
- * Nessuna modifica a collezioni, stato o verifiche Premium.
+ * Crea anche una ArrayList dimostrativa separata (3 String + 2 Long).
+ * Non la passa a Lkqgs: nessuna modifica alle collezioni o verifiche Premium.
  * ATTENZIONE: i log possono contenere dati account/acquisti: oscurarli
  * prima di condividerli.
  */
 @Suppress("unused")
 val stateInputDiagnosticPatch = bytecodePatch(
     name = "Leghe FC - Diagnostica ingresso LXJX",
-    description = "Log A/C e classe concreta di A dopo il caricamento, prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
+    description = "Log A/C e test di ArrayList separata con 3 String e 2 Long. Tag: LegheFC-LXJX.",
     default = false
 ) {
     compatibleWith(
@@ -155,6 +156,37 @@ val stateInputDiagnosticPatch = bytecodePatch(
         method.addInstructions(
             afterInputsReady,
             """
+                # Solo demo: non sostituisce A (v1) ne' crea un Lkmpl.
+                # v4 e v5 sono temporanei e vengono sovrascritti qui.
+                new-instance v4, Ljava/util/ArrayList;
+                invoke-direct {v4}, Ljava/util/ArrayList;-><init>()V
+
+                const-string v5, "a"
+                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+                const-string v5, "b"
+                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+                const-string v5, "c"
+                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                # Boxing tramite parse: 2 valori Long autentici.
+                const-string v5, "1"
+                invoke-static {v5}, Ljava/lang/Long;->valueOf(Ljava/lang/String;)Ljava/lang/Long;
+                move-result-object v5
+                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                const-string v5, "2"
+                invoke-static {v5}, Ljava/lang/Long;->valueOf(Ljava/lang/String;)Ljava/lang/Long;
+                move-result-object v5
+                invoke-virtual {v4, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                invoke-static {v4}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "DEMO ArrayList (3 String + 2 Long; NON Lkmpl) = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
                 invoke-interface {v1}, Ljava/util/List;->size()I
                 move-result v4
                 invoke-static {v4}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;

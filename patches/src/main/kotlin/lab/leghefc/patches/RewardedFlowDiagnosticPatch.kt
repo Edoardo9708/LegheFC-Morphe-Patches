@@ -9,19 +9,17 @@ import app.morphe.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.Opcode
 
 /**
- * Leghe FC 13.2.1 (build 445): diagnostica di sola lettura del campo Lkqgs.B.
+ * Leghe FC 13.2.1 (build 445): imposta Lkqgs.B = true.
  *
- * Intercetta Lkqgs.<init> prima di return-void, dopo l'inizializzazione
- * originale dei campi, e legge B direttamente dall'istanza (p0).
- * Il valore originale viene stampato come "B = true/false" in Logcat.
- *
- * In questo punto p1 e p2 non sono piu' usati dalle istruzioni originali.
- * Non viene mai scritto Lkqgs.B e non vengono alterati timer, annunci o accessi.
+ * La patch modifica il campo B nel costruttore, dopo la scrittura
+ * originale, e poi stampa il risultato nel Logcat (LegheFC-B).
+ * Non e' una diagnostica di sola lettura.
+ * Non modifica le collezioni A/C.
  */
 @Suppress("unused")
 val booleanFieldDiagnosticPatch = bytecodePatch(
-    name = "Leghe FC - Diagnostica stato B",
-    description = "Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B.",
+    name = "Leghe FC - Unlock percentages",
+    description = "Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B).",
     default = false
 ) {
     compatibleWith(
