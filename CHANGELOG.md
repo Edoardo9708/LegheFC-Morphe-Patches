@@ -1,3 +1,9 @@
+## [1.0.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2026-10-22)
+
+### ✨ New Features
+
+* log original Lkqgs B state without mutation ([7c23ce7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7c23ce7012323361bca92aaf18d5d85dbd674c75))
+
 ## [1.0.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2026-10-22)
 
 ### ✨ New Features

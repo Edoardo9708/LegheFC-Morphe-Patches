@@ -41,7 +41,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.7)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.0.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.8)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
@@ -53,8 +53,8 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Leghe FC - Diagnostica stato B](#leghe-fc-diagnostica-stato-b) | Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B. |  |
 | [Leghe FC - LAB e Play Store](#leghe-fc-lab-e-play-store) | Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali. |  |
-| [Leghe FC - Test iput/iget boolean](#leghe-fc-test-iput-iget-boolean) | Scrive e rilegge un booleano di prova in un oggetto separato. Logcat: LegheFC-BOOL. |  |
 
 </details>
 
