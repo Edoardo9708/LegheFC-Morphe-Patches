@@ -41,7 +41,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.14)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
+> **[v1.0.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.15)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
@@ -54,7 +54,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Leghe FC - Diagnostica collezioni A/C](#leghe-fc-diagnostica-collezioni-a-c) | Log in sola lettura di A.size, A, C.size e C alla creazione dello stato. Logcat: tag:LegheFC-AC. |  |
-| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Log di A/C immediatamente prima del costruttore Lkqgs. Logcat: tag:LegheFC-LXJX. |  |
+| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Log di A/C dopo il caricamento e prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX. |  |
 | [Leghe FC - Diagnostica stato B](#leghe-fc-diagnostica-stato-b) | Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B. |  |
 | [Leghe FC - LAB e Play Store](#leghe-fc-lab-e-play-store) | Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali. |  |
 | [Leghe FC - Test pulsante consigliata](#leghe-fc-test-pulsante-consigliata) | Diagnostica del ramo Premium con ritorno anticipato. Logcat: LegheFC-SUG. |  |

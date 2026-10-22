@@ -1,3 +1,9 @@
+## [1.0.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* log LXJX collections right after inputs are loaded ([bb2bf34](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/bb2bf34fd82c7ddfcd5bafdee9fc68b8e955f6e3))
+
 ## [1.0.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-10-22)
 
 ### 🐛 Bug Fixes

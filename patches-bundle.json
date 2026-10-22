@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-22T15:08:43",
-  "description": "## [1.0.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* add read-only LXJX A/C constructor input logging ([223b22a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/223b22a71b5fe6b25e553ea0d8c2fc317905d0e9))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.14/patches-1.0.0-dev.14.mpp",
+  "created_at": "2026-10-22T15:29:07",
+  "description": "## [1.0.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* log LXJX collections right after inputs are loaded ([bb2bf34](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/bb2bf34fd82c7ddfcd5bafdee9fc68b8e955f6e3))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.15/patches-1.0.0-dev.15.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.14"
+  "version": "1.0.0-dev.15"
 }
