@@ -1,36 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.16",
+  "version": "1.0.0-dev.17",
   "patches": [
     {
-      "name": "Leghe FC - Diagnostica collezioni A/C",
-      "description": "Log in sola lettura di A.size, A, C.size e C alla creazione dello stato. Logcat: tag:LegheFC-AC.",
-      "default": false,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "it.quadronica.leghe",
-          "name": "Leghe FC",
-          "description": null,
-          "apkFileType": null,
-          "appIconColor": null,
-          "signatures": null,
-          "targets": [
-            {
-              "version": "13.2.1",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": null,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
       "name": "Leghe FC - Diagnostica ingresso LXJX",
-      "description": "Log A/C e classe concreta di A dopo il caricamento, prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
+      "description": "Log A/C e test di ArrayList separata con 3 String e 2 Long. Tag: LegheFC-LXJX.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -55,8 +29,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - Diagnostica stato B",
-      "description": "Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B.",
+      "name": "Leghe FC - Fix apertura app e nome LAB",
+      "description": "Risolve il controllo locale della sorgente di installazione e mostra il nome Leghe FC LAB.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -81,34 +55,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - LAB e Play Store",
-      "description": "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",
-      "default": false,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "it.quadronica.leghe",
-          "name": "Leghe FC",
-          "description": null,
-          "apkFileType": null,
-          "appIconColor": null,
-          "signatures": null,
-          "targets": [
-            {
-              "version": "13.2.1",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": null,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
-      "name": "Leghe FC - Test pulsante consigliata",
-      "description": "Diagnostica del ramo Premium con ritorno anticipato. Logcat: LegheFC-SUG.",
+      "name": "Leghe FC - Unlock percentages",
+      "description": "Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B).",
       "default": false,
       "category": null,
       "compatiblePackages": [

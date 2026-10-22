@@ -1,3 +1,9 @@
+## [1.0.0-dev.17](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* clean up patch menu and add isolated ArrayList logging test ([bb366c4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/bb366c4afcfad5f5277613649803a0a80fa00acc))
+
 ## [1.0.0-dev.16](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2026-10-22)
 
 ### 🐛 Bug Fixes
