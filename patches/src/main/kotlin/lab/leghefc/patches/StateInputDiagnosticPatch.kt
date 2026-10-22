@@ -7,14 +7,17 @@ import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 /**
  * Leghe FC 13.2.1 (build 445).
  *
- * Log in sola lettura delle collezioni A (List) e C (Set)
- * appena prima della chiamata Lkqgs.<init> in LXJX.invokeSuspend.
+ * Log in sola lettura delle collezioni A (List) e C (Set) in
+ * DUE punti di LXJX.invokeSuspend: subito dopo il caricamento
+ * di entrambi i riferimenti e appena prima di Lkqgs.<init>.
  *
  * DEX originale verificato:
  * - LXJX.invokeSuspend: registers=8, ins=2
@@ -29,7 +32,7 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 @Suppress("unused")
 val stateInputDiagnosticPatch = bytecodePatch(
     name = "Leghe FC - Diagnostica ingresso LXJX",
-    description = "Log di A/C immediatamente prima del costruttore Lkqgs. Logcat: tag:LegheFC-LXJX.",
+    description = "Log di A/C dopo il caricamento e prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
     default = false
 ) {
     compatibleWith(
@@ -79,6 +82,31 @@ val stateInputDiagnosticPatch = bytecodePatch(
             "Registri della chiamata al costruttore diversi da quelli attesi"
         }
 
+
+        // Trova il momento in cui v1 diventa una List, dopo che v0
+        // e' gia' stato caricato e verificato come Set.
+        // Questo e' il primo punto in LXJX in cui A e C sono
+        // entrambi pronti. Non e' la creazione degli elementi
+        // delle collezioni, che avviene a monte.
+        val listCast = implementation.instructions.withIndex().singleOrNull { (_, ins) ->
+            val type = (ins as? ReferenceInstruction)?.reference as? TypeReference
+            ins.opcode == Opcode.CHECK_CAST &&
+                type?.type == "Ljava/util/List;" &&
+                (ins as? OneRegisterInstruction)?.registerA == 1
+        } ?: error("Impossibile individuare il caricamento di A in v1")
+
+        val afterInputsReady = listCast.index + 1
+        require(
+            afterInputsReady < beforeConstructor &&
+            implementation.instructions.elementAt(afterInputsReady).opcode == Opcode.CONST_WIDE_16
+        ) {
+            "Il layout dopo il caricamento delle collezioni e' cambiato"
+        }
+
+        // IMPORTANTE: inserire prima la diagnostica all'indice PIU' ALTO
+        // (beforeConstructor), poi quella all'indice piu' basso
+        // (afterInputsReady), cosi' gli indici originali restano validi.
+
         // v4/v5 sono temporanei morti a questo punto; non toccare v0/v1/v2/v3/v7.
         method.addInstructions(
             beforeConstructor,
@@ -120,5 +148,50 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
             """.trimIndent()
         )
+
+        // Snapshot immediatamente DOPO il caricamento di A e C,
+        // PRIMA del calcolo di B e PRIMA della costruzione di Lkqgs.
+        // v4/v5 vengono sovrascritti subito dopo dal codice originale.
+        method.addInstructions(
+            afterInputsReady,
+            """
+                invoke-interface {v1}, Ljava/util/List;->size()I
+                move-result v4
+                invoke-static {v4}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "POST-LOAD A.size = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                invoke-static {v1}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "POST-LOAD A = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                invoke-interface {v0}, Ljava/util/Set;->size()I
+                move-result v4
+                invoke-static {v4}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "POST-LOAD C.size = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                invoke-static {v0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "POST-LOAD C = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+            """.trimIndent()
+        )
+
     }
 }
