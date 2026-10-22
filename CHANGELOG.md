@@ -1,3 +1,9 @@
+## [1.0.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* add read-only LXJX A/C constructor input logging ([223b22a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/223b22a71b5fe6b25e553ea0d8c2fc317905d0e9))
+
 ## [1.0.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-10-22)
 
 ### 🐛 Bug Fixes

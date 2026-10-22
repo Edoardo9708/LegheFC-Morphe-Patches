@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-22T12:01:15",
-  "description": "## [1.0.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* test call ([d95629a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d95629a080e058e44a5c6c14cdb67ef2c4534d8c))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.13/patches-1.0.0-dev.13.mpp",
+  "created_at": "2026-10-22T15:08:43",
+  "description": "## [1.0.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2026-10-22)\n\n### 🐛 Bug Fixes\n\n* add read-only LXJX A/C constructor input logging ([223b22a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/223b22a71b5fe6b25e553ea0d8c2fc317905d0e9))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.0.0-dev.14/patches-1.0.0-dev.14.mpp",
   "signature_download_url": "",
-  "version": "1.0.0-dev.13"
+  "version": "1.0.0-dev.14"
 }
