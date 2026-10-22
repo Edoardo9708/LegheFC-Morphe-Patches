@@ -1,3 +1,9 @@
+## [1.0.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* improve boolean logging ([9f6b7ef](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/9f6b7ef72f6bf4dba0b110ad7029723fb9fd4222))
+
 ## [1.0.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2026-10-22)
 
 ### ✨ New Features

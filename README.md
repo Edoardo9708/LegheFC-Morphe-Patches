@@ -41,7 +41,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.8)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+> **[v1.0.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.9)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
