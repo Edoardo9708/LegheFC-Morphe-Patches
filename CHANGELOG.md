@@ -1,3 +1,10 @@
+## [1.0.0-dev.16](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* log runtime implementation class of A list ([59832b9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/59832b9f19ed7fc0724deb887796b7cb8638615e))
+* trigger dev release for A list type diagnostic ([cd38c47](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/cd38c47025c7f832ccbf71543cae032f30d5b630))
+
 ## [1.0.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2026-10-22)
 
 ### 🐛 Bug Fixes

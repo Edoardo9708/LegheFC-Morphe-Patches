@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.15",
+  "version": "1.0.0-dev.16",
   "patches": [
     {
       "name": "Leghe FC - Diagnostica collezioni A/C",
@@ -30,7 +30,7 @@
     },
     {
       "name": "Leghe FC - Diagnostica ingresso LXJX",
-      "description": "Log di A/C dopo il caricamento e prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
+      "description": "Log A/C e classe concreta di A dopo il caricamento, prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
       "default": false,
       "category": null,
       "compatiblePackages": [
