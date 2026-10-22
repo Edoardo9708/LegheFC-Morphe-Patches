@@ -32,7 +32,7 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 @Suppress("unused")
 val stateInputDiagnosticPatch = bytecodePatch(
     name = "Leghe FC - Diagnostica ingresso LXJX",
-    description = "Log di A/C dopo il caricamento e prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
+    description = "Log A/C e classe concreta di A dopo il caricamento, prima di Lkqgs.<init>. Logcat: tag:LegheFC-LXJX.",
     default = false
 ) {
     compatibleWith(
@@ -160,6 +160,18 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 invoke-static {v4}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
                 move-result-object v4
                 const-string v5, "POST-LOAD A.size = "
+                invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "LegheFC-LXJX"
+                invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+
+                # Identifica la classe concreta della lista A senza modificarla.
+                invoke-virtual {v1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+                move-result-object v4
+                invoke-virtual {v4}, Ljava/lang/Class;->getName()Ljava/lang/String;
+                move-result-object v4
+                const-string v5, "POST-LOAD A.class = "
                 invoke-virtual {v5, v4}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                 move-result-object v4
                 const-string v5, "LegheFC-LXJX"
