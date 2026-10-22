@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.6",
+  "version": "1.0.0-dev.7",
   "patches": [
     {
-      "name": "Leghe FC - Diagnostica timer v3",
-      "description": "Dopo la pubblicita premiata mostra i secondi residui dello sblocco temporaneo salvato dall'app.",
+      "name": "Leghe FC - LAB e Play Store",
+      "description": "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -29,8 +29,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - LAB e Play Store",
-      "description": "Rinomina l'app in Leghe FC LAB e simula Google Play come fonte per i controlli locali.",
+      "name": "Leghe FC - Test iput/iget boolean",
+      "description": "Scrive e rilegge un booleano di prova in un oggetto separato. Logcat: LegheFC-BOOL.",
       "default": false,
       "category": null,
       "compatiblePackages": [

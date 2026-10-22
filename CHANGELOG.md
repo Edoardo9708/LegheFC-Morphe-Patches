@@ -1,3 +1,9 @@
+## [1.0.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2026-10-22)
+
+### ✨ New Features
+
+* replace rewarded timer diagnostic with isolated boolean iput/iget test ([fa95f0d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/fa95f0d5ccb1878be287771351f332da72d7db52))
+
 ## [1.0.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2026-10-21)
 
 ### ✨ New Features
