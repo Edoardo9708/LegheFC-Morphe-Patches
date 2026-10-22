@@ -1,3 +1,9 @@
+## [1.0.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2026-10-22)
+
+### ✨ New Features
+
+* add read-only A and C collection diagnostics ([386b923](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/386b92347a47e342f7a5cab28e0305c197f01c63))
+
 ## [1.0.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2026-10-22)
 
 ### 🐛 Bug Fixes

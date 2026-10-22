@@ -1,7 +1,33 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.9",
+  "version": "1.0.0-dev.10",
   "patches": [
+    {
+      "name": "Leghe FC - Diagnostica collezioni A/C",
+      "description": "Log in sola lettura di A.size, A, C.size e C alla creazione dello stato. Logcat: tag:LegheFC-AC.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "it.quadronica.leghe",
+          "name": "Leghe FC",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "13.2.1",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "Leghe FC - Diagnostica stato B",
       "description": "Legge il valore originale di Lkqgs.B quando viene creato uno stato. Filtro Logcat: tag:LegheFC-B.",
