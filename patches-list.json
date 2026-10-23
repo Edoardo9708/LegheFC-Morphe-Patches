@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "patches": [
     {
-      "name": "Leghe FC - Diagnostica ingresso LXJX",
-      "description": "Sblocca formazione suggerita e comparatore",
+      "name": "Leghe FC - Avvio e nome 3 campo",
+      "description": "Corregge l'avvio dell'app e la rinomina in 3 campo.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -29,8 +29,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - Fix apertura app e nome 3 campo",
-      "description": "Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo.",
+      "name": "Leghe FC - Sblocca formazione suggerita e comparatore",
+      "description": "Formazione suggerita e confronto fra giocatori.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -55,8 +55,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - Unlock percentages",
-      "description": "Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B).",
+      "name": "Leghe FC - Sblocca percentuali",
+      "description": "Mostra le percentuali utili per scegliere chi schierare.",
       "default": false,
       "category": null,
       "compatiblePackages": [
