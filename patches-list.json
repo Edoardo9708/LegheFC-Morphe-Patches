@@ -1,7 +1,33 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.1.0-dev.2",
+  "version": "1.2.0-dev.1",
   "patches": [
+    {
+      "name": "Flowx - Diagnostica autorizzazione Gold",
+      "description": "Verifica locale dello stato Gold con dati di prova, senza modificare l'abbonamento.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.enzuredigital.weatherbomb",
+          "name": "Flowx",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.650",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "Leghe FC - Avvio e nome 3 campo",
       "description": "Corregge l'avvio dell'app e la rinomina in 3 campo.",

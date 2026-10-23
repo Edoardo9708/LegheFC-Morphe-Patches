@@ -1,3 +1,19 @@
+## [1.2.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0...v1.2.0-dev.1) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* accurately describe experimental Outdooractive behavior ([9259566](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/9259566eb787f1eb74bcb963fd9aa9702f59e466))
+* accurately describe experimental Twilight behavior ([973d31d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/973d31d51f6a7548a27399c0e91fcc494a19b357))
+* replace outdated Leghe FC repository documentation ([e5b1eeb](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5b1eeb8fc7950d41c7b60d067c67ddb5d249e7e))
+* set MembershipDiagnosticPatch.kt patch description to Unlock Pro ([927682c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/927682c02a782e0ab20aeb076d4f0cdf8d5647b1))
+* set TrialStatusExperimentPatch.kt patch description to Unlock Pro ([313ca9a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/313ca9a33119c69624e56dc66d583a5a6a59c0d0))
+
+### ✨ New Features
+
+* **flowx:** add isolated Gold entitlement diagnostic test ([9097d9d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/9097d9da4e1ab383035a2a4ccf5f6ca8c7ec0373))
+* import Outdooractive experimental patch ([f0bde4e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f0bde4e543781f8a170e20fd2b55033cfa5a39fc))
+* import Twilight experimental patch ([4a0d735](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4a0d735de2bb1244faa29d2cb1d460efaf57c877))
+
 ## [1.1.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-10-23)
 
 ### 🐛 Bug Fixes
