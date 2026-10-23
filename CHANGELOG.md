@@ -1,3 +1,9 @@
+## [1.2.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** use all explicit entitlement constructor arguments ([84ce609](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/84ce609c2f8e097f9bd3674c15b4bf1796eefa1d))
+
 ## [1.2.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0...v1.2.0-dev.1) (2026-10-23)
 
 ### 🐛 Bug Fixes
