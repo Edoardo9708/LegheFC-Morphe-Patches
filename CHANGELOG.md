@@ -1,3 +1,9 @@
+## [1.2.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.5...v1.2.0-dev.6) (2026-10-23)
+
+### ✨ New Features
+
+* **flowx:** create isolated test lists after server and cache load ([e49ee2d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e49ee2d1d234acb5538d7976e62b0a918d273604))
+
 ## [1.2.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.4...v1.2.0-dev.5) (2026-10-23)
 
 ### 🐛 Bug Fixes
