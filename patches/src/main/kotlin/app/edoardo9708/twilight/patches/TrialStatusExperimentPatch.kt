@@ -26,8 +26,8 @@ private object TrialStatusFingerprint : Fingerprint(
 
 @Suppress("unused")
 val trialStatusExperimentPatch = bytecodePatch(
-    name = "Test stato trial",
-    description = "Fa restituire true a isTrial() e ne stampa il valore in Logcat (sperimentale).",
+    name = "Twilight - Test stato trial",
+    description = "Forza false in isTrial() e registra il test in Logcat (sperimentale).",
     default = false
 ) {
     compatibleWith(TWILIGHT)
@@ -39,7 +39,7 @@ val trialStatusExperimentPatch = bytecodePatch(
         TrialStatusFingerprint.method.addInstructions(
             0,
             """
-                const-string v0, "TW-isTrial=true"
+                const-string v0, "TW-isTrial=false"
                 invoke-static {v0, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
                 const/4 v0, 0x0
                 return v0
