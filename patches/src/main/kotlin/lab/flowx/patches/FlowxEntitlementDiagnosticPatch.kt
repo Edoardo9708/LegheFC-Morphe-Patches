@@ -500,44 +500,58 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             }
 
             // ===========================================================
-            // TEST PRIMA DELLA SCRITTURA ORIGINALE
+            // ISTRUZIONI SMALI DIFFERENZIATE PER SERVER E CACHE
             // ===========================================================
-            // Il metodo crea una List<Lxi1> dimostrativa indipendente.
-            // move-result-object riceve il riferimento nel registro v7/v5.
-            // La successiva Lrs5.i resta quella ORIGINALE:
-            //   c(): usa v1, v11  (non v7)
-            //   h(): usa v1, v9   (non v5)
-            // Non viene modificato lo stato x.
-            //
-            // ========== PUNTO DA INDIVIDUARE NELLO SMALI ==========
-            // Qui i due riferimenti sono contemporaneamente disponibili.
-            //   c(): lista ORIGINALE = v11; lista TEST = v7
-            //   h(): lista ORIGINALE = v9;  lista TEST = v5
-            // Subito dopo queste due istruzioni si trova la chiamata
-            // ORIGINALE a Lrs5.i, che assegna il valore al contenitore x.
-            // Il codice diagnostico NON modifica gli argomenti di Lrs5.i.
-            // ======================================================
-            m.addInstructions(
-                index,
-                """
-                    # RIFERIMENTO ALLA LISTA DI PROVA (SOLO DIAGNOSTICA).
+            // Ogni metodo riceve il proprio blocco: nessun v$temp nello
+            // Smali generato. I registri sono validati sopra, rispetto
+            // alla chiamata originale Lrs5.i.
+            val beforeWriteSmali = when (methodName) {
+                "c" -> """
+                    # ========== c() - SERVER ==========
+                    # v11 = lista ORIGINALE ottenuta dal server.
+                    # v7  = registro temporaneo per la nostra lista di prova.
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
-                    move-result-object v$temp
-                    # PUNTO DI CONFRONTO: originale e test ora coesistono.
-                    # c(): originale=v11, prova=v7
-                    # h(): originale=v9, prova=v5
-                    # L'istruzione seguente del DEX originale e' Lrs5.i.
-                    # NON viene alterata l'assegnazione a x.
-                """.trimIndent()
-            )
+                    move-result-object v7
 
-            // La scrittura originale Lrs5.i occupa index+2, subito dopo
-            // il blocco inserito. Questo e' il punto di assegnazione in x.
-            // Manteniamo la stampa delle liste subito DOPO (index+3).
-            m.addInstructions(
-                index + 3,
-                "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V"
-            )
+                    # Qui coesistono i due riferimenti (v11 originale, v7 prova).
+                    # Lrs5.i originale che segue riceve sempre v11.
+                    # Non modifichiamo lo stato x.
+                """.trimIndent()
+
+                "h" -> """
+                    # ========== h() - CACHE ==========
+                    # v9 = lista ORIGINALE recuperata dalla cache.
+                    # v5 = registro temporaneo per la nostra lista di prova.
+                    invoke-static {}, Lz5;->$probeName()Ljava/util/List;
+                    move-result-object v5
+
+                    # Qui coesistono i due riferimenti (v9 originale, v5 prova).
+                    # Lrs5.i originale che segue riceve sempre v9.
+                    # Non modifichiamo lo stato x.
+                """.trimIndent()
+
+                else -> error("Flowx: metodo $methodName non previsto")
+            }
+
+            // Le istruzioni di prova precedono Lrs5.i, che rimane intatta.
+            m.addInstructions(index, beforeWriteSmali)
+
+            // Due logger diversi per il contenuto originale, inseriti
+            // immediatamente DOPO la Lrs5.i originale (index+2).
+            val afterWriteSmali = when (methodName) {
+                "c" -> """
+                    # c() - diagnostica della risposta del server.
+                    invoke-static {v11}, Lz5;->morpheIsolatedServerList(Ljava/lang/Object;)V
+                """.trimIndent()
+
+                "h" -> """
+                    # h() - diagnostica della lista recuperata dalla cache.
+                    invoke-static {v9}, Lz5;->morpheIsolatedCacheList(Ljava/lang/Object;)V
+                """.trimIndent()
+
+                else -> error("Flowx: metodo $methodName non previsto")
+            }
+            m.addInstructions(index + 3, afterWriteSmali)
 
         }
 
