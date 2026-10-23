@@ -1,3 +1,9 @@
+## [1.2.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.2...v1.2.0-dev.3) (2026-10-23)
+
+### ✨ New Features
+
+* **flowx:** log calls to original entitlement check without altering inputs ([a0bbc54](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/a0bbc54fc60cfc16f087b7ba8bda4f9049bd9e71))
+
 ## [1.2.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2026-10-23)
 
 ### 🐛 Bug Fixes
