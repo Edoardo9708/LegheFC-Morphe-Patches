@@ -9,6 +9,7 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMuta
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -34,6 +35,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  * Registra inoltre le chiamate ORIGINALI a B() effettuate dal ciclo di k().
  * La revisione r3 legge la dimensione della List in Lz5.x dopo getValue()
  * e prima del test originale Collection.isEmpty().
+ * Nei metodi c() ed h(), dopo la scrittura in x, crea liste di test
+ * separate con un EntitlementRow di esempio. NON le assegna a x.
  * Nessuna modifica a parametri, booleani o stato abbonamento.
  */
 @Suppress("unused")
@@ -165,9 +168,9 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Questo identificativo viene stampato ogni volta che
                         # k() esegue il test; e' indipendente dal ciclo originale.
                         # Identifica la revisione del test e il bundle che la introduce.
-                        # Per le release successive, la revisione resta r3.
+                        # Per le release successive, la revisione resta r4.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH DIAG r3 (introduced in v1.2.0-dev.5)"
+                        const-string v12, "PATCH DIAG r4 (introduced in v1.2.0-dev.6)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -204,7 +207,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r3]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r4]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
@@ -247,6 +250,100 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                 )
             }
         )
+
+        // Liste di prova isolate: una viene costruita dopo la scrittura
+        // della risposta del server, l'altra dopo quella della cache.
+        // Nessun oggetto creato qui viene passato a x, k() o B().
+        fun addIsolatedListTest(name: String, origin: String) {
+            require(targetClass.methods.none { it.name == name }) {
+                "Flowx: helper $name esiste gia'"
+            }
+            targetClass.methods.add(
+                ImmutableMethod(
+                    target, name, emptyList(), "V",
+                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                    null, null, MutableMethodImplementation(13)
+                ).toMutable().apply {
+                    addInstructions(
+                        0,
+                        """
+                            # Crea una lista NUOVA, non collegata allo stato di Flowx.
+                            new-instance v8, Ljava/util/ArrayList;
+                            invoke-direct {v8}, Ljava/util/ArrayList;-><init>()V
+
+                            # Crea un EntitlementRow dimostrativo, come nel test B().
+                            new-instance v0, Lxi1;
+                            const/16 v1, 0x3f
+                            const-string v2, "gold"
+                            const-string v3, "active"
+                            const-string v4, "morphe-test"
+                            const-string v5, "morphe-test"
+                            const-string v6, "morphe-test"
+                            const-string v7, ""
+                            invoke-direct/range {v0 .. v7}, Lxi1;-><init>(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+
+                            # Aggiunge l'oggetto ESCLUSIVAMENTE alla lista v8.
+                            invoke-virtual {v8, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                            # Stampa soltanto la dimensione della lista sandbox.
+                            invoke-virtual {v8}, Ljava/util/ArrayList;->size()I
+                            move-result v9
+                            invoke-static {v9}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                            move-result-object v9
+                            const-string v10, "Flowx-Entitlement"
+                            const-string v11, "ISOLATED TEST LIST $origin size = "
+                            invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v11
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                            # La lista v8 resta locale: non modifica x.
+                            return-void
+                        """.trimIndent()
+                    )
+                }
+            )
+        }
+
+        val serverTest = "morpheIsolatedServerList"
+        val cacheTest = "morpheIsolatedCacheList"
+        addIsolatedListTest(serverTest, "c() server")
+        addIsolatedListTest(cacheTest, "h() cache")
+
+        fun insertAfterXWrite(methodName: String, params: List<String>, expectedWrites: Int,
+                              receiver: Int, value: Int, testName: String) {
+            val m = Fingerprint(
+                definingClass = target,
+                name = methodName,
+                returnType = "Ljava/lang/Object;",
+                parameters = params
+            ).method
+            val instructions = m.implementation?.instructions?.toList()
+                ?: error("Flowx: $methodName() senza istruzioni")
+            val writes = instructions.withIndex().filter { (_, ins) ->
+                val ref = (ins as? ReferenceInstruction)?.reference as? MethodReference
+                ins.opcode == Opcode.INVOKE_VIRTUAL &&
+                    ref?.definingClass == "Lrs5;" &&
+                    ref.name == "i" &&
+                    ref.parameterTypes.toList() == listOf("Ljava/lang/Object;") &&
+                    ref.returnType == "V"
+            }
+            require(writes.size == expectedWrites) {
+                "Flowx: numero inatteso di chiamate Lrs5.i in $methodName()"
+            }
+            val (index, ins) = writes.last()
+            val registers = ins as? FiveRegisterInstruction
+                ?: error("Flowx: registri inattesi in $methodName()")
+            require(registers.registerC == receiver && registers.registerD == value) {
+                "Flowx: non riconosco la scrittura nella lista x di $methodName()"
+            }
+            // Il logger ha registri propri e non tocca quelli della coroutine.
+            m.addInstructions(index + 1, "invoke-static {}, Lz5;->$testName()V")
+        }
+
+        // c(): unica scrittura Lrs5.i, parametri v1 e v11.
+        insertAfterXWrite("c", listOf("Li5;", "Lgn0;"), 1, 1, 11, serverTest)
+        // h(): due scritture, la seconda e' quella relativa a x (v1,v9).
+        insertAfterXWrite("h", listOf("Lgn0;"), 2, 1, 9, cacheTest)
 
         // Prima inseriamo il log immediatamente PRIMA della chiamata originale.
         // L'istruzione non legge o modifica i registri del ciclo e quindi
