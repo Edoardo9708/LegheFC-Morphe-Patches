@@ -1,3 +1,9 @@
+## [1.0.0-dev.20](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* sintax err ([044f9d8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/044f9d81efe0fd37bbb741c8a0197fd897e1d766))
+
 ## [1.0.0-dev.19](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.18...v1.0.0-dev.19) (2026-10-23)
 
 ### 🐛 Bug Fixes
