@@ -35,8 +35,10 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  * Registra inoltre le chiamate ORIGINALI a B() effettuate dal ciclo di k().
  * La revisione r3 legge la dimensione della List in Lz5.x dopo getValue()
  * e prima del test originale Collection.isEmpty().
- * Nei metodi c() ed h(), dopo la scrittura in x, crea liste di test
- * separate con un EntitlementRow di esempio. NON le assegna a x.
+ * Nei metodi c() ed h(), subito dopo la scrittura in x, passa la lista
+ * originale a un helper separato. Quest'ultimo mantiene nello stesso scope
+ * la lista originale (p0) e quella di prova (v8), e registra entrambe.
+ * NON assegna mai la lista di prova a x.
  * Nessuna modifica a parametri, booleani o stato abbonamento.
  */
 @Suppress("unused")
@@ -168,9 +170,9 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Questo identificativo viene stampato ogni volta che
                         # k() esegue il test; e' indipendente dal ciclo originale.
                         # Identifica la revisione del test e il bundle che la introduce.
-                        # Per le release successive, la revisione resta r4.
+                        # Per le release successive, la revisione resta r5.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH DIAG r4 (introduced in v1.2.0-dev.6)"
+                        const-string v12, "PATCH DIAG r5 (introduced in v1.2.0-dev.7)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -207,7 +209,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r4]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r5]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
@@ -251,27 +253,72 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             }
         )
 
-        // Liste di prova isolate: una viene costruita dopo la scrittura
-        // della risposta del server, l'altra dopo quella della cache.
-        // Nessun oggetto creato qui viene passato a x, k() o B().
+        // I registri v11 di c() e v9 di h() contengono gli oggetti
+        // originali subito dopo la scrittura in x.
+        // Li passiamo al helper come p0: non sostituiamo il valore scritto in x.
+        // L'helper costruisce una ArrayList indipendente in v8 e
+        // stampa nello stesso metodo sia l'originale che la prova.
         fun addIsolatedListTest(name: String, origin: String) {
             require(targetClass.methods.none { it.name == name }) {
                 "Flowx: helper $name esiste gia'"
             }
             targetClass.methods.add(
                 ImmutableMethod(
-                    target, name, emptyList(), "V",
+                    target, name,
+                    listOf(ImmutableMethodParameter("Ljava/lang/Object;", null, null)),
+                    "V",
                     AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
-                    null, null, MutableMethodImplementation(13)
+                    null, null, MutableMethodImplementation(14)
                 ).toMutable().apply {
                     addInstructions(
                         0,
                         """
-                            # Crea una lista NUOVA, non collegata allo stato di Flowx.
+                            # p0 = originale da c()/h(), puo' essere List o null.
+                            # In un metodo STATIC con 14 registri e 1 parametro,
+                            # p0 e' l'alias di v13: v0..v12 sono locali.
+
+                            const-string v10, "Flowx-Entitlement"
+                            if-eqz p0, :original_null
+
+                            # Stampa numero di elementi della lista originale.
+                            instance-of v9, p0, Ljava/util/List;
+                            if-eqz v9, :original_other
+                            move-object v9, p0
+                            check-cast v9, Ljava/util/List;
+                            invoke-interface {v9}, Ljava/util/List;->size()I
+                            move-result v9
+                            invoke-static {v9}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                            move-result-object v9
+                            const-string v11, "$origin ORIGINAL size = "
+                            invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v11
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                            # String.valueOf visualizza il contenuto se la List
+                            # implementa toString(), altrimenti la sua rappresentazione.
+                            invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                            move-result-object v9
+                            const-string v11, "$origin ORIGINAL elements = "
+                            invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v11
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            goto :make_test
+
+                            :original_other
+                            const-string v11, "$origin ORIGINAL is not a List"
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            goto :make_test
+
+                            :original_null
+                            const-string v11, "$origin ORIGINAL = null"
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                            :make_test
+                            # Lista di test LOCALE, mai salvata in x.
                             new-instance v8, Ljava/util/ArrayList;
                             invoke-direct {v8}, Ljava/util/ArrayList;-><init>()V
 
-                            # Crea un EntitlementRow dimostrativo, come nel test B().
+                            # Nuovo EntitlementRow dimostrativo, separato da p0.
                             new-instance v0, Lxi1;
                             const/16 v1, 0x3f
                             const-string v2, "gold"
@@ -281,22 +328,26 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                             const-string v6, "morphe-test"
                             const-string v7, ""
                             invoke-direct/range {v0 .. v7}, Lxi1;-><init>(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-
-                            # Aggiunge l'oggetto ESCLUSIVAMENTE alla lista v8.
                             invoke-virtual {v8, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
 
-                            # Stampa soltanto la dimensione della lista sandbox.
+                            # Stampa dimensione e contenuto della lista di test.
                             invoke-virtual {v8}, Ljava/util/ArrayList;->size()I
                             move-result v9
                             invoke-static {v9}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
                             move-result-object v9
-                            const-string v10, "Flowx-Entitlement"
-                            const-string v11, "ISOLATED TEST LIST $origin size = "
+                            const-string v11, "$origin TEST size = "
                             invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                             move-result-object v11
                             invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
-                            # La lista v8 resta locale: non modifica x.
+                            invoke-static {v8}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                            move-result-object v9
+                            const-string v11, "$origin TEST elements = "
+                            invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v11
+                            invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                            # Nessuna assegnazione a Lz5.x; nessuna chiamata B().
                             return-void
                         """.trimIndent()
                     )
@@ -337,7 +388,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                 "Flowx: non riconosco la scrittura nella lista x di $methodName()"
             }
             // Il logger ha registri propri e non tocca quelli della coroutine.
-            m.addInstructions(index + 1, "invoke-static {}, Lz5;->$testName()V")
+            m.addInstructions(index + 1, "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V")
         }
 
         // c(): unica scrittura Lrs5.i, parametri v1 e v11.
