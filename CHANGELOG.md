@@ -1,3 +1,9 @@
+## [1.0.1-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.1-dev.1...v1.0.1-dev.2) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* replace outdated Leghe FC repository documentation ([e5b1eeb](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5b1eeb8fc7950d41c7b60d067c67ddb5d249e7e))
+
 ## [1.0.1-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0...v1.0.1-dev.1) (2026-10-23)
 
 ### 🐛 Bug Fixes

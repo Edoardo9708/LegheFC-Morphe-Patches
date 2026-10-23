@@ -36,7 +36,7 @@ Per le versioni stabili lascia disattivato **Pre-release patches**; attivalo sol
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.1-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.0.1-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.1-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
