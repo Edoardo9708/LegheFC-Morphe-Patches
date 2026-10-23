@@ -213,7 +213,7 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                 invoke-static {}, LXJX;->patch_logLkmplDemo()Ljava/util/List;
-                move -result-object v1
+                move-result-object v1
                 
             """.trimIndent()
         )
