@@ -29,7 +29,7 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 @Suppress("unused")
 val membershipDiagnosticPatch = bytecodePatch(
     name = "Outdooractive - Test getter abbonamento",
-    description = "Registra i valori originali e restituisce valori dimostrativi (Pro=true, livello=2).",
+    description = "Unlock Pro",
     default = false
 ) {
     compatibleWith(
