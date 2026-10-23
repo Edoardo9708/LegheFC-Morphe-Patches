@@ -19,8 +19,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 
 /**
- * Solo diagnostica per Outdooractive 3.23.20.
- * Conserva i risultati originali; non cambia account o autorizzazioni.
+ * Test sperimentale per Outdooractive 3.23.20.
+ * Registra i valori originali ma modifica i valori restituiti dai getter.
  *
  * Getter verificati su classes4.dex:
  * isProUser():Z -> iget-boolean v0,p0; return v0
@@ -28,8 +28,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  */
 @Suppress("unused")
 val membershipDiagnosticPatch = bytecodePatch(
-    name = "Outdooractive - Diagnostica abbonamento",
-    description = "Registra in Logcat il livello e i controlli Pro, senza modificare i risultati.",
+    name = "Outdooractive - Test getter abbonamento",
+    description = "Registra i valori originali e restituisce valori dimostrativi (Pro=true, livello=2).",
     default = false
 ) {
     compatibleWith(
@@ -44,7 +44,7 @@ val membershipDiagnosticPatch = bytecodePatch(
         val target = "Lcom/outdooractive/sdk/objects/ooi/Membership;"
         val targetClass = mutableClassDefBy(target)
         // Registro dei soli controlli nuovi: metodo + valore + chiamante.
-        // La mappa è condivisa dai due logger, ma NON tocca lo stato Membership.
+        // La mappa è condivisa dai due logger, ma NON modifica i campi Membership.
         val seenField = "morpheDiagSeen"
         val seenType = "Ljava/util/concurrent/ConcurrentHashMap;"
         require(targetClass.staticFields.none { it.name == seenField }) {
