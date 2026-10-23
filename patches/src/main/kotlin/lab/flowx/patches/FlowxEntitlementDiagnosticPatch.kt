@@ -440,6 +440,11 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             // Sono registri TEMPORANEAMENTE disponibili, non liberi
             // per tutto il metodo. registerCount resta invariato.
             val temp = if (methodName == "c") 7 else 5
+            // Protezione aggiuntiva: il registro della demo non deve
+            // coincidere con i due argomenti della Lrs5.i originale.
+            require(temp != receiver && temp != value) {
+                "Flowx: v$temp e' ancora necessario alla scrittura originale"
+            }
             val expectedRegisterCount = if (methodName == "c") 12 else 10
             val expectedNextMethod = if (methodName == "c") "e" else "k"
             val nextRef = (instructions.getOrNull(index + 1) as? ReferenceInstruction)
