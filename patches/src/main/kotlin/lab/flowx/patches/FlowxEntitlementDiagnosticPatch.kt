@@ -19,7 +19,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
  * Lxi1; = EntitlementRow, costruttore sintetico:
  *   <init>(I, String, String, String, String, String, String)V
  * Il primo int e' la maschera Kotlin dei parametri predefiniti.
- * Maschera 0: utilizza tutte le sei stringhe fornite.
+ * Maschera 0: usa i valori predefiniti (status vuoto).
+ * Maschera 0x3f: usa tutte e sei le stringhe passate dal chiamante.
  *
  * Lz5;->k()V valuta gli elementi dell'elenco e chiama:
  *   Ldw6;->B(Lxi1;J)Z
@@ -88,8 +89,9 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # v0: istanza EntitlementRow da usare solo nel test.
                         new-instance v0, Lxi1;
 
-                        # v1: maschera Kotlin = 0; nessun campo predefinito.
-                        const/4 v1, 0x0
+                        # v1: bit 0-5 a 1: usa i sei valori forniti.
+                        # Con 0, status diventerebbe la stringa vuota.
+                        const/16 v1, 0x3f
 
                         # v2/v3: prodotto e stato validi secondo B().
                         const-string v2, "gold"
