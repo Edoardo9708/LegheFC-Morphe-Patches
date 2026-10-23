@@ -162,7 +162,7 @@ val stateInputDiagnosticPatch = bytecodePatch(
             afterInputsReady,
             """
                 # Metodo separato con 11 registri: non tocca v0/v1 o il controllo Premium.
-                invoke-static {}, LXJX;->patch_logLkmplDemo()V
+                # invoke-static {}, LXJX;->patch_logLkmplDemo()V
 
                 invoke-interface {v1}, Ljava/util/List;->size()I
                 move-result v4
@@ -211,6 +211,10 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 move-result-object v4
                 const-string v5, "LegheFC-LXJX"
                 invoke-static {v5, v4}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                invoke-static {}, LXJX;->patch_logLkmplDemo()Ljava/util/List;
+                move -result-object v1
+                
             """.trimIndent()
         )
 
@@ -227,7 +231,7 @@ val stateInputDiagnosticPatch = bytecodePatch(
                 "LXJX;",
                 demoMethodName,
                 emptyList(),
-                "V",
+                "Ljava/util/List;",
                 AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
                 null,
                 null,
@@ -303,7 +307,7 @@ val stateInputDiagnosticPatch = bytecodePatch(
                         move-result-object v5
                         invoke-static {v9, v5}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
-                        return-void
+                        return-object v0
                     """.trimIndent()
                 )
             }
