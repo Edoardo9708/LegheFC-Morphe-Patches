@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.1...v1.1.0) (2026-10-23)
+
+### ✨ New Features
+
+* include Outdooractive Unlock Pro experimental patch ([6a21c89](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6a21c89e8fdadcef5233910d86c56cda5811b307))
+* include Twilight Unlock Pro experimental patch ([740b9d4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/740b9d4fa0eabc52c650ef71070967859795f8c9))
+
 ## [1.0.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0...v1.0.1) (2026-10-23)
 
 ### 🐛 Bug Fixes
