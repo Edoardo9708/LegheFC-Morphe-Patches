@@ -9,9 +9,13 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMuta
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
+import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 
 /**
  * Flowx 4.650, APK esaminato (classes.dex).
@@ -28,6 +32,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
  * La patch NON sostituisce gli elementi reali: all'inizio di k()
  * crea un oggetto di prova separato e stampa soltanto il risultato.
  * Registra inoltre le chiamate ORIGINALI a B() effettuate dal ciclo di k().
+ * La revisione r3 legge la dimensione della List in Lz5.x dopo getValue()
+ * e prima del test originale Collection.isEmpty().
  * Nessuna modifica a parametri, booleani o stato abbonamento.
  */
 @Suppress("unused")
@@ -69,9 +75,44 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             "Flowx: il controllo Gold non corrisponde al bytecode verificato"
         }
 
+        val originalInstructions = body.instructions.toList()
+        // Nel DEX originale:
+        // 0 iget-object v0,p0,Lz5;->x:Lrs5;
+        // 1 invoke-virtual {v0},Lrs5;->getValue()Ljava/lang/Object;
+        // 2 move-result-object v0
+        // 3 check-cast v0,Ljava/util/List;
+        // 4 sget-object (inizio del calcolo temporale)
+        // Quindi all'indice 4 v0 contiene esattamente la lista controllata da k().
+        val firstField = (originalInstructions.getOrNull(0) as? ReferenceInstruction)
+            ?.reference as? FieldReference
+        val castType = (originalInstructions.getOrNull(3) as? ReferenceInstruction)
+            ?.reference as? TypeReference
+        val getValue = (originalInstructions.getOrNull(1) as? ReferenceInstruction)
+            ?.reference as? MethodReference
+        require(
+            originalInstructions.size > 4 &&
+            originalInstructions[0].opcode == Opcode.IGET_OBJECT &&
+            firstField?.definingClass == target &&
+            firstField.name == "x" && firstField.type == "Lrs5;" &&
+            originalInstructions[1].opcode == Opcode.INVOKE_VIRTUAL &&
+            getValue?.definingClass == "Lrs5;" &&
+            getValue.name == "getValue" &&
+            getValue.returnType == "Ljava/lang/Object;" &&
+            originalInstructions[2].opcode == Opcode.MOVE_RESULT_OBJECT &&
+            originalInstructions[3].opcode == Opcode.CHECK_CAST &&
+            castType?.type == "Ljava/util/List;" &&
+            (originalInstructions[3] as? OneRegisterInstruction)?.registerA == 0 &&
+            originalInstructions[4].opcode == Opcode.SGET_OBJECT
+        ) {
+            "Flowx: il caricamento della lista in k() non corrisponde al DEX 4.650"
+        }
+
         val targetClass = mutableClassDefBy(target)
         val callLogger = "morpheLogOriginalBCall"
-        require(targetClass.methods.none { it.name == helper || it.name == callLogger }) {
+        val listLogger = "morpheLogEntitlementList"
+        require(targetClass.methods.none {
+            it.name == helper || it.name == callLogger || it.name == listLogger
+        }) {
             "Flowx: un metodo diagnostico e' gia' presente"
         }
 
@@ -124,9 +165,9 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Questo identificativo viene stampato ogni volta che
                         # k() esegue il test; e' indipendente dal ciclo originale.
                         # Identifica la revisione del test e il bundle che la introduce.
-                        # Per le release successive, la revisione resta r2.
+                        # Per le release successive, la revisione resta r3.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH DIAG r2 (introduced in v1.2.0-dev.4)"
+                        const-string v12, "PATCH DIAG r3 (introduced in v1.2.0-dev.5)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -163,8 +204,44 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r2]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r3]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                        return-void
+                    """.trimIndent()
+                )
+            }
+        )
+
+        // Logger indipendente con parametro: l'oggetto List ricevuto da k().
+        // Usa soltanto registri propri; non altera contenuto o riferimenti.
+        targetClass.methods.add(
+            ImmutableMethod(
+                target,
+                listLogger,
+                listOf(ImmutableMethodParameter("Ljava/util/List;", null, null)),
+                "V",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null,
+                null,
+                MutableMethodImplementation(4)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        # p0 = stesso oggetto List che k() usa in isEmpty().
+                        invoke-interface {p0}, Ljava/util/List;->size()I
+                        move-result v0
+
+                        # Converte la dimensione in testo per Logcat.
+                        invoke-static {v0}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                        move-result-object v0
+                        const-string v1, "Flowx-Entitlement"
+                        const-string v2, "k() entitlement list size = "
+                        invoke-virtual {v2, v0}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v2
+
+                        # Log della dimensione, prima dell'isEmpty() originale.
+                        invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
                 )
@@ -177,6 +254,15 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
         entry.addInstructions(
             bCalls.single().index,
             "invoke-static {}, Lz5;->morpheLogOriginalBCall()V"
+        )
+
+        // L'indice 4 e' immediatamente dopo il check-cast della List,
+        // ma prima della chiamata originale a isEmpty(). Nessun registro
+        // del metodo k() viene modificato da questa istruzione.
+        // Inseriamo in ordine decrescente per preservare gli indici originali.
+        entry.addInstructions(
+            4,
+            "invoke-static {v0}, Lz5;->morpheLogEntitlementList(Ljava/util/List;)V"
         )
 
         // Infine aggiungiamo il test sintetico all'inizio di k().
