@@ -27,7 +27,7 @@ private object TrialStatusFingerprint : Fingerprint(
 @Suppress("unused")
 val trialStatusExperimentPatch = bytecodePatch(
     name = "Twilight - Test stato trial",
-    description = "Forza false in isTrial() e registra il test in Logcat (sperimentale).",
+    description = "Unlock Pro",
     default = false
 ) {
     compatibleWith(TWILIGHT)
