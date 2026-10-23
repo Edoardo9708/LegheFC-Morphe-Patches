@@ -387,7 +387,22 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             require(registers.registerC == receiver && registers.registerD == value) {
                 "Flowx: non riconosco la scrittura nella lista x di $methodName()"
             }
-            // Il logger ha registri propri e non tocca quelli della coroutine.
+            // ===========================================================
+            // PUNTO DI PASSAGGIO DELLA LISTA ORIGINALE (SOLO RIFERIMENTO)
+            // ===========================================================
+            // La chiamata Lrs5.i individuata all'indice 'index' ha gia'
+            // assegnato la lista originale al contenitore x:
+            // - c() server: registro v11
+            // - h() cache: registro v9
+            //
+            // La lista di test, invece, viene creata solo all'interno
+            // di morpheIsolatedServerList / morpheIsolatedCacheList (v8
+            // del metodo ausiliario). Non e' visibile in c() o h().
+            //
+            // NOTA: nessuna sostituzione della lista o dell'autorizzazione
+            // viene eseguita qui. La chiamata seguente passa unicamente
+            // l'oggetto originale alla diagnostica per il confronto.
+            // ===========================================================
             m.addInstructions(index + 1, "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V")
         }
 
