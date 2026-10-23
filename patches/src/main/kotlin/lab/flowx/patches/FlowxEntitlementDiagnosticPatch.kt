@@ -27,6 +27,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
  *
  * La patch NON sostituisce gli elementi reali: all'inizio di k()
  * crea un oggetto di prova separato e stampa soltanto il risultato.
+ * Registra inoltre le chiamate ORIGINALI a B() effettuate dal ciclo di k().
+ * Nessuna modifica a parametri, booleani o stato abbonamento.
  */
 @Suppress("unused")
 val flowxEntitlementDiagnosticPatch = bytecodePatch(
@@ -55,7 +57,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
 
         // Sicurezza: modifica consentita solo se il bytecode contiene
         // esattamente la chiamata a B() verificata nell'APK 4.650.
-        val bCalls = body.instructions.filter { instruction ->
+        val bCalls = body.instructions.withIndex().filter { (_, instruction) ->
             val reference = (instruction as? ReferenceInstruction)?.reference as? MethodReference
             instruction.opcode == Opcode.INVOKE_STATIC &&
                 reference?.definingClass == "Ldw6;" &&
@@ -68,8 +70,9 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
         }
 
         val targetClass = mutableClassDefBy(target)
-        require(targetClass.methods.none { it.name == helper }) {
-            "Flowx: il metodo diagnostico e' gia' presente"
+        val callLogger = "morpheLogOriginalBCall"
+        require(targetClass.methods.none { it.name == helper || it.name == callLogger }) {
+            "Flowx: un metodo diagnostico e' gia' presente"
         }
 
         targetClass.methods.add(
@@ -134,8 +137,43 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             }
         )
 
-        // Esegue il test anche se l'elenco ricevuto dal server e' vuoto.
-        // Il metodo k() prosegue poi con tutte le sue istruzioni originali.
+        // Questo helper registra SOLO l'arrivo alla chiamata originale.
+        // Due registri propri; non necessita di registri liberi dentro k().
+        targetClass.methods.add(
+            ImmutableMethod(
+                target,
+                callLogger,
+                emptyList(),
+                "V",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null,
+                null,
+                MutableMethodImplementation(2)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        # Tag uguale al test precedente per filtrare con Logcat.
+                        const-string v0, "Flowx-Entitlement"
+                        # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
+                        const-string v1, "ORIGINAL B() called"
+                        invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                        return-void
+                    """.trimIndent()
+                )
+            }
+        )
+
+        // Prima inseriamo il log immediatamente PRIMA della chiamata originale.
+        // L'istruzione non legge o modifica i registri del ciclo e quindi
+        // non sostituisce l'oggetto EntitlementRow ne' il suo risultato.
+        entry.addInstructions(
+            bCalls.single().index,
+            "invoke-static {}, Lz5;->morpheLogOriginalBCall()V"
+        )
+
+        // Infine aggiungiamo il test sintetico all'inizio di k().
+        // Il metodo prosegue poi eseguendo tutto il codice originale.
         entry.addInstructions(
             0,
             "invoke-static {}, Lz5;->morpheTestEntitlement()V"
