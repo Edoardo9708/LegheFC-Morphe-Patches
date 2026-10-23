@@ -392,7 +392,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
         addIsolatedListTest(serverTest, "c() server")
         addIsolatedListTest(cacheTest, "h() cache")
 
-        fun insertAfterXWrite(methodName: String, params: List<String>, expectedWrites: Int,
+        fun instrumentXWrite(methodName: String, params: List<String>, expectedWrites: Int,
                               receiver: Int, value: Int, testName: String) {
             val m = Fingerprint(
                 definingClass = target,
@@ -419,60 +419,78 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             require(registers.registerC == receiver && registers.registerD == value) {
                 "Flowx: non riconosco la scrittura nella lista x di $methodName()"
             }
+
             // ===========================================================
-            // PUNTO DI PASSAGGIO DELLA LISTA ORIGINALE (SOLO RIFERIMENTO)
+            // REGISTRI TEMPORANEAMENTE DISPONIBILI (DEX Flowx 4.650)
             // ===========================================================
-            // La chiamata Lrs5.i individuata all'indice 'index' ha gia'
-            // assegnato la lista originale al contenitore x:
-            // - c() server: registro v11
-            // - h() cache: registro v9
+            // c() / server:
+            //   v11 = lista originale (NON modificare)
+            //   v1  = contenitore x (NON modificare)
+            //   v7  = temporaneo libero in questo tratto:
+            //         scrittura originale al code-unit 109,
+            //         ridefinizione con sget-object al code-unit 122.
             //
-            // La lista di test, invece, viene creata solo all'interno
-            // di morpheIsolatedServerList / morpheIsolatedCacheList (v8
-            // del metodo ausiliario). Non e' visibile in c() o h().
+            // h() / cache:
+            //   v9  = lista originale (NON modificare prima della scrittura)
+            //   v1  = contenitore x (NON modificare)
+            //   v5  = temporaneo libero in questo tratto:
+            //         scrittura originale al code-unit 86,
+            //         ridefinizione con const-string al code-unit 126.
             //
-            // NOTA: nessuna sostituzione della lista o dell'autorizzazione
-            // viene eseguita qui. La chiamata seguente passa unicamente
-            // l'oggetto originale alla diagnostica per il confronto.
-            // ===========================================================
-            // Il risultato neutro usa un registro sovrascritto poco dopo
-            // dal codice originale (verificato sul DEX della versione 4.650).
-            // Non incrementiamo registerCount per non spostare i parametri.
-            val temp = if (methodName == "c") 7 else 9
+            // Sono registri TEMPORANEAMENTE disponibili, non liberi
+            // per tutto il metodo. registerCount resta invariato.
+            val temp = if (methodName == "c") 7 else 5
             val expectedRegisterCount = if (methodName == "c") 12 else 10
-            val nextName = if (methodName == "c") "e" else "k"
-            val nextReference = (instructions.getOrNull(index + 1) as? ReferenceInstruction)
+            val expectedNextMethod = if (methodName == "c") "e" else "k"
+            val nextRef = (instructions.getOrNull(index + 1) as? ReferenceInstruction)
                 ?.reference as? MethodReference
-            val overwritten = instructions.drop(index + 2).take(12).any { instruction ->
-                instruction.opcode == Opcode.SGET_OBJECT &&
+            val resetOpcode = if (methodName == "c") Opcode.SGET_OBJECT else Opcode.CONST_STRING
+            val precedingOpcode = if (methodName == "c") Opcode.IGET_OBJECT else Opcode.MOVE_OBJECT
+            val resetFound = instructions.drop(index + 2).take(30).any { instruction ->
+                instruction.opcode == resetOpcode &&
                     (instruction as? OneRegisterInstruction)?.registerA == temp
             }
             require(
                 m.implementation?.registerCount == expectedRegisterCount &&
-                    nextReference?.definingClass == target &&
-                    nextReference.name == nextName &&
-                    overwritten
+                    instructions.getOrNull(index - 1)?.opcode == precedingOpcode &&
+                    nextRef?.definingClass == target &&
+                    nextRef.name == expectedNextMethod &&
+                    resetFound
             ) {
-                "Flowx: non e' verificato il registro temporaneo di $methodName()"
+                "Flowx: il temporaneo v$temp di $methodName() non e' verificato"
             }
 
-            // Prima preserviamo la diagnostica originale di entrambe le liste.
-            // Poi riceviamo in un registro locale la nuova List<String>.
-            // Non viene eseguita nessuna seconda scrittura Lrs5.i.
+            // ===========================================================
+            // TEST PRIMA DELLA SCRITTURA ORIGINALE
+            // ===========================================================
+            // Il metodo crea una List<String> indipendente.
+            // move-result-object riceve il riferimento nel registro v7/v5.
+            // La successiva Lrs5.i resta quella ORIGINALE:
+            //   c(): usa v1, v11  (non v7)
+            //   h(): usa v1, v9   (non v5)
+            // Non viene modificato lo stato x.
             m.addInstructions(
-                index + 1,
+                index,
                 """
-                    invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
                     move-result-object v$temp
                 """.trimIndent()
             )
+
+            // Dopo le 2 istruzioni aggiunte, la scrittura originale
+            // occupa index+2. Manteniamo la stampa delle liste originali
+            // e di test subito DOPO, nella posizione index+3.
+            m.addInstructions(
+                index + 3,
+                "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V"
+            )
+
         }
 
-        // c(): unica scrittura Lrs5.i, parametri v1 e v11.
-        insertAfterXWrite("c", listOf("Li5;", "Lgn0;"), 1, 1, 11, serverTest)
-        // h(): due scritture, la seconda e' quella relativa a x (v1,v9).
-        insertAfterXWrite("h", listOf("Lgn0;"), 2, 1, 9, cacheTest)
+        // c(): originale v11, registro temporaneo v7 prima della scrittura.
+        instrumentXWrite("c", listOf("Li5;", "Lgn0;"), 1, 1, 11, serverTest)
+        // h(): originale v9, registro temporaneo v5 prima della scrittura.
+        instrumentXWrite("h", listOf("Lgn0;"), 2, 1, 9, cacheTest)
 
         // Prima inseriamo il log immediatamente PRIMA della chiamata originale.
         // L'istruzione non legge o modifica i registri del ciclo e quindi
