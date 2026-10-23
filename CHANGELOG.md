@@ -1,3 +1,9 @@
+## [1.2.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.9...v1.2.0-dev.10) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** separate server and cache diagnostic smali blocks ([959f145](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/959f1455a366047f0a3feace87bd4758f7d18f56))
+
 ## [1.2.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.8...v1.2.0-dev.9) (2026-10-23)
 
 ### 🐛 Bug Fixes
