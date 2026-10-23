@@ -1,3 +1,9 @@
+## [1.2.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.4...v1.2.0-dev.5) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** log original entitlement list size before empty check ([f52288f](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f52288fd0784f3201229a8cb694d97e8e29fdf16))
+
 ## [1.2.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.3...v1.2.0-dev.4) (2026-10-23)
 
 ### 🐛 Bug Fixes
