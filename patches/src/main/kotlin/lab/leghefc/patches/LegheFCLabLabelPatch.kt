@@ -17,8 +17,8 @@ import org.w3c.dom.Element
  */
 @Suppress("unused")
 val legheFcLabLabelPatch = resourcePatch(
-    name = "Leghe FC - Fix apertura app e nome 3 campo",
-    description = "Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo.",
+    name = "Leghe FC - Avvio e nome 3 campo",
+    description = "Corregge l'avvio dell'app e la rinomina in 3 campo.",
     default = false
 ) {
     compatibleWith(

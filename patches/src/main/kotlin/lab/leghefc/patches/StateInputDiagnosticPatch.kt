@@ -37,8 +37,8 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
  */
 @Suppress("unused")
 val stateInputDiagnosticPatch = bytecodePatch(
-    name = "Leghe FC - Diagnostica ingresso LXJX",
-    description = "Sblocca formazione suggerita e comparatore",
+    name = "Leghe FC - Sblocca formazione suggerita e comparatore",
+    description = "Formazione suggerita e confronto fra giocatori.",
     default = false
 ) {
     compatibleWith(

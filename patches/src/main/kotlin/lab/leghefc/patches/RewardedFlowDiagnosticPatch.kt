@@ -18,8 +18,8 @@ import com.android.tools.smali.dexlib2.Opcode
  */
 @Suppress("unused")
 val booleanFieldDiagnosticPatch = bytecodePatch(
-    name = "Leghe FC - Unlock percentages",
-    description = "Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B).",
+    name = "Leghe FC - Sblocca percentuali",
+    description = "Mostra le percentuali utili per scegliere chi schierare.",
     default = false
 ) {
     compatibleWith(
