@@ -39,7 +39,7 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  * originale a un helper separato. Quest'ultimo mantiene nello stesso scope
  * la lista originale (p0) e quella di prova (v8), e registra entrambe.
  * NON assegna mai la lista di prova a x.
- * Nessuna modifica a parametri, booleani o stato abbonamento.
+ * Una prova neutra indipendente restituisce inoltre una List<String>\n * al chiamante, che la conserva brevemente in un registro temporaneo.\n * Nessuna modifica a parametri, booleani o stato abbonamento.
  */
 @Suppress("unused")
 val flowxEntitlementDiagnosticPatch = bytecodePatch(
@@ -355,6 +355,38 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             )
         }
 
+        // Prova indipendente: crea e restituisce una lista di STRINGHE.
+        // Non contiene EntitlementRow e non viene scritta nel campo x.
+        val probeName = "morpheCreateDemoStrings"
+        require(targetClass.methods.none { it.name == probeName }) {
+            "Flowx: helper neutro esiste gia'"
+        }
+        targetClass.methods.add(
+            ImmutableMethod(
+                target, probeName, emptyList(), "Ljava/util/List;",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null, null, MutableMethodImplementation(4)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        # v0 = ArrayList<String> neutra e indipendente.
+                        new-instance v0, Ljava/util/ArrayList;
+                        invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+
+                        # Aggiunge valori dimostrativi senza alcuna semantica applicativa.
+                        const-string v1, "demo-a"
+                        invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+                        const-string v1, "demo-b"
+                        invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                        # v0 viene restituito al metodo chiamante.
+                        return-object v0
+                    """.trimIndent()
+                )
+            }
+        )
+
         val serverTest = "morpheIsolatedServerList"
         val cacheTest = "morpheIsolatedCacheList"
         addIsolatedListTest(serverTest, "c() server")
@@ -403,7 +435,38 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             // viene eseguita qui. La chiamata seguente passa unicamente
             // l'oggetto originale alla diagnostica per il confronto.
             // ===========================================================
-            m.addInstructions(index + 1, "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V")
+            // Il risultato neutro usa un registro sovrascritto poco dopo
+            // dal codice originale (verificato sul DEX della versione 4.650).
+            // Non incrementiamo registerCount per non spostare i parametri.
+            val temp = if (methodName == "c") 7 else 9
+            val expectedRegisterCount = if (methodName == "c") 12 else 10
+            val nextName = if (methodName == "c") "e" else "k"
+            val nextReference = (instructions.getOrNull(index + 1) as? ReferenceInstruction)
+                ?.reference as? MethodReference
+            val overwritten = instructions.drop(index + 2).take(12).any { instruction ->
+                instruction.opcode == Opcode.SGET_OBJECT &&
+                    (instruction as? OneRegisterInstruction)?.registerA == temp
+            }
+            require(
+                m.implementation?.registerCount == expectedRegisterCount &&
+                    nextReference?.definingClass == target &&
+                    nextReference.name == nextName &&
+                    overwritten
+            ) {
+                "Flowx: non e' verificato il registro temporaneo di $methodName()"
+            }
+
+            // Prima preserviamo la diagnostica originale di entrambe le liste.
+            // Poi riceviamo in un registro locale la nuova List<String>.
+            // Non viene eseguita nessuna seconda scrittura Lrs5.i.
+            m.addInstructions(
+                index + 1,
+                """
+                    invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V
+                    invoke-static {}, Lz5;->$probeName()Ljava/util/List;
+                    move-result-object v$temp
+                """.trimIndent()
+            )
         }
 
         // c(): unica scrittura Lrs5.i, parametri v1 e v11.
