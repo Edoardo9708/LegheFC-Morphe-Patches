@@ -1,44 +1,39 @@
-# Leghe FC LAB — patch Morphe non ufficiali
+# Patch per Leghe Fantacalcio (Leghe FC) su Android
 
-Repository **sperimentale** dedicato a Leghe FC, indipendente dagli sviluppatori dell'app e dal progetto Morphe.
+Repository indipendente di **patch per Leghe FC**, compatibili con **Morphe Manager**. Contiene un bundle di patch non ufficiali per personalizzare l'app **Leghe Fantacalcio** su Android.
 
-## Patch combinata: LAB e Play Store
-- App: Leghe FC (package `it.quadronica.leghe`).
-- Versione supportata: **13.2.1** (build 445).
-- Cambia l'etichetta dell'app in **Leghe FC LAB**.
-- Sostituisce con `com.android.vending` le risposte a quattro API Android usate dal codice dell'app per leggere la sorgente di installazione.
-- Non modifica la sorgente reale conservata da Android, i servizi online, il login, né lo stato Premium.
-- Stato: **sperimentale**, da verificare sul dispositivo con un APK reale. La patch precedente con l'etichetta LAB e la patch Morphe separata sono state testate; la combinazione singola no.
+**Versione supportata:** Leghe FC **13.2.1** (build 445) · **Pacchetto Android:** `it.quadronica.leghe`
 
-L'implementazione della modifica installer proviene da [Morphe Patches Library](https://github.com/MorpheApp/morphe-patches-library/blob/main/patch-library/src/main/kotlin/app/morphe/patches/all/misc/fix/changepackageinstaller/ChangePackageInstallerPatch.kt), utilizzata come dipendenza. Si applicano i termini GPLv3 e gli avvisi di licenza del progetto Morphe.
+[**Aggiungi la sorgente a Morphe Manager**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches) · [Release disponibili](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases) · [Segnala un problema](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues)
 
-## Diagnostica su dispositivo
+## Patch incluse
 
-**Leghe FC - Diagnostica timer v3** osserva il percorso `Y()` della
-pubblicità premiata e mostra un messaggio tipo
-`LAB Y: secondi residui = 899` calcolato usando la scadenza realmente
-memorizzata in `LXJl.D` meno `System.currentTimeMillis()`.
-Il numero è un esempio, non un valore garantito.
+| Nome in Morphe | Descrizione |
+| --- | --- |
+| **Leghe FC - Avvio e nome 3 campo** | Rinomina l'app in **3 campo** e adatta il controllo locale sulla sorgente d'installazione. |
+| **Leghe FC - Sblocca percentuali** | Interviene sull'indicatore utilizzato per mostrare le percentuali dei giocatori. |
+| **Leghe FC - Sblocca formazione suggerita e comparatore** | Modifica i dati passati alla funzione interessata usando una lista dimostrativa e registra informazioni diagnostiche. |
 
-Questa patch non cambia la durata, lo stato degli acquisti, il Premium
-o il flusso degli annunci. È sperimentale: la compilazione non sostituisce
-il test sul dispositivo. Mostra i dati solo sul telefono, senza ADB.
+**Stato dei test:** le patch sono sperimentali. Il bundle può essere compilato e distribuito, ma il nome delle patch **non garantisce** l'effettivo sblocco delle funzionalità a pagamento. In particolare, la patch per formazione suggerita e comparatore usa ancora **dati dimostrativi** e non equivale alla verifica completa del comportamento nell'app.
 
-Per provarla, aggiorna la sorgente in Morphe e seleziona due patch:
-**Leghe FC - LAB e Play Store** + **Leghe FC - Diagnostica timer v3**.
+## Installazione
 
-La diagnostica originale della release `v1.0.0-dev.3` è difettosa e ritirata;
-non usarla.
+1. Installa **Morphe Manager** sul dispositivo Android.
+2. Tocca [**Aggiungi la sorgente**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches), oppure apri **Sources → + → Remote** e inserisci l'URL del repository:
+   `https://github.com/Edoardo9708/LegheFC-Morphe-Patches`
+3. Aggiorna la sorgente e seleziona **Leghe FC 13.2.1**.
+4. Abilita **Expert mode** se necessario, scegli consapevolmente le patch desiderate e applicale alla tua copia dell'APK.
 
-## Aggiunta a Morphe Manager
-[Apri la sorgente in Morphe Manager](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches)
+Per le versioni stabili lascia disattivato **Pre-release patches**; attivalo solo se vuoi provare versioni di sviluppo.
 
-In alternativa: **Sources → + → Remote**, quindi incolla:
-`https://github.com/Edoardo9708/LegheFC-Morphe-Patches`
+## Compatibilità e avvertenze
 
-Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e premi **Update**. La nostra patch è disabilitata di default: attivala manualmente in **Expert mode**. Non aggiungere anche la patch universale `Change installer source`: il comportamento è già incluso.
+- Le patch sono destinate alla versione specifica indicata; nuove versioni di Leghe FC possono richiedere modifiche.
+- Alcune modifiche sono sperimentali e possono causare errori o crash. Conserva un backup dei dati prima di sostituire l'app.
+- La firma dell'APK modificato può differire da quella dell'APK ufficiale.
+- Il bundle non sostituisce eventuali verifiche remote di licenze, acquisti o abbonamenti.
 
-## Elenco patch pubblicate
+## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
 > **[v1.0.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
@@ -61,12 +56,12 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 
 <!-- PATCHES_END -->
 
-## Sviluppo e pubblicazione
-Il repository deriva dal [template Morphe](https://github.com/MorpheApp/morphe-patches-template).
-Le modifiche si eseguono sul ramo `dev`; il workflow originale `.github/workflows/release.yml` gestisce build e release tramite semantic-release.
-Non modificare manualmente `patches-bundle.json`, `patches-list.json`, `CHANGELOG.md` o il workflow di release.
+## Sviluppo e licenze
 
-## Attenzione
-L'APK modificato è firmato con una firma diversa da quello ufficiale. Conserva un backup dei dati prima di qualsiasi sostituzione. Non è previsto l'aggiramento delle verifiche degli abbonamenti o dei pagamenti.
+Lo sviluppo avviene su `dev`; le release stabili sono pubblicate dal ramo `main` tramite il workflow esistente. L'elenco qui sopra viene aggiornato automaticamente durante la pubblicazione: non modificare a mano `patches-list.json`, `patches-bundle.json` e `CHANGELOG.md`.
 
-Licenza: [GPLv3](LICENSE).
+Il repository deriva dal [template di Morphe](https://github.com/MorpheApp/morphe-patches-template). La modifica relativa alla sorgente d'installazione utilizza la [Morphe Patches Library](https://github.com/MorpheApp/morphe-patches-library) come dipendenza. Sono conservati i relativi termini e avvisi di licenza.
+
+**Progetto indipendente:** non affiliato né approvato dagli sviluppatori di Leghe Fantacalcio o dal progetto Morphe. Il nome Morphe indica esclusivamente la compatibilità tecnica.
+
+Licenza: [GPLv3](LICENSE). Vedi anche [NOTICE](NOTICE).
