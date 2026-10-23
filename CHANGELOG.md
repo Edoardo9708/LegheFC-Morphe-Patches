@@ -1,3 +1,9 @@
+## [1.2.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.10...v1.2.0-dev.11) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* test new reg values ([da49269](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/da49269aecc4c2d4934cb231991a5474d9de20d6))
+
 ## [1.2.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.9...v1.2.0-dev.10) (2026-10-23)
 
 ### 🐛 Bug Fixes
