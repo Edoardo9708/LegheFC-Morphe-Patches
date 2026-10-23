@@ -17,8 +17,8 @@ Repository unico di patch indipendenti per piu applicazioni Android, compatibile
 ### Stato dei test
 
 - **Leghe FC:** il bundle stabile 1.0.1 resta invariato; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
-- **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`); il messaggio Logcat e la descrizione originari indicano erroneamente `true`. Non e stato verificato il comportamento complessivo dell'app.
-- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`); la descrizione originaria che parla di sola diagnostica non rappresenta fedelmente il comportamento. Non usarla come patch stabile.
+- **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
+- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). Non usarla come patch stabile.
 
 ## Installazione
 
