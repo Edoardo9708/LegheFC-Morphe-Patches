@@ -1,3 +1,9 @@
+## [1.2.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.7...v1.2.0-dev.8) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** guard neutral test register against original write arguments ([12bb28b](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/12bb28b0088ba694ff698744c0dc6c8afc86e75e))
+
 ## [1.2.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.6...v1.2.0-dev.7) (2026-10-23)
 
 ### 🐛 Bug Fixes
