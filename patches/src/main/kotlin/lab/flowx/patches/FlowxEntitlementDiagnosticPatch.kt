@@ -382,10 +382,24 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # v1: maschera Kotlin, usa tutti i campi stringa v2-v7.
                         const/16 v1, 0x3f
 
-                        # Dati fittizi: non indicano un piano abilitato.
+                        # MAPPATURA DEI CAMPI DELL'ENTITLEMENT ROW (Lxi1):
                         # v2=product, v3=status, v4=source,
                         # v5=source_ref, v6=store_product_id,
                         # v7=current_period_end.
+                        #
+                        # VALORI OSSERVATI NEL PRECEDENTE TEST DI B():
+                        #   product = "gold"
+                        #   status  = "active"
+                        #   bitmask = 0x3f (usa tutti e 6 i campi forniti)
+                        # Con questa combinazione B() aveva restituito true
+                        # nel test locale. Questo NON dimostra che bastino
+                        # tali campi per attivare l'abbonamento nell'app:
+                        # possono intervenire altre verifiche lato server.
+                        # Gli altri quattro campi erano dati dimostrativi.
+                        #
+                        # DATI UTILIZZATI IN QUESTA PROVA NEUTRA:
+                        # Lasciamo "demo"/"sample" per evitare di simulare
+                        # autorizzazioni valide e non cambiamo il contenitore x.
                         const-string v2, "demo"
                         const-string v3, "sample"
                         const-string v4, "local-test"
