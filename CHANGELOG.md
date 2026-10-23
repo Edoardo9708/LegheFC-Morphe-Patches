@@ -1,3 +1,9 @@
+## [1.0.0-dev.21](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* update patch description and app launcher label ([e0b4e3d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e0b4e3d51a45988b6264cb61bcc960123847966e))
+
 ## [1.0.0-dev.20](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2026-10-23)
 
 ### 🐛 Bug Fixes

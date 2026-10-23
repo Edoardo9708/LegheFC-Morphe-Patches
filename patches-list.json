@@ -1,10 +1,10 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.0-dev.20",
+  "version": "1.0.0-dev.21",
   "patches": [
     {
       "name": "Leghe FC - Diagnostica ingresso LXJX",
-      "description": "Log A/C e lista di prova con un vero Lkmpl (a,b,c,1,2). Tag: LegheFC-LXJX.",
+      "description": "Sblocca formazione suggerita e comparatore",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -29,8 +29,8 @@
       "options": []
     },
     {
-      "name": "Leghe FC - Fix apertura app e nome LAB",
-      "description": "Risolve il controllo locale della sorgente di installazione e mostra il nome Leghe FC LAB.",
+      "name": "Leghe FC - Fix apertura app e nome 3 campo",
+      "description": "Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo.",
       "default": false,
       "category": null,
       "compatiblePackages": [
