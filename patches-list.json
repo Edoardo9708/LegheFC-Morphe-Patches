@@ -1,5 +1,84 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "0.0.0",
-  "patches": []
+  "version": "1.0.0-dev.21",
+  "patches": [
+    {
+      "name": "Leghe FC - Diagnostica ingresso LXJX",
+      "description": "Sblocca formazione suggerita e comparatore",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "it.quadronica.leghe",
+          "name": "Leghe FC",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "13.2.1",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Leghe FC - Fix apertura app e nome 3 campo",
+      "description": "Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "it.quadronica.leghe",
+          "name": "Leghe FC",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "13.2.1",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Leghe FC - Unlock percentages",
+      "description": "Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B).",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "it.quadronica.leghe",
+          "name": "Leghe FC",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "13.2.1",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    }
+  ]
 }

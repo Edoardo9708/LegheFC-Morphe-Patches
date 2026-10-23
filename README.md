@@ -1,91 +1,72 @@
-# 👋🧩 Morphe Patches template
+# Leghe FC LAB — patch Morphe non ufficiali
 
-Template repository for Morphe Patches.
+Repository **sperimentale** dedicato a Leghe FC, indipendente dagli sviluppatori dell'app e dal progetto Morphe.
 
-## ❓ About
+## Patch combinata: LAB e Play Store
+- App: Leghe FC (package `it.quadronica.leghe`).
+- Versione supportata: **13.2.1** (build 445).
+- Cambia l'etichetta dell'app in **Leghe FC LAB**.
+- Sostituisce con `com.android.vending` le risposte a quattro API Android usate dal codice dell'app per leggere la sorgente di installazione.
+- Non modifica la sorgente reale conservata da Android, i servizi online, il login, né lo stato Premium.
+- Stato: **sperimentale**, da verificare sul dispositivo con un APK reale. La patch precedente con l'etichetta LAB e la patch Morphe separata sono state testate; la combinazione singola no.
 
-Patches for apps I like.
+L'implementazione della modifica installer proviene da [Morphe Patches Library](https://github.com/MorpheApp/morphe-patches-library/blob/main/patch-library/src/main/kotlin/app/morphe/patches/all/misc/fix/changepackageinstaller/ChangePackageInstallerPatch.kt), utilizzata come dipendenza. Si applicano i termini GPLv3 e gli avvisi di licenza del progetto Morphe.
 
-<!-- TODO: Update this about section with a brief introduction/summary about this repo and what it offers. -->
+## Diagnostica su dispositivo
 
-### How to use these patches
+**Leghe FC - Diagnostica timer v3** osserva il percorso `Y()` della
+pubblicità premiata e mostra un messaggio tipo
+`LAB Y: secondi residui = 899` calcolato usando la scadenza realmente
+memorizzata in `LXJl.D` meno `System.currentTimeMillis()`.
+Il numero è un esempio, non un valore garantito.
 
-Click here to add these patches to Morphe: https://morphe.software/add-source?github=xyz-user/xyz-patches
+Questa patch non cambia la durata, lo stato degli acquisti, il Premium
+o il flusso degli annunci. È sperimentale: la compilazione non sostituisce
+il test sul dispositivo. Mostra i dati solo sul telefono, senza ADB.
 
-## 🩹 Patches list
+Per provarla, aggiorna la sorgente in Morphe e seleziona due patch:
+**Leghe FC - LAB e Play Store** + **Leghe FC - Diagnostica timer v3**.
+
+La diagnostica originale della release `v1.0.0-dev.3` è difettosa e ritirata;
+non usarla.
+
+## Aggiunta a Morphe Manager
+[Apri la sorgente in Morphe Manager](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches)
+
+In alternativa: **Sources → + → Remote**, quindi incolla:
+`https://github.com/Edoardo9708/LegheFC-Morphe-Patches`
+
+Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e premi **Update**. La nostra patch è disabilitata di default: attivala manualmente in **Expert mode**. Non aggiungere anche la patch universale `Change installer source`: il comportamento è già incluso.
+
+## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0-dev.21](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0-dev.21)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+<details open>
+<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<br>
 
-<!-- Do not modify this section by hand. The patch list is generated when release.yml creates a new release.
-     
-     If you wish for the patches list to be collapsed, then remove the word 'EXPANDED' from the comment tag above.
+**🎯 Supported versions:**
 
-     If you wish to manually keep this list updated then remove the PATCHES_START and PATCHES_END 
-     comment blocks entirely. -->
+| 13.2.1 |
+| :---: |
 
-#### A list of your patches will automatically be shown here after your first patches release is created.
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Sblocca formazione suggerita e comparatore |  |
+| [Leghe FC - Fix apertura app e nome 3 campo](#leghe-fc-fix-apertura-app-e-nome-3-campo) | Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo. |  |
+| [Leghe FC - Unlock percentages](#leghe-fc-unlock-percentages) | Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B). |  |
 
-&nbsp;
+</details>
 
-## 🚀 Getting development started
-
-To start using this template, follow these steps:
-
-1. [Setup](https://github.com/MorpheApp/morphe-documentation/blob/main/docs/morphe-development/README.md) your development environment including adding a GitHub PAT as described [here](https://github.com/MorpheApp/morphe-patcher/blob/main/docs/2_1_setup.md#-prepare-the-environment).
-2. [Create a new repository using this template](https://github.com/new?template_name=morphe-patches-template&template_owner=MorpheApp). Select create a new repository, and **enable 'Include all branches'** 
-3. Enable "Allow GitHub Actions to create and approve pull requests" in your repo Settings > Actions > General > Workflow permissions
-4. Update the [build.gradle.kts](patches/build.gradle.kts) file (Specifically, the 
-   [group of the project](patches/build.gradle.kts#L1), and the [About](patches/build.gradle.kts#L6-L11))
-5. Update the [README.md](README.md) file to be specific of your repo, and update the links in the [issue templates](.github/ISSUE_TEMPLATE).
-6. Choose a name for your patches project. Keep in mind you must use a name that does not 
-   imply authorship by the Morphe open source project. If unsure, then simply name these
-   patches after yourself ("UserXYZ Morphe patches"). See the [NOTICE](NOTICE) for details. 
-7. (Optional): Add `patches-bundle.png` to the project if you want a custom icon to show in
-   Morphe Manager instead of your GitHub profile avatar.
-
-🎉 You are now ready to start creating patches!
-
-## 🧑‍💻 Dev usage
-
-To develop and release your Patches using this template:
-
-- **Make all changes to the `dev` branch.**
-- For local development work build your patches using the gradle task `./gradlew buildAndroid` to generate the mpp file found in `patches/build/libs/patches-*.mpp`. Apply your patches locally using Morphe Desktop tool like any other patch bundle.
-- Always use [Semantic commit](https://kapeli.com/cheat_sheets/Semantic_Commits.docset/Contents/Resources/Documents/index) messages for commits. To keep it simple use only 3 commit message types: 
-  - `feat: Added a new feature`
-  - `fix: Some problem now fixed`
-  - `chore: Random change you do not want in the user facing changelog`
-- Commits of `fix:` and `feat:` will automatically generate new pre-releases and `chore:` will not create a new release.
-- Users can apply your dev branch releases by enabling `pre-release` in Morphe Manager patch sources.
-- When your dev branch is ready, and you want a stable release, merge dev branch to main (do not squash, and only merge).
-- **Always use semantic release (release.yml)**. Do not manually upload or create releases by hand
-  because many files must be updated and release.yml handles everything.
-
-## 🤓 Tips
-- See the [patcher documentation](https://github.com/MorpheApp/morphe-patcher/blob/main/docs/1_patcher_intro.md) for more examples of creating patches and fingerprints.
-- Do not use AI to create new release scripts. The `release.yml` here already handles everything.
-  If you need something custom with your releases then modify the existing `release.yml`
-  and `.releaserc` instead of writing everything new from scratch.
-- Do not manually edit or manually commit any generated files such as: `patches-list.json`,
-  `patches-bundle.json`, `CHANGELOG.md`.  These files will be automatically updated by `release.yml`.
-- Do not force push any semantic release commits as that will break all future releases.
-  If you need to fix a broken release, it's always easiest to create a new release instead of 
-  fixing an existing release.
-
-
-<!-- The patches end tag is intentionally placed here so the first release will clean up 
-     this readme of all developer instructions above. -->
 <!-- PATCHES_END -->
 
-### 🛠️ Building locally
+## Sviluppo e pubblicazione
+Il repository deriva dal [template Morphe](https://github.com/MorpheApp/morphe-patches-template).
+Le modifiche si eseguono sul ramo `dev`; il workflow originale `.github/workflows/release.yml` gestisce build e release tramite semantic-release.
+Non modificare manualmente `patches-bundle.json`, `patches-list.json`, `CHANGELOG.md` o il workflow di release.
 
-- Run `./gradlew buildAndroid`
-- The built patches .mpp file is found in `patches/build/libs/patches-*.mpp`
-- Patch the mpp file using [Morphe-Desktop](https://github.com/MorpheApp/morphe-desktop)
-  like any other patch bundle.
+## Attenzione
+L'APK modificato è firmato con una firma diversa da quello ufficiale. Conserva un backup dei dati prima di qualsiasi sostituzione. Non è previsto l'aggiramento delle verifiche degli abbonamenti o dei pagamenti.
 
-See the [Morphe documentation](https://github.com/MorpheApp/morphe-documentation) for more information.
-
-## 📜 License
-
-UserXYZ Patches are licensed under the [GNU General Public License v3.0](LICENSE)
+Licenza: [GPLv3](LICENSE).
