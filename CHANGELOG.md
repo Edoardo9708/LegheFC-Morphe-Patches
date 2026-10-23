@@ -1,3 +1,9 @@
+## [1.2.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.3...v1.2.0-dev.4) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** log diagnostic revision on each entitlement refresh ([0dbf92b](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/0dbf92be38bc8354e03a7bfaac3d8bcb9ee1674e))
+
 ## [1.2.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.2...v1.2.0-dev.3) (2026-10-23)
 
 ### ✨ New Features
