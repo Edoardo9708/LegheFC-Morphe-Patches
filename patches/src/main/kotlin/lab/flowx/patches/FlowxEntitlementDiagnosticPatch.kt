@@ -513,6 +513,8 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
                     move-result-object v7
 
+                    move-object v11, v7
+
                     # Qui coesistono i due riferimenti (v11 originale, v7 prova).
                     # Lrs5.i originale che segue riceve sempre v11.
                     # Non modifichiamo lo stato x.
@@ -524,6 +526,8 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                     # v5 = registro temporaneo per la nostra lista di prova.
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
                     move-result-object v5
+
+                    move-object v9, v5
 
                     # Qui coesistono i due riferimenti (v9 originale, v5 prova).
                     # Lrs5.i originale che segue riceve sempre v9.
