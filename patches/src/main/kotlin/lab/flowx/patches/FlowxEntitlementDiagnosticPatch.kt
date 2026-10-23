@@ -121,8 +121,15 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         invoke-static {v10}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                         move-result-object v10
 
-                        # Composizione del messaggio da registrare nel log.
+                        # Questo identificativo viene stampato ogni volta che
+                        # k() esegue il test; e' indipendente dal ciclo originale.
+                        # Identifica la revisione del test e il bundle che la introduce.
+                        # Per le release successive, la revisione resta r2.
                         const-string v11, "Flowx-Entitlement"
+                        const-string v12, "PATCH DIAG r2 (introduced in v1.2.0-dev.4)"
+                        invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        # Composizione del messaggio del test vero e proprio.
                         const-string v12, "TEST gold/active B() = "
                         invoke-virtual {v12, v10}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v12
@@ -156,7 +163,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r2]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
