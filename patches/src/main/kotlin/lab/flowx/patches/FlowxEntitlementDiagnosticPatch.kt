@@ -397,11 +397,12 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # possono intervenire altre verifiche lato server.
                         # Gli altri quattro campi erano dati dimostrativi.
                         #
-                        # DATI UTILIZZATI IN QUESTA PROVA NEUTRA:
-                        # Lasciamo "demo"/"sample" per evitare di simulare
-                        # autorizzazioni valide e non cambiamo il contenitore x.
-                        const-string v2, "demo"
-                        const-string v3, "sample"
+                        # DATI CABLATI NELLA STRUTTURA DI TEST:
+                        # v2 = product "gold"; v3 = status "active".
+                        # Solo per confrontare i dati di test con B() gia' verificato.
+                        # La struttura resta locale: il contenitore x non cambia.
+                        const-string v2, "gold"
+                        const-string v3, "active"
                         const-string v4, "local-test"
                         const-string v5, "local-test"
                         const-string v6, "local-test"
