@@ -1,3 +1,9 @@
+## [1.2.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.8...v1.2.0-dev.9) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** use type-compatible demo rows in isolated list probe ([09d9802](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/09d9802ff9eb9eb501365500cddee56d57597c65))
+
 ## [1.2.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.7...v1.2.0-dev.8) (2026-10-23)
 
 ### 🐛 Bug Fixes
