@@ -355,33 +355,52 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             )
         }
 
-        // Prova indipendente: crea e restituisce una lista di STRINGHE.
-        // Non contiene EntitlementRow e non viene scritta nel campo x.
-        val probeName = "morpheCreateDemoStrings"
+        // Prova indipendente: crea una ArrayList contenente Lxi1.
+        // Sono gli stessi TIPI di elementi della List originale, ma i valori
+        // restano dimostrativi: non rappresentano autorizzazioni attive.
+        // Il valore restituito e' usato soltanto in un registro temporaneo.
+        val probeName = "morpheCreateDemoRows"
         require(targetClass.methods.none { it.name == probeName }) {
-            "Flowx: helper neutro esiste gia'"
+            "Flowx: helper demo esiste gia'"
         }
         targetClass.methods.add(
             ImmutableMethod(
                 target, probeName, emptyList(), "Ljava/util/List;",
                 AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
-                null, null, MutableMethodImplementation(4)
+                null, null, MutableMethodImplementation(9)
             ).toMutable().apply {
                 addInstructions(
                     0,
                     """
-                        # v0 = ArrayList<String> neutra e indipendente.
-                        new-instance v0, Ljava/util/ArrayList;
-                        invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+                        # v8: nuova ArrayList di prova, completamente indipendente.
+                        new-instance v8, Ljava/util/ArrayList;
+                        invoke-direct {v8}, Ljava/util/ArrayList;-><init>()V
 
-                        # Aggiunge valori dimostrativi senza alcuna semantica applicativa.
-                        const-string v1, "demo-a"
-                        invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-                        const-string v1, "demo-b"
-                        invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+                        # v0: oggetto Lxi1 (EntitlementRow) di dimostrazione.
+                        new-instance v0, Lxi1;
 
-                        # v0 viene restituito al metodo chiamante.
-                        return-object v0
+                        # v1: maschera Kotlin, usa tutti i campi stringa v2-v7.
+                        const/16 v1, 0x3f
+
+                        # Dati fittizi: non indicano un piano abilitato.
+                        # v2=product, v3=status, v4=source,
+                        # v5=source_ref, v6=store_product_id,
+                        # v7=current_period_end.
+                        const-string v2, "demo"
+                        const-string v3, "sample"
+                        const-string v4, "local-test"
+                        const-string v5, "local-test"
+                        const-string v6, "local-test"
+                        const-string v7, ""
+
+                        # Costruttore della STESSA classe usata negli elementi originali.
+                        invoke-direct/range {v0 .. v7}, Lxi1;-><init>(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+
+                        # Inserisce v0 nella lista v8: List<Lxi1> a runtime.
+                        invoke-virtual {v8, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+                        # Restituisce la lista al chiamante, SENZA scriverla in x.
+                        return-object v8
                     """.trimIndent()
                 )
             }
@@ -468,7 +487,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             // ===========================================================
             // TEST PRIMA DELLA SCRITTURA ORIGINALE
             // ===========================================================
-            // Il metodo crea una List<String> indipendente.
+            // Il metodo crea una List<Lxi1> dimostrativa indipendente.
             // move-result-object riceve il riferimento nel registro v7/v5.
             // La successiva Lrs5.i resta quella ORIGINALE:
             //   c(): usa v1, v11  (non v7)
