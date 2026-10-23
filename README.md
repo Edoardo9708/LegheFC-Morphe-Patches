@@ -16,15 +16,15 @@ Repository unico di patch indipendenti per piu applicazioni Android, compatibile
 
 ### Stato dei test
 
-- **Leghe FC:** il bundle stabile 1.0.1 resta invariato; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
+- **Leghe FC:** le tre patch esistenti rimangono invariate; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
 - **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
-- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). Non usarla come patch stabile.
+- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). La pubblicazione sul canale stabile non certifica il corretto comportamento della patch nell'app.
 
 ## Installazione
 
 1. Apri Morphe Manager e aggiungi la [sorgente GitHub esistente](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches), se non presente.
 2. Aggiorna la sorgente e seleziona l'app desiderata (Leghe FC, Twilight o Outdooractive). Se avevi gia aggiunto solo Leghe FC, potrebbe essere necessario abilitare le altre app nelle impostazioni della sorgente.
-3. Per le versioni di sviluppo abilita **Pre-release patches**. Le release stabili vengono pubblicate solo dopo la verifica.
+3. Per le versioni di sviluppo abilita **Pre-release patches**. La compilazione del bundle viene verificata su GitHub; il comportamento delle patch sperimentali nell'app va verificato separatamente.
 4. Se necessario abilita **Expert mode** e scegli le patch da applicare alla tua copia dell'APK.
 
 ## Compatibilita
