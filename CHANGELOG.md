@@ -1,3 +1,9 @@
+## [1.2.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.6...v1.2.0-dev.7) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **flowx:** log original and isolated test lists together after each load ([b694ef8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/b694ef807a4aa2978bacfead5c97d81fd132cdb7))
+
 ## [1.2.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.5...v1.2.0-dev.6) (2026-10-23)
 
 ### ✨ New Features
