@@ -1,37 +1,39 @@
-# Patch per Leghe Fantacalcio (Leghe FC) su Android
+# Edoardo9708 Patches — Morphe
 
-Repository indipendente di **patch per Leghe FC**, compatibili con **Morphe Manager**. Contiene un bundle di patch non ufficiali per personalizzare l'app **Leghe Fantacalcio** su Android.
+Repository unico di patch indipendenti per piu applicazioni Android, compatibile con **Morphe Manager**.
 
-**Versione supportata:** Leghe FC **13.2.1** (build 445) · **Pacchetto Android:** `it.quadronica.leghe`
+**Questo repository mantiene esattamente lo stesso indirizzo di Leghe FC**, gia presente nel catalogo Morphe. La sorgente originale non va rimossa e non e necessario aggiungerne una nuova.
 
-[**Aggiungi la sorgente a Morphe Manager**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches) · [Release disponibili](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases) · [Segnala un problema](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues)
+[**Aggiungi la sorgente a Morphe**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches) · [Release](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases) · [Problemi](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues)
 
-## Patch incluse
+## Applicazioni e patch
 
-| Nome in Morphe | Descrizione |
-| --- | --- |
-| **Leghe FC - Avvio e nome 3 campo** | Rinomina l'app in **3 campo** e adatta il controllo locale sulla sorgente d'installazione. |
-| **Leghe FC - Sblocca percentuali** | Interviene sull'indicatore utilizzato per mostrare le percentuali dei giocatori. |
-| **Leghe FC - Sblocca formazione suggerita e comparatore** | Modifica i dati passati alla funzione interessata usando una lista dimostrativa e registra informazioni diagnostiche. |
+| App | Pacchetto Android | Versione analizzata | Patch |
+| --- | --- | --- | --- |
+| **Leghe FC** | `it.quadronica.leghe` | 13.2.1 (445) | Avvio e nome **3 campo**, percentuali, formazione suggerita e comparatore |
+| **Twilight** | `com.urbandroid.lux` | 14.32 (APKM) | Test sperimentale su `TrialFilter.isTrial()` e Logcat |
+| **Outdooractive** | `com.outdooractive.Outdooractive` | 3.23.20 | Diagnostica e test sperimentale dei getter di `Membership` |
 
-**Stato dei test:** le patch sono sperimentali. Il bundle può essere compilato e distribuito, ma il nome delle patch **non garantisce** l'effettivo sblocco delle funzionalità a pagamento. In particolare, la patch per formazione suggerita e comparatore usa ancora **dati dimostrativi** e non equivale alla verifica completa del comportamento nell'app.
+### Stato dei test
+
+- **Leghe FC:** il bundle stabile 1.0.1 resta invariato; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
+- **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`); il messaggio Logcat e la descrizione originari indicano erroneamente `true`. Non e stato verificato il comportamento complessivo dell'app.
+- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`); la descrizione originaria che parla di sola diagnostica non rappresenta fedelmente il comportamento. Non usarla come patch stabile.
 
 ## Installazione
 
-1. Installa **Morphe Manager** sul dispositivo Android.
-2. Tocca [**Aggiungi la sorgente**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches), oppure apri **Sources → + → Remote** e inserisci l'URL del repository:
-   `https://github.com/Edoardo9708/LegheFC-Morphe-Patches`
-3. Aggiorna la sorgente e seleziona **Leghe FC 13.2.1**.
-4. Abilita **Expert mode** se necessario, scegli consapevolmente le patch desiderate e applicale alla tua copia dell'APK.
+1. Apri Morphe Manager e aggiungi la [sorgente GitHub esistente](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches), se non presente.
+2. Aggiorna la sorgente e seleziona l'app desiderata (Leghe FC, Twilight o Outdooractive). Se avevi gia aggiunto solo Leghe FC, potrebbe essere necessario abilitare le altre app nelle impostazioni della sorgente.
+3. Per le versioni di sviluppo abilita **Pre-release patches**. Le release stabili vengono pubblicate solo dopo la verifica.
+4. Se necessario abilita **Expert mode** e scegli le patch da applicare alla tua copia dell'APK.
 
-Per le versioni stabili lascia disattivato **Pre-release patches**; attivalo solo se vuoi provare versioni di sviluppo.
+## Compatibilita
 
-## Compatibilità e avvertenze
+Le patch sono legate alle versioni dell'app indicate. Possono causare errori, crash o comportamenti imprevisti. Conserva i dati originali; gli APK modificati possono avere una firma diversa da quella ufficiale. Il bundle non sostituisce eventuali verifiche remote di licenze o abbonamenti.
 
-- Le patch sono destinate alla versione specifica indicata; nuove versioni di Leghe FC possono richiedere modifiche.
-- Alcune modifiche sono sperimentali e possono causare errori o crash. Conserva un backup dei dati prima di sostituire l'app.
-- La firma dell'APK modificato può differire da quella dell'APK ufficiale.
-- Il bundle non sostituisce eventuali verifiche remote di licenze, acquisti o abbonamenti.
+## Struttura del progetto
+
+Il codice delle diverse app e separato per package sotto `patches/src/main/kotlin`. Si usa un solo build Gradle e una sola pipeline di release. Il link di questa sorgente resta invariato.
 
 ## Elenco automatico delle patch pubblicate
 
@@ -62,6 +64,6 @@ Lo sviluppo avviene su `dev`; le release stabili sono pubblicate dal ramo `main`
 
 Il repository deriva dal [template di Morphe](https://github.com/MorpheApp/morphe-patches-template). La modifica relativa alla sorgente d'installazione utilizza la [Morphe Patches Library](https://github.com/MorpheApp/morphe-patches-library) come dipendenza. Sono conservati i relativi termini e avvisi di licenza.
 
-**Progetto indipendente:** non affiliato né approvato dagli sviluppatori di Leghe Fantacalcio o dal progetto Morphe. Il nome Morphe indica esclusivamente la compatibilità tecnica.
+**Progetto indipendente:** non affiliato né approvato dagli sviluppatori delle applicazioni interessate o dal progetto Morphe. Il nome Morphe indica esclusivamente la compatibilità tecnica.
 
 Licenza: [GPLv3](LICENSE). Vedi anche [NOTICE](NOTICE).
