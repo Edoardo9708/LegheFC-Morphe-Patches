@@ -493,17 +493,32 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             //   c(): usa v1, v11  (non v7)
             //   h(): usa v1, v9   (non v5)
             // Non viene modificato lo stato x.
+            //
+            // ========== PUNTO DA INDIVIDUARE NELLO SMALI ==========
+            // Qui i due riferimenti sono contemporaneamente disponibili.
+            //   c(): lista ORIGINALE = v11; lista TEST = v7
+            //   h(): lista ORIGINALE = v9;  lista TEST = v5
+            // Subito dopo queste due istruzioni si trova la chiamata
+            // ORIGINALE a Lrs5.i, che assegna il valore al contenitore x.
+            // Il codice diagnostico NON modifica gli argomenti di Lrs5.i.
+            // ======================================================
             m.addInstructions(
                 index,
                 """
+                    # RIFERIMENTO ALLA LISTA DI PROVA (SOLO DIAGNOSTICA).
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
                     move-result-object v$temp
+                    # PUNTO DI CONFRONTO: originale e test ora coesistono.
+                    # c(): originale=v11, prova=v7
+                    # h(): originale=v9, prova=v5
+                    # L'istruzione seguente del DEX originale e' Lrs5.i.
+                    # NON viene alterata l'assegnazione a x.
                 """.trimIndent()
             )
 
-            // Dopo le 2 istruzioni aggiunte, la scrittura originale
-            // occupa index+2. Manteniamo la stampa delle liste originali
-            // e di test subito DOPO, nella posizione index+3.
+            // La scrittura originale Lrs5.i occupa index+2, subito dopo
+            // il blocco inserito. Questo e' il punto di assegnazione in x.
+            // Manteniamo la stampa delle liste subito DOPO (index+3).
             m.addInstructions(
                 index + 3,
                 "invoke-static {v$value}, Lz5;->$testName(Ljava/lang/Object;)V"
