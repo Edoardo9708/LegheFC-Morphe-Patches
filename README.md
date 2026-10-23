@@ -41,7 +41,7 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 ## Elenco patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.0.1-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.0.1-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -53,9 +53,9 @@ Se stai usando il ramo `dev`, attiva **Pre-release patches** per la sorgente e p
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Leghe FC - Diagnostica ingresso LXJX](#leghe-fc-diagnostica-ingresso-lxjx) | Sblocca formazione suggerita e comparatore |  |
-| [Leghe FC - Fix apertura app e nome 3 campo](#leghe-fc-fix-apertura-app-e-nome-3-campo) | Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo. |  |
-| [Leghe FC - Unlock percentages](#leghe-fc-unlock-percentages) | Imposta B a true per mostrare le percentuali e registra B in Logcat (LegheFC-B). |  |
+| [Leghe FC - Avvio e nome 3 campo](#leghe-fc-avvio-e-nome-3-campo) | Corregge l'avvio dell'app e la rinomina in 3 campo. |  |
+| [Leghe FC - Sblocca formazione suggerita e comparatore](#leghe-fc-sblocca-formazione-suggerita-e-comparatore) | Formazione suggerita e confronto fra giocatori. |  |
+| [Leghe FC - Sblocca percentuali](#leghe-fc-sblocca-percentuali) | Mostra le percentuali utili per scegliere chi schierare. |  |
 
 </details>
 

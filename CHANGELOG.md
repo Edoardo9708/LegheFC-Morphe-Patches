@@ -1,3 +1,9 @@
+## [1.0.1-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0...v1.0.1-dev.1) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* unify Italian patch titles and descriptions ([2c95280](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2c95280fd58ec11470a0a30184c7adf0931bd1b7))
+
 ## 1.0.0 (2026-10-23)
 
 ### 🐛 Bug Fixes
