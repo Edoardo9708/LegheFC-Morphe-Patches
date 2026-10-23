@@ -17,8 +17,8 @@ import org.w3c.dom.Element
  */
 @Suppress("unused")
 val legheFcLabLabelPatch = resourcePatch(
-    name = "Leghe FC - Fix apertura app e nome LAB",
-    description = "Risolve il controllo locale della sorgente di installazione e mostra il nome Leghe FC LAB.",
+    name = "Leghe FC - Fix apertura app e nome 3 campo",
+    description = "Risolve il controllo locale della sorgente di installazione e mostra il nome 3 campo.",
     default = false
 ) {
     compatibleWith(
@@ -40,7 +40,7 @@ val legheFcLabLabelPatch = resourcePatch(
             application.setAttributeNS(
                 "http://schemas.android.com/apk/res/android",
                 "android:label",
-                "Leghe FC LAB"
+                "3 campo"
             )
         }
     }
