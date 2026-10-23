@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.1.0-dev.1",
+  "version": "1.1.0-dev.2",
   "patches": [
     {
       "name": "Leghe FC - Avvio e nome 3 campo",
@@ -82,7 +82,7 @@
     },
     {
       "name": "Outdooractive - Test getter abbonamento",
-      "description": "Registra i valori originali e restituisce valori dimostrativi (Pro=true, livello=2).",
+      "description": "Unlock Pro",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -108,7 +108,7 @@
     },
     {
       "name": "Twilight - Test stato trial",
-      "description": "Forza false in isTrial() e registra il test in Logcat (sperimentale).",
+      "description": "Unlock Pro",
       "default": false,
       "category": null,
       "compatiblePackages": [

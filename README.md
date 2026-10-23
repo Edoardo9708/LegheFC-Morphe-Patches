@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.1.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.1.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
+> **[v1.1.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.1.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
 <summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -67,7 +67,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Outdooractive - Test getter abbonamento](#outdooractive-test-getter-abbonamento) | Registra i valori originali e restituisce valori dimostrativi (Pro=true, livello=2). |  |
+| [Outdooractive - Test getter abbonamento](#outdooractive-test-getter-abbonamento) | Unlock Pro |  |
 
 </details>
 
@@ -82,7 +82,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Twilight - Test stato trial](#twilight-test-stato-trial) | Forza false in isTrial() e registra il test in Logcat (sperimentale). |  |
+| [Twilight - Test stato trial](#twilight-test-stato-trial) | Unlock Pro |  |
 
 </details>
 

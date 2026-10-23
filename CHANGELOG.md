@@ -1,3 +1,10 @@
+## [1.1.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* set MembershipDiagnosticPatch.kt patch description to Unlock Pro ([927682c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/927682c02a782e0ab20aeb076d4f0cdf8d5647b1))
+* set TrialStatusExperimentPatch.kt patch description to Unlock Pro ([313ca9a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/313ca9a33119c69624e56dc66d583a5a6a59c0d0))
+
 ## [1.1.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.1-dev.2...v1.1.0-dev.1) (2026-10-23)
 
 ### 🐛 Bug Fixes
