@@ -1,3 +1,9 @@
+## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
+
+### 🐛 Bug Fixes
+
+* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
+
 ## [1.2.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.10...v1.2.0-dev.11) (2026-10-23)
 
 ### 🐛 Bug Fixes
