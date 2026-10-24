@@ -174,7 +174,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Se questo ID compare in Logcat, l'APK installato
                         # contiene la nostra nuova revisione diagnostica.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH CODE ID FX-20261024-R7 (entry + post-write logs)"
+                        const-string v12, "PATCH CODE ID FX-20261024-R8 (factory + reset tracing)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -211,7 +211,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r7]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r8]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
@@ -374,6 +374,12 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                 addInstructions(
                     0,
                     """
+                        # Se questo log manca, la coroutine ha saltato il nostro
+                        # blocco di creazione demo prima della scrittura.
+                        const-string v0, "Flowx-Entitlement"
+                        const-string v1, "FX-R8 demo factory CALLED"
+                        invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
                         # v8: nuova ArrayList di prova, completamente indipendente.
                         new-instance v8, Ljava/util/ArrayList;
                         invoke-direct {v8}, Ljava/util/ArrayList;-><init>()V
@@ -416,7 +422,19 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Inserisce v0 nella lista v8: List<Lxi1> a runtime.
                         invoke-virtual {v8, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
 
-                        # Restituisce la lista al chiamante, SENZA scriverla in x.
+                        # Registra la dimensione della lista che torna DAVVERO
+                        # al chiamante, non quella costruita dal logger di prova.
+                        invoke-virtual {v8}, Ljava/util/ArrayList;->size()I
+                        move-result v1
+                        invoke-static {v1}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                        move-result-object v1
+                        const-string v2, "FX-R8 demo factory RETURN size = "
+                        invoke-virtual {v2, v1}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v2
+                        const-string v1, "Flowx-Entitlement"
+                        invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+                        # Restituisce la lista al chiamante.
                         return-object v8
                     """.trimIndent()
                 )
@@ -502,6 +520,105 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
 
         addPathDiagnostic("c() server", "morpheLogCEntry", "morpheLogCXAfterWrite")
         addPathDiagnostic("h() cache", "morpheLogHEntry", "morpheLogHXAfterWrite")
+
+
+        // R8: il DEX originale contiene anche un reset di x nel metodo b().
+        // b() usa Lrs5.j(current, emptyList) cioe' compare-and-set, non i().
+        // Tracciamo x prima e dopo senza intervenire sull'operazione originale.
+        fun addResetStateLogger(name: String, stage: String) {
+            require(targetClass.methods.none { it.name == name }) {
+                "Flowx: helper R8 $name gia' presente"
+            }
+            targetClass.methods.add(
+                ImmutableMethod(
+                    target, name,
+                    listOf(ImmutableMethodParameter("Lrs5;", null, null)),
+                    "V",
+                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                    null, null, MutableMethodImplementation(5)
+                ).toMutable().apply {
+                    addInstructions(
+                        0,
+                        """
+                            # p0 = stesso contenitore x usato dalla CAS originale.
+                            invoke-virtual {p0}, Lrs5;->getValue()Ljava/lang/Object;
+                            move-result-object v0
+                            const-string v1, "Flowx-Entitlement"
+                            if-eqz v0, :null_state
+                            instance-of v2, v0, Ljava/util/List;
+                            if-eqz v2, :other_state
+                            check-cast v0, Ljava/util/List;
+                            invoke-interface {v0}, Ljava/util/List;->size()I
+                            move-result v2
+                            invoke-static {v2}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                            move-result-object v2
+                            const-string v3, "FX-R8 b() RESET $stage x size = "
+                            invoke-virtual {v3, v2}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v3
+                            goto :print_state
+
+                            :null_state
+                            const-string v3, "FX-R8 b() RESET $stage x = null"
+                            goto :print_state
+
+                            :other_state
+                            const-string v3, "FX-R8 b() RESET $stage x is not List"
+
+                            :print_state
+                            invoke-static {v1, v3}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            return-void
+                        """.trimIndent()
+                    )
+                }
+            )
+        }
+        addResetStateLogger("morpheLogBResetBefore", "BEFORE")
+        addResetStateLogger("morpheLogBResetAfter", "AFTER")
+
+        val resetMethod = Fingerprint(
+            definingClass = target,
+            name = "b",
+            returnType = "Ljava/lang/Object;",
+            parameters = listOf("Lq4;", "Lgn0;")
+        ).method
+        val resetInstructions = resetMethod.implementation?.instructions?.toList()
+            ?: error("Flowx: b() senza istruzioni")
+        // Distinzione precisa fra le tre j() chiamate di b():
+        // il reset di x e' quello preceduto da Lmh1.k (lista vuota).
+        val resetCandidates = resetInstructions.withIndex().filter { (idx, ins) ->
+            val ref = (ins as? ReferenceInstruction)?.reference as? MethodReference
+            val previous = resetInstructions.getOrNull(idx - 1)
+            val emptyListRef = (previous as? ReferenceInstruction)?.reference as? FieldReference
+            ins.opcode == Opcode.INVOKE_VIRTUAL &&
+                ref?.definingClass == "Lrs5;" && ref.name == "j" &&
+                ref.parameterTypes.toList() == listOf("Ljava/lang/Object;", "Ljava/lang/Object;") &&
+                ref.returnType == "Z" &&
+                previous?.opcode == Opcode.SGET_OBJECT &&
+                emptyListRef?.definingClass == "Lmh1;" && emptyListRef.name == "k"
+        }
+        require(resetCandidates.size == 1 && resetMethod.implementation?.registerCount == 10) {
+            "Flowx: impossibile localizzare in sicurezza il reset x in b()"
+        }
+        val (resetIndex, resetInstruction) = resetCandidates.single()
+        val resetRegisters = resetInstruction as? FiveRegisterInstruction
+            ?: error("Flowx: reset b() non usa invoke-virtual standard")
+        require(
+            resetRegisters.registerC == 8 &&
+            resetRegisters.registerD == 5 &&
+            resetRegisters.registerE == 9
+        ) {
+            "Flowx: registri della CAS x inattesi"
+        }
+        // Il log BEFORE precede j(), AFTER la segue. j() non e' seguito
+        // da move-result, quindi l'inserimento non spezza nessun accoppiamento.
+        resetMethod.addInstructions(
+            resetIndex,
+            "invoke-static {v8}, Lz5;->morpheLogBResetBefore(Lrs5;)V"
+        )
+        resetMethod.addInstructions(
+            resetIndex + 2,
+            "invoke-static {v8}, Lz5;->morpheLogBResetAfter(Lrs5;)V"
+        )
 
         fun instrumentXWrite(methodName: String, params: List<String>, expectedWrites: Int,
                               receiver: Int, value: Int, testName: String) {
