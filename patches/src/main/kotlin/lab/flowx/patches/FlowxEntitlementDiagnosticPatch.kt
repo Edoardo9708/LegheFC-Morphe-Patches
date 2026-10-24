@@ -174,7 +174,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Se questo ID compare in Logcat, l'APK installato
                         # contiene la nostra nuova revisione diagnostica.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH CODE ID FX-20261024-R6 (post dev.11)"
+                        const-string v12, "PATCH CODE ID FX-20261024-R7 (entry + post-write logs)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -211,7 +211,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r6]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r7]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
@@ -291,7 +291,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                             move-result v9
                             invoke-static {v9}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
                             move-result-object v9
-                            const-string v11, "$origin ORIGINAL size = "
+                            const-string v11, "$origin WRITE ARG size = "
                             invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                             move-result-object v11
                             invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
@@ -300,19 +300,19 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                             # implementa toString(), altrimenti la sua rappresentazione.
                             invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
                             move-result-object v9
-                            const-string v11, "$origin ORIGINAL elements = "
+                            const-string v11, "$origin WRITE ARG elements = "
                             invoke-virtual {v11, v9}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                             move-result-object v11
                             invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                             goto :make_test
 
                             :original_other
-                            const-string v11, "$origin ORIGINAL is not a List"
+                            const-string v11, "$origin WRITE ARG is not a List"
                             invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                             goto :make_test
 
                             :original_null
-                            const-string v11, "$origin ORIGINAL = null"
+                            const-string v11, "$origin WRITE ARG = null"
                             invoke-static {v10, v11}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                             :make_test
@@ -428,6 +428,81 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
         addIsolatedListTest(serverTest, "c() server")
         addIsolatedListTest(cacheTest, "h() cache")
 
+
+        // R7: tracciamento del percorso di caricamento e dello stato
+        // effettivo del contenitore x DOPO la scrittura originale.
+        // I helper usano solo registri propri, senza modificarne il valore.
+        fun addPathDiagnostic(origin: String, entryName: String, afterName: String) {
+            require(targetClass.methods.none { it.name == entryName || it.name == afterName }) {
+                "Flowx: helper R7 gia' presente"
+            }
+
+            targetClass.methods.add(
+                ImmutableMethod(
+                    target, entryName, emptyList(), "V",
+                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                    null, null, MutableMethodImplementation(2)
+                ).toMutable().apply {
+                    addInstructions(
+                        0,
+                        """
+                            const-string v0, "Flowx-Entitlement"
+                            const-string v1, "FX-R7 $origin ENTRY"
+                            invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            return-void
+                        """.trimIndent()
+                    )
+                }
+            )
+
+            targetClass.methods.add(
+                ImmutableMethod(
+                    target, afterName,
+                    listOf(ImmutableMethodParameter("Lrs5;", null, null)),
+                    "V",
+                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                    null, null, MutableMethodImplementation(5)
+                ).toMutable().apply {
+                    addInstructions(
+                        0,
+                        """
+                            # Legge davvero il contenuto di x dopo Lrs5.i().
+                            # p0 = contenitore Lrs5; v0..v3 locali.
+                            invoke-virtual {p0}, Lrs5;->getValue()Ljava/lang/Object;
+                            move-result-object v0
+                            const-string v1, "Flowx-Entitlement"
+                            if-eqz v0, :null_value
+                            instance-of v2, v0, Ljava/util/List;
+                            if-eqz v2, :other_value
+                            check-cast v0, Ljava/util/List;
+                            invoke-interface {v0}, Ljava/util/List;->size()I
+                            move-result v2
+                            invoke-static {v2}, Ljava/lang/String;->valueOf(I)Ljava/lang/String;
+                            move-result-object v2
+                            const-string v3, "FX-R7 $origin x AFTER write size = "
+                            invoke-virtual {v3, v2}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                            move-result-object v3
+                            goto :print_result
+
+                            :null_value
+                            const-string v3, "FX-R7 $origin x AFTER write = null"
+                            goto :print_result
+
+                            :other_value
+                            const-string v3, "FX-R7 $origin x AFTER write is not List"
+
+                            :print_result
+                            invoke-static {v1, v3}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            return-void
+                        """.trimIndent()
+                    )
+                }
+            )
+        }
+
+        addPathDiagnostic("c() server", "morpheLogCEntry", "morpheLogCXAfterWrite")
+        addPathDiagnostic("h() cache", "morpheLogHEntry", "morpheLogHXAfterWrite")
+
         fun instrumentXWrite(methodName: String, params: List<String>, expectedWrites: Int,
                               receiver: Int, value: Int, testName: String) {
             val m = Fingerprint(
@@ -517,9 +592,8 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
 
                     move-object v11, v7
 
-                    # Qui coesistono i due riferimenti (v11 originale, v7 prova).
-                    # Lrs5.i originale che segue riceve sempre v11.
-                    # Non modifichiamo lo stato x.
+                    # La prova sostituisce v11 PRIMA dell'invoke originale:
+                    # la scrittura Lrs5.i riceve la lista demo in v11.
                 """.trimIndent()
 
                 "h" -> """
@@ -531,9 +605,8 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
 
                     move-object v9, v5
 
-                    # Qui coesistono i due riferimenti (v9 originale, v5 prova).
-                    # Lrs5.i originale che segue riceve sempre v9.
-                    # Non modifichiamo lo stato x.
+                    # La prova sostituisce v9 PRIMA dell'invoke originale:
+                    # la scrittura Lrs5.i riceve la lista demo in v9.
                 """.trimIndent()
 
                 else -> error("Flowx: metodo $methodName non previsto")
@@ -542,22 +615,31 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             // Le istruzioni di prova precedono Lrs5.i, che rimane intatta.
             m.addInstructions(index, beforeWriteSmali)
 
-            // Due logger diversi per il contenuto originale, inseriti
-            // immediatamente DOPO la Lrs5.i originale (index+2).
+            // Le 3 istruzioni aggiunte prima della scrittura spostano
+            // l'invoke Lrs5.i originale all'indice index+3.
+            // Il logger va a index+4, DOPO l'invoke, non a index+3.
+            // Oltre all'argomento passato alla scrittura leggiamo x via getValue().
             val afterWriteSmali = when (methodName) {
                 "c" -> """
-                    # c() - diagnostica della risposta del server.
+                    # c() - dopo la scrittura originale in x.
                     invoke-static {v11}, Lz5;->morpheIsolatedServerList(Ljava/lang/Object;)V
+                    invoke-static {v1}, Lz5;->morpheLogCXAfterWrite(Lrs5;)V
                 """.trimIndent()
 
                 "h" -> """
-                    # h() - diagnostica della lista recuperata dalla cache.
+                    # h() - dopo la scrittura originale in x.
                     invoke-static {v9}, Lz5;->morpheIsolatedCacheList(Ljava/lang/Object;)V
+                    invoke-static {v1}, Lz5;->morpheLogHXAfterWrite(Lrs5;)V
                 """.trimIndent()
 
                 else -> error("Flowx: metodo $methodName non previsto")
             }
-            m.addInstructions(index + 3, afterWriteSmali)
+            m.addInstructions(index + 4, afterWriteSmali)
+
+            // Inserito per ultimo a indice 0: non altera gli indici
+            // verificati per la chiamata Lrs5.i.
+            val entryName = if (methodName == "c") "morpheLogCEntry" else "morpheLogHEntry"
+            m.addInstructions(0, "invoke-static {}, Lz5;->$entryName()V")
 
         }
 
