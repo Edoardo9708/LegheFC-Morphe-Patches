@@ -34,10 +34,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Repair the dev.12 release accidentally uploaded by gh CLI with
-      # audio/x-musepack instead of Morphe's patch-bundle media type.
-      # Idempotent: a correctly typed asset is never replaced.
-      - name: Repair dev.12 published asset metadata
+      # One-time recovery of dev.12: the previous fallback uploaded a
+      # pre-publication archive which lacked the Dex payload in patches.jar.
+      # Restore the same final bundle that Gradle publish would normally create.
+      - name: Rebuild corrupted dev.12 asset
         if: github.ref == 'refs/heads/dev'
         shell: bash
         env:
@@ -45,29 +45,48 @@ jobs:
         run: |
           set -euo pipefail
           tag="v1.2.0-dev.12"
-          asset="patches-1.2.0-dev.12.mpp"
+          bundle="patches/build/libs/patches-1.2.0-dev.12.mpp"
+          # The branch contains the same patch sources as the dev.12 tag.
+          ./gradlew publish -q
+          test -s "$bundle" || { echo "::error::No final bundle found"; exit 1; }
+          python3 - "$bundle" <<'PY'
+          import io
+          import sys
+          import zipfile
+
+          bundle = sys.argv[1]
+          found = []
+          with zipfile.ZipFile(bundle) as archive:
+              for entry in archive.namelist():
+                  if entry.endswith(".dex"):
+                      found.append(entry)
+                  elif entry.endswith(".jar"):
+                      try:
+                          with zipfile.ZipFile(io.BytesIO(archive.read(entry))) as nested:
+                              for name in nested.namelist():
+                                  if name.endswith(".dex"):
+                                      found.append(f"{entry}!/{name}")
+                      except zipfile.BadZipFile:
+                          pass
+          if not found:
+              raise SystemExit(f"INVALID Morphe bundle: no DEX files in {bundle}")
+          print(f"Validated {bundle}: DEX files found: {found}")
+          PY
+
           release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
-          existing_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq ".[] | select(.name == \"$asset\") | .id")
-          test -n "$existing_id" || { echo "::error::Expected dev.12 asset missing"; exit 1; }
-          mime=$(gh api "repos/$GITHUB_REPOSITORY/releases/assets/$existing_id" --jq '.content_type')
-          if [[ "$mime" == "application/dash-patch+xml" ]]; then
-            echo "Existing bundle already has the expected Morphe media type."
-            exit 0
-          fi
-          dir=$(mktemp -d)
-          gh release download "$tag" --pattern "$asset" --dir "$dir"
-          test -s "$dir/$asset"
-          unzip -tq "$dir/$asset" >/dev/null
+          old_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[] | select(.name == "patches-1.2.0-dev.12.mpp") | .id')
+          test -n "$old_id" || { echo "::error::Broken dev.12 asset not found"; exit 1; }
           gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" -f target_commitish=dev >/dev/null
-          gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$existing_id"
-          upload_url="https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=$asset"
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$old_id"
           curl --fail-with-body --silent --show-error --retry 3 \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "Content-Type: application/dash-patch+xml" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            --data-binary "@$dir/$asset" "$upload_url" | jq -e '.state == "uploaded" and .content_type == "application/dash-patch+xml" and (.size > 0)'
-          echo "Repaired $tag patch bundle media type."
+            --data-binary "@$bundle" \
+            "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=patches-1.2.0-dev.12.mpp" \
+            | jq -e '.state == "uploaded" and .content_type == "application/dash-patch+xml" and (.size > 0)'
+          echo "Restored dev.12 with a complete DEX-bearing bundle."
 
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
@@ -81,7 +100,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # GitHub may reject refs/notes (missing necessary objects) AFTER
-      # the release commit/tag and Gradle .mpp have already been prepared.
+      # the release commit/tag but BEFORE Gradle publish creates the final .mpp.
       # Recover only on dev, only with the expected, nonempty bundle,
       # and only when the tag was actually pushed by semantic-release.
       - name: Recover prepared dev release
@@ -96,12 +115,37 @@ jobs:
           [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$ ]] || { echo "::error::Invalid prepared dev version: $version"; exit 1; }
           tag="v$version"
           bundle="patches/build/libs/patches-$version.mpp"
-          test -s "$bundle" || { echo "::error::No compiled bundle for $tag"; exit 1; }
+          # The bundle is built in the publish phase below, not in prepare.
           git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null || { echo "::error::Release tag $tag was not pushed"; exit 1; }
-          # Publish with the same release metadata and MIME type as
-          # @semantic-release/github. gh release upload otherwise guesses
-          # audio/x-musepack for .mpp and Morphe cannot recognize it.
-          unzip -tq "$bundle" >/dev/null
+          # Normal semantic-release calls Gradle publish AFTER prepare.
+          # This is essential: the mpp from prepare lacks Dex payloads.
+          ./gradlew publish -q
+          test -s "$bundle" || { echo "::error::Final published bundle is missing"; exit 1; }
+          python3 - "$bundle" <<'PY'
+          import io
+          import sys
+          import zipfile
+
+          bundle = sys.argv[1]
+          found = []
+          with zipfile.ZipFile(bundle) as archive:
+              for entry in archive.namelist():
+                  if entry.endswith(".dex"):
+                      found.append(entry)
+                  elif entry.endswith(".jar"):
+                      try:
+                          with zipfile.ZipFile(io.BytesIO(archive.read(entry))) as nested:
+                              for name in nested.namelist():
+                                  if name.endswith(".dex"):
+                                      found.append(f"{entry}!/{name}")
+                      except zipfile.BadZipFile:
+                          pass
+          if not found:
+              raise SystemExit(f"INVALID Morphe bundle: no DEX files in {bundle}")
+          print(f"Validated {bundle}: DEX files found: {found}")
+          PY
+
+          # Upload with Morphe's media type, not gh CLI's guessed Musepack type.
           if ! gh release view "$tag" >/dev/null 2>&1; then
             gh release create "$tag" --verify-tag --target dev --prerelease \
               --title "$tag" \
