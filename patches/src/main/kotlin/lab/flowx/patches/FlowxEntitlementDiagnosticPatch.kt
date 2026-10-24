@@ -169,10 +169,12 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
 
                         # Questo identificativo viene stampato ogni volta che
                         # k() esegue il test; e' indipendente dal ciclo originale.
-                        # Identifica la revisione del test e il bundle che la introduce.
-                        # Per le release successive, la revisione resta r5.
+                        # MARCATORE DI REVISIONE DEL CODICE DELLA PATCH:
+                        # non e' il numero di versione del bundle .mpp.
+                        # Se questo ID compare in Logcat, l'APK installato
+                        # contiene la nostra nuova revisione diagnostica.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH DIAG r5 (introduced in v1.2.0-dev.7)"
+                        const-string v12, "PATCH CODE ID FX-20261024-R6 (post dev.11)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -209,7 +211,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Tag uguale al test precedente per filtrare con Logcat.
                         const-string v0, "Flowx-Entitlement"
                         # Se questa riga appare, k() ha raggiunto la chiamata reale a B().
-                        const-string v1, "ORIGINAL B() called [FlowxDiag r5]"
+                        const-string v1, "ORIGINAL B() called [FlowxDiag r6]"
                         invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                         return-void
                     """.trimIndent()
