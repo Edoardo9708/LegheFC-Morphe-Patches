@@ -39,20 +39,57 @@ jobs:
       - name: Release
         uses: cycjimmy/semantic-release-action@v6
         id: release
+        # On dev only, a guarded recovery below can publish a successfully
+        # built bundle if semantic-release fails on git-notes synchronization.
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # GitHub may reject refs/notes (missing necessary objects) AFTER
+      # the release commit/tag and Gradle .mpp have already been prepared.
+      # Recover only on dev, only with the expected, nonempty bundle,
+      # and only when the tag was actually pushed by semantic-release.
+      - name: Recover prepared dev release
+        id: recover
+        if: steps.release.outcome == 'failure' && github.ref == 'refs/heads/dev'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version=$(sed -nE 's/^version[[:space:]]*=[[:space:]]*([^[:space:]]+).*$/\1/p' gradle.properties | head -n 1)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$ ]] || { echo "::error::Invalid prepared dev version: $version"; exit 1; }
+          tag="v$version"
+          bundle="patches/build/libs/patches-$version.mpp"
+          test -s "$bundle" || { echo "::error::No compiled bundle for $tag"; exit 1; }
+          git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null || { echo "::error::Release tag $tag was not pushed"; exit 1; }
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$bundle" --clobber
+          else
+            gh release create "$tag" "$bundle" --verify-tag --prerelease \
+              --title "$tag" \
+              --notes "Recovered publication of the prepared $tag bundle after semantic-release failed to push Git notes."
+          fi
+          echo "published=true" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Fail if release could not be published
+        if: steps.release.outcome == 'failure' && steps.recover.outputs.published != 'true'
+        run: |
+          echo "::error::Release failed and no verified bundle was published."
+          exit 1
+
       - name: Attest
-        if: steps.release.outputs.new_release_published == 'true'
+        if: steps.release.outputs.new_release_published == 'true' || steps.recover.outputs.published == 'true'
         uses: actions/attest-build-provenance@v4
         with:
-          subject-name: 'Morphe Patches ${{ steps.release.outputs.new_release_git_tag }}'
+          subject-name: 'Morphe Patches ${{ steps.release.outputs.new_release_git_tag || steps.recover.outputs.tag }}'
           subject-path: patches/build/libs/patches-*.mpp
 
-      # Always verify compilation when semantic-release did not publish a release.
-      # This covers non-main/dev branches, chore commits, docs commits, etc.
+      # Verify compilation on non-release commits; recovery already
+      # requires an existing compiled bundle.
       - name: Verify project compiles
-        if: steps.release.outputs.new_release_published != 'true'
+        if: steps.release.outputs.new_release_published != 'true' && steps.recover.outputs.published != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :patches:buildAndroid clean --no-daemon
