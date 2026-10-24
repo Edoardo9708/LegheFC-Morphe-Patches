@@ -3,6 +3,14 @@
 ### 🐛 Bug Fixes
 
 * **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
+* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
+* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
+
+## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
+
+### 🐛 Bug Fixes
+
+* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
 * **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
 
 ## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
