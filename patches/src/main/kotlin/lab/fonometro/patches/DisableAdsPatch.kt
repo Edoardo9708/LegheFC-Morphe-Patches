@@ -86,7 +86,7 @@ val fonometroDisableAdsPatch = bytecodePatch(
         )
         val showInterstitial = checkedMethod(
             adClass, "o", listOf("Landroid/app/Activity;", "I"), 7,
-            "Lc5/v;->f", "Lc5/a\$e;->E"
+            "Lc5/v;->f", "Lc5/a${'->E"
         )
         val callbackFieldPresent = showInterstitial.implementation!!.instructions.any {
             val ref = (it as? ReferenceInstruction)?.reference as? FieldReference
@@ -134,6 +134,120 @@ val fonometroDisableAdsPatch = bytecodePatch(
             """
                 iget-object v0, p0, Lc5/a;->d:Lc5/a\$e;
                 invoke-interface {v0, p2}, Lc5/a\$e;->E(I)V
+                return-void
+            """.trimIndent()
+        )
+    }
+}
+}e;->E"
+        )
+        val callbackFieldPresent = showInterstitial.implementation!!.instructions.any {
+            val ref = (it as? ReferenceInstruction)?.reference as? FieldReference
+            ref?.definingClass == adClass && ref.name == "d" &&
+                ref.type == "Lc5/a${'"
+        }
+        require(callbackFieldPresent) {
+            "Fonometro: callback interstitial non trovata"
+        }
+
+        // Replica il percorso originale che nasconde il banner e sgancia
+        // gli oggetti pubblicitari; mantiene il riadattamento della UI.
+        main.addInstructions(
+            0,
+            """
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/MainActivity;->n1()V
+                iget-object v0, p0, Lcom/ktwapps/soundmeter/MainActivity;->M:Lc5/a;
+                const/4 v1, 0x0
+                invoke-virtual {v0, v1}, Lc5/a;->i(Lz2/i;)V
+                iget-object v0, p0, Lcom/ktwapps/soundmeter/MainActivity;->M:Lc5/a;
+                invoke-virtual {v0, v1}, Lc5/a;->j(LM2/a;)V
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/MainActivity;->j1()V
+                return-void
+            """.trimIndent()
+        )
+
+        // Z0() e' il percorso originale che rimuove il banner dai dettagli.
+        detail.addInstructions(
+            0,
+            """
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/Detail;->Z0()V
+                return-void
+            """.trimIndent()
+        )
+
+        // Nessun caricamento in background degli annunci dai due ingressi.
+        loadDetailAd.addInstructions(0, "return-void")
+        loadMainAd.addInstructions(0, "return-void")
+
+        // Non fare un semplice return: E(int) e' la callback applicativa
+        // usata dal percorso originale quando non esiste un annuncio da mostrare.
+        // p0 = gestore annunci; p2 = argomento originale per il chiamante.
+        showInterstitial.addInstructions(
+            0,
+            """
+                iget-object v0, p0, Lc5/a;->d:Lc5/a\$e;
+                invoke-interface {v0, p2}, Lc5/a\$e;->E(I)V
+                return-void
+            """.trimIndent()
+        )
+    }
+}
+}e;"
+        }
+        require(callbackFieldPresent) {
+            "Fonometro: callback interstitial non trovata"
+        }
+
+        // Replica il percorso originale che nasconde il banner e sgancia
+        // gli oggetti pubblicitari; mantiene il riadattamento della UI.
+        main.addInstructions(
+            0,
+            """
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/MainActivity;->n1()V
+                iget-object v0, p0, Lcom/ktwapps/soundmeter/MainActivity;->M:Lc5/a;
+                const/4 v1, 0x0
+                invoke-virtual {v0, v1}, Lc5/a;->i(Lz2/i;)V
+                iget-object v0, p0, Lcom/ktwapps/soundmeter/MainActivity;->M:Lc5/a;
+                invoke-virtual {v0, v1}, Lc5/a;->j(LM2/a;)V
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/MainActivity;->j1()V
+                return-void
+            """.trimIndent()
+        )
+
+        // Z0() e' il percorso originale che rimuove il banner dai dettagli.
+        detail.addInstructions(
+            0,
+            """
+                invoke-direct {p0}, Lcom/ktwapps/soundmeter/Detail;->Z0()V
+                return-void
+            """.trimIndent()
+        )
+
+        // Nessun caricamento in background degli annunci dai due ingressi.
+        loadDetailAd.addInstructions(0, "return-void")
+        loadMainAd.addInstructions(0, "return-void")
+
+        // Non fare un semplice return: E(int) e' la callback applicativa
+        // usata dal percorso originale quando non esiste un annuncio da mostrare.
+        // p0 = gestore annunci; p2 = argomento originale per il chiamante.
+        showInterstitial.addInstructions(
+            0,
+            """
+                iget-object v0, p0, Lc5/a;->d:Lc5/a${'
+                invoke-interface {v0, p2}, Lc5/a\$e;->E(I)V
+                return-void
+            """.trimIndent()
+        )
+    }
+}
+}e;
+                invoke-interface {v0, p2}, Lc5/a${'->E(I)V
+                return-void
+            """.trimIndent()
+        )
+    }
+}
+}e;->E(I)V
                 return-void
             """.trimIndent()
         )
