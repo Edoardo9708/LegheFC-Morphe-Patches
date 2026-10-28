@@ -107,7 +107,7 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
                         invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
                         move-result-object v0
                         const-string v1, "Spotify-Prev"
-                        const-string v2, "REASONS prev = "
+                        const-string v2, "PATCH CODE ID SP-PREV-DIAG-R3 | REASONS prev = "
                         invoke-virtual {v2, v0}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v2
                         invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
