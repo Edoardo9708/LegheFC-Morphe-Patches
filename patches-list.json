@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.4.0-dev.1",
+  "version": "1.4.0-dev.2",
   "patches": [
     {
       "name": "Flowx - Test stato Gold locale",
@@ -29,8 +29,8 @@
       "options": []
     },
     {
-      "name": "Fonometro - Disabilita pubblicita",
-      "description": "Disabilita banner e annunci a schermo intero senza modificare lo stato Premium o gli acquisti.",
+      "name": "Fonometro - Remove ads",
+      "description": "Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases.",
       "default": false,
       "category": null,
       "compatiblePackages": [

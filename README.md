@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.4.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.4.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;7 patches total
+> **[v1.4.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.4.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;7 patches total
 <details open>
 <summary>📦 Flowx&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -65,7 +65,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Fonometro - Disabilita pubblicita](#fonometro-disabilita-pubblicita) | Disabilita banner e annunci a schermo intero senza modificare lo stato Premium o gli acquisti. |  |
+| [Fonometro - Remove ads](#fonometro-remove-ads) | Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases. |  |
 
 </details>
 

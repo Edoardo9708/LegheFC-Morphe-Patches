@@ -1,3 +1,9 @@
+## [1.4.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **fonometro:** use English ad removal patch metadata ([997ea57](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/997ea57bf7f3dfb5784faca0427fd80729ce8f2b))
+
 ## [1.4.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.3.0...v1.4.0-dev.1) (2026-10-28)
 
 ### 🐛 Bug Fixes
