@@ -169,5 +169,98 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
             0,
             "invoke-static {}, ${commandBuilderClass}->morpheLogPrevCommand()V"
         )
+
+        // Traccia i due ingressi concreti onSkipToPrevious() presenti
+        // nell'APK: entrambi sono callback senza parametri e con ritorno void.
+        // Il logger risiede in un helper con registri propri: nessun
+        // valore o flusso originale viene alterato.
+        for ((callbackClass, marker) in listOf(
+            "Lp/zpf0;" to "ANDROID_CALLBACK zpf0.onSkipToPrevious",
+            "Lp/gsf0;" to "ANDROID_CALLBACK gsf0.onSkipToPrevious"
+        )) {
+            val callback = Fingerprint(
+                definingClass = callbackClass,
+                name = "onSkipToPrevious",
+                returnType = "V",
+                parameters = emptyList()
+            ).method
+            val body = callback.implementation
+                ?: error("Spotify Prev: missing Android media callback")
+            require(body.instructions.isNotEmpty() && body.registerCount >= 1) {
+                "Spotify Prev: unexpected Android media callback"
+            }
+            val cls = mutableClassDefBy(callbackClass)
+            val logger = "morpheLogSkipToPrevious"
+            require(cls.methods.none { it.name == logger }) {
+                "Spotify Prev: callback logger already present"
+            }
+            cls.methods.add(
+                ImmutableMethod(
+                    callbackClass, logger, emptyList(), "V",
+                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                    null, null, MutableMethodImplementation(2)
+                ).toMutable().apply {
+                    addInstructions(
+                        0,
+                        """
+                            const-string v0, "Spotify-Prev"
+                            const-string v1, "$marker"
+                            invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                            return-void
+                        """.trimIndent()
+                    )
+                }
+            )
+            callback.addInstructions(
+                0, "invoke-static {}, ${callbackClass}->${logger}()V"
+            )
+        }
+
+        // Registra il nome dell'azione che arriva allo smistatore
+        // Rx del player. Il parametro p1 e' la String originale
+        // dell'azione; il helper non la modifica.
+        val dispatcherClass = "Lp/hz3;"
+        val dispatcher = Fingerprint(
+            definingClass = dispatcherClass,
+            name = "o",
+            returnType = "Lio/reactivex/rxjava3/core/Completable;",
+            parameters = listOf("Ljava/lang/String;", "Landroid/os/Bundle;", "Lp/ihz;")
+        ).method
+        val dispatcherBody = dispatcher.implementation
+            ?: error("Spotify Prev: player dispatcher missing")
+        require(dispatcherBody.registerCount == 27 && dispatcherBody.instructions.size > 100) {
+            "Spotify Prev: unexpected player dispatcher implementation"
+        }
+        val dispatcherDef = mutableClassDefBy(dispatcherClass)
+        require(dispatcherDef.methods.none { it.name == "morpheLogPlayerDispatch" }) {
+            "Spotify Prev: player dispatch logger already present"
+        }
+        dispatcherDef.methods.add(
+            ImmutableMethod(
+                dispatcherClass,
+                "morpheLogPlayerDispatch",
+                listOf(ImmutableMethodParameter("Ljava/lang/String;", null, null)),
+                "V",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null, null, MutableMethodImplementation(3)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        const-string v0, "Spotify-Prev"
+                        const-string v1, "PLAYER_DISPATCH action="
+                        invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+                        move-result-object v2
+                        invoke-virtual {v1, v2}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+                        move-result-object v1
+                        invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                        return-void
+                    """.trimIndent()
+                )
+            }
+        )
+        dispatcher.addInstructions(
+            0, "invoke-static {p1}, Lp/hz3;->morpheLogPlayerDispatch(Ljava/lang/String;)V"
+        )
     }
 }
