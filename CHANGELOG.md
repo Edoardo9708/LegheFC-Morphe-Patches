@@ -1,3 +1,16 @@
+## [1.5.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.4.0...v1.5.0-dev.1) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **fonometro:** correct Kotlin escaping for nested ad callback class ([7493a4b](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7493a4b9258a5cb3c447a66306433d7c42fd9cc5))
+* **fonometro:** escape nested DEX class name in Smali injection ([cb3cddd](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/cb3cddd50d99a06b9a0f709e87af311e2fdc05f0))
+* **fonometro:** use English ad removal patch metadata ([997ea57](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/997ea57bf7f3dfb5784faca0427fd80729ce8f2b))
+
+### ✨ New Features
+
+* **fonometro:** add ads-only patch for version 11.5 ([2b6f67d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2b6f67d98895c7af2b7863434b4342679a625c69))
+* **spotify:** add ADB logcat previous-button diagnostic patch ([1d3e975](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1d3e975ca86546df113f51e52f1284d95c0641c8))
+
 ## [1.4.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2026-10-28)
 
 ### 🐛 Bug Fixes
