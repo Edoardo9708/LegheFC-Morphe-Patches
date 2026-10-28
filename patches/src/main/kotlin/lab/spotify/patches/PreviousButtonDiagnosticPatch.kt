@@ -12,7 +12,6 @@ import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
-import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
@@ -108,7 +107,7 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
                         invoke-static {p0}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
                         move-result-object v0
                         const-string v1, "Spotify-Prev"
-                        const-string v2, "PATCH CODE ID SP-PREV-DIAG-R4 | REASONS prev = "
+                        const-string v2, "PATCH CODE ID SP-PREV-DIAG-R3 | REASONS prev = "
                         invoke-virtual {v2, v0}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v2
                         invoke-static {v1, v2}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
@@ -263,78 +262,5 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
         dispatcher.addInstructions(
             0, "invoke-static/range {p1 .. p1}, Lp/hz3;->morpheLogPlayerDispatch(Ljava/lang/String;)V"
         )
-        // Traccia due punti reali dell'evento dell'interfaccia "SkipPreviousTapped".
-        // DEX originale classes11.dex:
-        // - ceh1.L: emissione dell'evento singleton lzh1.a
-        // - uru.B: confronto/gestione del medesimo evento
-        // Il log viene inserito sul riferimento al campo, senza cambiare
-        // registri, stato del player, lista delle restrizioni o flusso originale.
-        for (entry in listOf(
-            listOf(
-                "Lp/ceh1;", "L", "Ljava/lang/Object;",
-                "Ljava/lang/Object;,Ljava/lang/Object;,Ljava/lang/Object;,Ljava/lang/Object;",
-                "37", "EVENT SkipPreviousTapped emitted"
-            ),
-            listOf(
-                "Lp/uru;", "B", "Lcom/spotify/mobius/Next;",
-                "Lp/qsm0;,Lp/mzh1;",
-                "23", "EVENT SkipPreviousTapped handled"
-            )
-        )) {
-            val eventClass = entry[0]
-            val methodName = entry[1]
-            val returnType = entry[2]
-            val parameters = entry[3]
-            val registerCount = entry[4]
-            val marker = entry[5]
-            val eventMethod = Fingerprint(
-                definingClass = eventClass,
-                name = methodName,
-                returnType = returnType,
-                parameters = parameters.split(",")
-            ).method
-            val eventBody = eventMethod.implementation
-                ?: error("Spotify Prev: missing tapped-event method")
-            require(eventBody.registerCount == registerCount.toInt()) {
-                "Spotify Prev: unexpected tapped-event method registers"
-            }
-            val matches = eventBody.instructions.withIndex().filter { (_, instruction) ->
-                val ref = (instruction as? ReferenceInstruction)?.reference as? FieldReference
-                instruction.opcode == Opcode.SGET_OBJECT &&
-                    ref?.definingClass == "Lp/lzh1;" &&
-                    ref.name == "a" &&
-                    ref.type == "Lp/lzh1;"
-            }
-            require(matches.size == 1) {
-                "Spotify Prev: tapped-event singleton field lookup not unique"
-            }
-            val cls = mutableClassDefBy(eventClass)
-            val loggerName = "morpheLogPreviousTappedEvent"
-            require(cls.methods.none { it.name == loggerName }) {
-                "Spotify Prev: tapped-event logger already exists"
-            }
-            cls.methods.add(
-                ImmutableMethod(
-                    eventClass, loggerName, emptyList(), "V",
-                    AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
-                    null, null, MutableMethodImplementation(2)
-                ).toMutable().apply {
-                    addInstructions(
-                        0,
-                        """
-                            const-string v0, "Spotify-Prev"
-                            const-string v1, "$marker | SP-PREV-DIAG-R4"
-                            invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
-                            return-void
-                        """.trimIndent()
-                    )
-                }
-            )
-            eventMethod.addInstructions(
-                matches.single().index,
-                "invoke-static {}, ${eventClass}->${loggerName}()V"
-            )
-        }
-
     }
 }
