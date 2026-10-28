@@ -34,132 +34,25 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Repair the missing semantic-release channel note for the already
-      # published dev.12 tag. Without it, semantic-release chooses dev.11
-      # and fails attempting to re-create the existing dev.12 tag.
-      # This changes no patch sources and leaves existing releases untouched.
-      - name: Restore missing dev.12 release note
-        if: github.ref == 'refs/heads/dev'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          note_ref="refs/notes/semantic-release-v1.2.0-dev.12"
-          if ! gh api "repos/$GITHUB_REPOSITORY/git/ref/notes/semantic-release-v1.2.0-dev.12" >/dev/null 2>&1; then
-            tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v1.2.0-dev.12" --jq '.object.sha')
-            blob_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/blobs" \
-              -f content='{"channels":["dev"]}' -f encoding=utf-8 --jq '.sha')
-            jq -cn --arg path "$tag_sha" --arg sha "$blob_sha" \
-              '{tree: [{path: $path, mode: "100644", type: "blob", sha: $sha}]}' > /tmp/morphe-dev12-note-tree.json
-            tree_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/trees" \
-              --input /tmp/morphe-dev12-note-tree.json --jq '.sha')
-            commit_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/commits" \
-              -f message="Notes added by semantic-release" -f tree="$tree_sha" --jq '.sha')
-            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
-              -f ref="$note_ref" -f sha="$commit_sha" >/dev/null
-            echo "Restored missing dev.12 channel note."
-          fi
-          git fetch origin "$note_ref:$note_ref"
-          git notes --ref=semantic-release-v1.2.0-dev.12 show 'v1.2.0-dev.12^{commit}'
-
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
       - name: Release
         uses: cycjimmy/semantic-release-action@v6
         id: release
-        # On dev only, a guarded recovery below can publish a successfully
-        # built bundle if semantic-release fails on git-notes synchronization.
-        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # GitHub may reject refs/notes (missing necessary objects) AFTER
-      # the release commit/tag but BEFORE Gradle publish creates the final .mpp.
-      # Recover only on dev, only with the expected, nonempty bundle,
-      # and only when the tag was actually pushed by semantic-release.
-      - name: Recover prepared dev release
-        id: recover
-        if: steps.release.outcome == 'failure' && github.ref == 'refs/heads/dev'
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          version=$(sed -nE 's/^version[[:space:]]*=[[:space:]]*([^[:space:]]+).*$/\1/p' gradle.properties | head -n 1)
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-dev\.[0-9]+$ ]] || { echo "::error::Invalid prepared dev version: $version"; exit 1; }
-          tag="v$version"
-          bundle="patches/build/libs/patches-$version.mpp"
-          # The bundle is built in the publish phase below, not in prepare.
-          git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null || { echo "::error::Release tag $tag was not pushed"; exit 1; }
-          # Normal semantic-release calls Gradle publish AFTER prepare.
-          # This is essential: the mpp from prepare lacks Dex payloads.
-          ./gradlew publish -q
-          test -s "$bundle" || { echo "::error::Final published bundle is missing"; exit 1; }
-          python3 - "$bundle" <<'PY'
-          import io
-          import sys
-          import zipfile
-
-          bundle = sys.argv[1]
-          found = []
-          with zipfile.ZipFile(bundle) as archive:
-              for entry in archive.namelist():
-                  if entry.endswith(".dex"):
-                      found.append(entry)
-                  elif entry.endswith(".jar"):
-                      try:
-                          with zipfile.ZipFile(io.BytesIO(archive.read(entry))) as nested:
-                              for name in nested.namelist():
-                                  if name.endswith(".dex"):
-                                      found.append(f"{entry}!/{name}")
-                      except zipfile.BadZipFile:
-                          pass
-          if not found:
-              raise SystemExit(f"INVALID Morphe bundle: no DEX files in {bundle}")
-          print(f"Validated {bundle}: DEX files found: {found}")
-          PY
-
-          # Upload with Morphe's media type, not gh CLI's guessed Musepack type.
-          if ! gh release view "$tag" >/dev/null 2>&1; then
-            gh release create "$tag" --verify-tag --target dev --prerelease \
-              --title "$tag" \
-              --notes "Recovered publication of the prepared $tag bundle after semantic-release failed to push Git notes."
-          fi
-          release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
-          old_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq ".[] | select(.name == \"patches-$version.mpp\") | .id")
-          if [[ -n "$old_id" ]]; then
-            gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$old_id"
-          fi
-          curl --fail-with-body --silent --show-error --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/dash-patch+xml" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            --data-binary "@$bundle" \
-            "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=patches-$version.mpp" \
-            | jq -e '.state == "uploaded" and .content_type == "application/dash-patch+xml" and (.size > 0)'
-          echo "published=true" >> "$GITHUB_OUTPUT"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-
-      - name: Fail if release could not be published
-        if: steps.release.outcome == 'failure' && steps.recover.outputs.published != 'true'
-        run: |
-          echo "::error::Release failed and no verified bundle was published."
-          exit 1
 
       - name: Attest
-        if: steps.release.outputs.new_release_published == 'true' || steps.recover.outputs.published == 'true'
+        if: steps.release.outputs.new_release_published == 'true'
         uses: actions/attest-build-provenance@v4
         with:
-          subject-name: 'Morphe Patches ${{ steps.release.outputs.new_release_git_tag || steps.recover.outputs.tag }}'
+          subject-name: 'Morphe Patches ${{ steps.release.outputs.new_release_git_tag }}'
           subject-path: patches/build/libs/patches-*.mpp
 
-      # Verify compilation on non-release commits; recovery already
-      # requires an existing compiled bundle.
+      # Always verify compilation when semantic-release did not publish a release.
+      # This covers non-main/dev branches, chore commits, docs commits, etc.
       - name: Verify project compiles
-        if: steps.release.outputs.new_release_published != 'true' && steps.recover.outputs.published != 'true'
+        if: steps.release.outputs.new_release_published != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :patches:buildAndroid clean --no-daemon
