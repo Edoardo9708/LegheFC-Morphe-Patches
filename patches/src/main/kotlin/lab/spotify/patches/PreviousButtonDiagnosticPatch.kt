@@ -269,7 +269,7 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
         // - uru.B: confronto/gestione del medesimo evento
         // Il log viene inserito sul riferimento al campo, senza cambiare
         // registri, stato del player, lista delle restrizioni o flusso originale.
-        for ((eventClass, methodName, returnType, parameters, registerCount, marker) in listOf(
+        for (entry in listOf(
             listOf(
                 "Lp/ceh1;", "L", "Ljava/lang/Object;",
                 "Ljava/lang/Object;,Ljava/lang/Object;,Ljava/lang/Object;,Ljava/lang/Object;",
@@ -281,6 +281,12 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
                 "23", "EVENT SkipPreviousTapped handled"
             )
         )) {
+            val eventClass = entry[0]
+            val methodName = entry[1]
+            val returnType = entry[2]
+            val parameters = entry[3]
+            val registerCount = entry[4]
+            val marker = entry[5]
             val eventMethod = Fingerprint(
                 definingClass = eventClass,
                 name = methodName,
