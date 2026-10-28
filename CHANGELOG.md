@@ -1,3 +1,9 @@
+## [1.3.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.3.0-dev.1...v1.3.0-dev.2) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **flowx:** clarify local Gold test metadata without changing bytecode ([eccd1e2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/eccd1e28fa67e30281ddb3f20e6a9b8a25a89341))
+
 ## [1.3.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0...v1.3.0-dev.1) (2026-10-28)
 
 ### 🐛 Bug Fixes
