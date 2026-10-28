@@ -260,7 +260,7 @@ val spotifyPreviousButtonDiagnosticPatch = bytecodePatch(
             }
         )
         dispatcher.addInstructions(
-            0, "invoke-static {p1}, Lp/hz3;->morpheLogPlayerDispatch(Ljava/lang/String;)V"
+            0, "invoke-static/range {p1 .. p1}, Lp/hz3;->morpheLogPlayerDispatch(Ljava/lang/String;)V"
         )
     }
 }
