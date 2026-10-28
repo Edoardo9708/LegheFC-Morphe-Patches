@@ -1,3 +1,13 @@
+## [1.5.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.4...v1.5.0-dev.5) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **spotify:** avoid unsupported six-element list destructuring in event logger ([fb9e4f4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/fb9e4f4f5d8d83bf228d60d7e3dc5db996ca44c5))
+
+### ✨ New Features
+
+* **spotify:** trace SkipPreviousTapped emission and handling with code ID R4 ([7fd1d47](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7fd1d47a7312748a7d11ae08f49b00ab63709a59))
+
 ## [1.5.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.3...v1.5.0-dev.4) (2026-10-28)
 
 ### ✨ New Features
