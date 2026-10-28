@@ -1,3 +1,10 @@
+## [1.5.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.3...v1.5.0-dev.4) (2026-10-28)
+
+### ✨ New Features
+
+* **spotify:** log UI-gate patch revision from proven controls path ([f24e05d](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f24e05def9d793fb4896150c0041d7a37e1cfbcd))
+* **spotify:** print diagnostic code revision on every observed player state ([c7b16d5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c7b16d5585cfbcf5fbb968a4524b55c0ac5ccc4c))
+
 ## [1.5.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.2...v1.5.0-dev.3) (2026-10-28)
 
 ### ✨ New Features
