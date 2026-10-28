@@ -34,60 +34,34 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # One-time recovery of dev.12: the previous fallback uploaded a
-      # pre-publication archive which lacked the Dex payload in patches.jar.
-      # Restore the same final bundle that Gradle publish would normally create.
-      - name: Rebuild corrupted dev.12 asset
+      # Repair the missing semantic-release channel note for the already
+      # published dev.12 tag. Without it, semantic-release chooses dev.11
+      # and fails attempting to re-create the existing dev.12 tag.
+      # This changes no patch sources and leaves existing releases untouched.
+      - name: Restore missing dev.12 release note
         if: github.ref == 'refs/heads/dev'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          tag="v1.2.0-dev.12"
-          bundle="patches/build/libs/patches-1.2.0-dev.12.mpp"
-          # The branch contains the same patch sources as the dev.12 tag.
-          ./gradlew publish -q
-          test -s "$bundle" || { echo "::error::No final bundle found"; exit 1; }
-          python3 - "$bundle" <<'PY'
-          import io
-          import sys
-          import zipfile
-
-          bundle = sys.argv[1]
-          found = []
-          with zipfile.ZipFile(bundle) as archive:
-              for entry in archive.namelist():
-                  if entry.endswith(".dex"):
-                      found.append(entry)
-                  elif entry.endswith(".jar"):
-                      try:
-                          with zipfile.ZipFile(io.BytesIO(archive.read(entry))) as nested:
-                              for name in nested.namelist():
-                                  if name.endswith(".dex"):
-                                      found.append(f"{entry}!/{name}")
-                      except zipfile.BadZipFile:
-                          pass
-          if not found:
-              raise SystemExit(f"INVALID Morphe bundle: no DEX files in {bundle}")
-          print(f"Validated {bundle}: DEX files found: {found}")
-          PY
-
-          release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
-          old_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" --jq '.[] | select(.name == "patches-1.2.0-dev.12.mpp") | .id')
-          test -n "$old_id" || { echo "::error::Broken dev.12 asset not found"; exit 1; }
-          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" -f target_commitish=dev >/dev/null
-          gh api --method DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$old_id"
-          curl --fail-with-body --silent --show-error --retry 3 \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/dash-patch+xml" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            --data-binary "@$bundle" \
-            "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=patches-1.2.0-dev.12.mpp" \
-            | jq -e '.state == "uploaded" and .content_type == "application/dash-patch+xml" and (.size > 0)'
-          echo "Restored dev.12 with a complete DEX-bearing bundle."
+          note_ref="refs/notes/semantic-release-v1.2.0-dev.12"
+          if ! gh api "repos/$GITHUB_REPOSITORY/git/ref/notes/semantic-release-v1.2.0-dev.12" >/dev/null 2>&1; then
+            tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v1.2.0-dev.12" --jq '.object.sha')
+            blob_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/blobs" \
+              -f content='{"channels":["dev"]}' -f encoding=utf-8 --jq '.sha')
+            jq -cn --arg path "$tag_sha" --arg sha "$blob_sha" \
+              '{tree: [{path: $path, mode: "100644", type: "blob", sha: $sha}]}' > /tmp/morphe-dev12-note-tree.json
+            tree_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/trees" \
+              --input /tmp/morphe-dev12-note-tree.json --jq '.sha')
+            commit_sha=$(gh api --method POST "repos/$GITHUB_REPOSITORY/git/commits" \
+              -f message="Notes added by semantic-release" -f tree="$tree_sha" --jq '.sha')
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+              -f ref="$note_ref" -f sha="$commit_sha" >/dev/null
+            echo "Restored missing dev.12 channel note."
+          fi
+          git fetch origin "$note_ref:$note_ref"
+          git notes --ref=semantic-release-v1.2.0-dev.12 show 'v1.2.0-dev.12^{commit}'
 
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
