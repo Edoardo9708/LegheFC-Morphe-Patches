@@ -43,8 +43,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  */
 @Suppress("unused")
 val flowxEntitlementDiagnosticPatch = bytecodePatch(
-    name = "Flowx - Sblocca Gold",
-    description = "Abilita le funzioni Gold in Flowx 4.650.",
+    name = "Flowx - Test stato Gold locale",
+    description = "Inserisce dati dimostrativi Gold nella cache locale dell'app per verificarne il comportamento; non modifica l'abbonamento lato server.",
     default = false
 ) {
     compatibleWith(
