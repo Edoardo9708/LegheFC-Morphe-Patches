@@ -23,8 +23,8 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  */
 @Suppress("unused")
 val fonometroDisableAdsPatch = bytecodePatch(
-    name = "Fonometro - Disabilita pubblicita",
-    description = "Disabilita banner e annunci a schermo intero senza modificare lo stato Premium o gli acquisti.",
+    name = "Fonometro - Remove ads",
+    description = "Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases.",
     default = false
 ) {
     compatibleWith(
