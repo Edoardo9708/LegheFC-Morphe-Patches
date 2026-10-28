@@ -1,3 +1,13 @@
+## [1.5.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **spotify:** use range invoke for high-index dispatcher argument ([d65938f](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d65938f8f9c245c066bcd0907021bfeec5e2c0c9))
+
+### ✨ New Features
+
+* **spotify:** trace media callbacks and player dispatch in ADB Logcat ([8dd0952](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/8dd0952cf3f4e4890aeb12a817f930069f473808))
+
 ## [1.5.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.4.0...v1.5.0-dev.1) (2026-10-28)
 
 ### 🐛 Bug Fixes
