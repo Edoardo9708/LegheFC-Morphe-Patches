@@ -1,3 +1,9 @@
+## [1.5.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.2...v1.5.0-dev.3) (2026-10-28)
+
+### ✨ New Features
+
+* **spotify:** add isolated previous-button UI gate test ([c285e79](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c285e79de60c9eb2e92747ecf79c7f9edf70ddfc))
+
 ## [1.5.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2026-10-28)
 
 ### 🐛 Bug Fixes
