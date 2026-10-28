@@ -33,6 +33,12 @@
 * import Outdooractive experimental patch ([f0bde4e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f0bde4e543781f8a170e20fd2b55033cfa5a39fc))
 * import Twilight experimental patch ([4a0d735](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4a0d735de2bb1244faa29d2cb1d460efaf57c877))
 
+## [1.2.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0...v1.2.0) (2026-10-28)
+
+### ✨ New Features
+
+* **flowx:** publish R9 Gold patch as stable ([9179d4c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/9179d4c7d26ecdb8109f3db6ca5e75a6fd6b6377))
+
 ## [1.2.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.12...v1.2.0-dev.13) (2026-10-28)
 
 ### 🐛 Bug Fixes
@@ -45,67 +51,6 @@
 * **flowx:** add R7 server/cache entry and post-write entitlement diagnostics ([c69323a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c69323ae61867f935d71c7828671030f21143999))
 * **flowx:** R8 trace demo factory and conditional entitlement reset in b() ([3c3eae5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/3c3eae58223938eb035c6ea9557deddaf76def45))
 * **flowx:** R9 move cache demo write to confirmed post-write path ([71973a7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/71973a78f9cf010f8d5a6c3e95a4a9557705c837))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-28)
-
-### 🐛 Bug Fixes
-
-* **ci:** authenticate Gradle publish to Morphe GitHub Maven registry ([2dfb2db](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2dfb2dbed0d10cb9f3a47f0b3d2e92465cfd6d5b))
-* **ci:** publish DEX-bearing Morphe bundle and repair dev.12 asset ([1c4a850](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1c4a8500a353b77855adabc6e29f590cb3006da1))
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
-* **flowx:** add R7 server/cache entry and post-write entitlement diagnostics ([c69323a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c69323ae61867f935d71c7828671030f21143999))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
-* **flowx:** R8 trace demo factory and conditional entitlement reset in b() ([3c3eae5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/3c3eae58223938eb035c6ea9557deddaf76def45))
-* **flowx:** R9 move cache demo write to confirmed post-write path ([71973a7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/71973a78f9cf010f8d5a6c3e95a4a9557705c837))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
-
-### 🐛 Bug Fixes
-
-* **ci:** authenticate Gradle publish to Morphe GitHub Maven registry ([2dfb2db](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2dfb2dbed0d10cb9f3a47f0b3d2e92465cfd6d5b))
-* **ci:** publish DEX-bearing Morphe bundle and repair dev.12 asset ([1c4a850](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1c4a8500a353b77855adabc6e29f590cb3006da1))
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
-* **flowx:** add R7 server/cache entry and post-write entitlement diagnostics ([c69323a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c69323ae61867f935d71c7828671030f21143999))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
-* **flowx:** R8 trace demo factory and conditional entitlement reset in b() ([3c3eae5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/3c3eae58223938eb035c6ea9557deddaf76def45))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
-
-### 🐛 Bug Fixes
-
-* **ci:** authenticate Gradle publish to Morphe GitHub Maven registry ([2dfb2db](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2dfb2dbed0d10cb9f3a47f0b3d2e92465cfd6d5b))
-* **ci:** publish DEX-bearing Morphe bundle and repair dev.12 asset ([1c4a850](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1c4a8500a353b77855adabc6e29f590cb3006da1))
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
-* **flowx:** add R7 server/cache entry and post-write entitlement diagnostics ([c69323a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c69323ae61867f935d71c7828671030f21143999))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
-
-### 🐛 Bug Fixes
-
-* **ci:** authenticate Gradle publish to Morphe GitHub Maven registry ([2dfb2db](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2dfb2dbed0d10cb9f3a47f0b3d2e92465cfd6d5b))
-* **ci:** publish DEX-bearing Morphe bundle and repair dev.12 asset ([1c4a850](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1c4a8500a353b77855adabc6e29f590cb3006da1))
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
-
-### 🐛 Bug Fixes
-
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **ci:** repair Morphe dev.12 bundle media type and correct fallback upload ([e5c2ddf](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e5c2ddfefb69199013a7609badcf3069a1291670))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
-
-## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
-
-### 🐛 Bug Fixes
-
-* **ci:** recover compiled dev bundle when semantic-release Git notes push fails ([4550b49](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4550b49f66db2d7f468ae4f72b985bc3f62a412e))
-* **flowx:** print unique patch runtime diagnostic revision ([6144e22](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6144e22ea172a5f3d0fdd6ce3c73ec755723a999))
 
 ## [1.2.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0-dev.11...v1.2.0-dev.12) (2026-10-24)
 
@@ -189,6 +134,13 @@
 * import Outdooractive experimental patch ([f0bde4e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f0bde4e543781f8a170e20fd2b55033cfa5a39fc))
 * import Twilight experimental patch ([4a0d735](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4a0d735de2bb1244faa29d2cb1d460efaf57c877))
 
+## [1.1.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.1...v1.1.0) (2026-10-23)
+
+### ✨ New Features
+
+* include Outdooractive Unlock Pro experimental patch ([6a21c89](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6a21c89e8fdadcef5233910d86c56cda5811b307))
+* include Twilight Unlock Pro experimental patch ([740b9d4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/740b9d4fa0eabc52c650ef71070967859795f8c9))
+
 ## [1.1.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2026-10-23)
 
 ### 🐛 Bug Fixes
@@ -207,6 +159,12 @@
 
 * import Outdooractive experimental patch ([f0bde4e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f0bde4e543781f8a170e20fd2b55033cfa5a39fc))
 * import Twilight experimental patch ([4a0d735](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4a0d735de2bb1244faa29d2cb1d460efaf57c877))
+
+## [1.0.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.0...v1.0.1) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* unify Italian patch titles and descriptions ([2c95280](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2c95280fd58ec11470a0a30184c7adf0931bd1b7))
 
 ## [1.0.1-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.0.1-dev.1...v1.0.1-dev.2) (2026-10-23)
 
