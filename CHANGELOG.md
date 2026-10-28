@@ -1,3 +1,10 @@
+## [1.5.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.5...v1.5.0-dev.6) (2026-10-28)
+
+### 🐛 Bug Fixes
+
+* **spotify:** revert tapped-event probes to last diagnostic revision R3 ([4d3e51c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/4d3e51c6075373b40c792b5951ef1478b98bc07a))
+* **spotify:** withdraw experimental previous-button UI override after playback instability ([f061582](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f061582805f3a24f4a8b0776510d8c22ed1cbc33))
+
 ## [1.5.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.4...v1.5.0-dev.5) (2026-10-28)
 
 ### 🐛 Bug Fixes
