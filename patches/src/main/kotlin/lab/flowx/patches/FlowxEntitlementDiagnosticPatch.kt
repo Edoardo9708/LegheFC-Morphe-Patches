@@ -174,7 +174,7 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
                         # Se questo ID compare in Logcat, l'APK installato
                         # contiene la nostra nuova revisione diagnostica.
                         const-string v11, "Flowx-Entitlement"
-                        const-string v12, "PATCH CODE ID FX-20261024-R8 (factory + reset tracing)"
+                        const-string v12, "PATCH CODE ID FX-20261028-R9 (cache post-write injection)"
                         invoke-static {v11, v12}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
 
                         # Composizione del messaggio del test vero e proprio.
@@ -699,61 +699,68 @@ val flowxEntitlementDiagnosticPatch = bytecodePatch(
             // Ogni metodo riceve il proprio blocco: nessun v$temp nello
             // Smali generato. I registri sono validati sopra, rispetto
             // alla chiamata originale Lrs5.i.
-            val beforeWriteSmali = when (methodName) {
-                "c" -> """
-                    # ========== c() - SERVER ==========
-                    # v11 = lista ORIGINALE ottenuta dal server.
-                    # v7  = registro temporaneo per la nostra lista di prova.
-                    invoke-static {}, Lz5;->$probeName()Ljava/util/List;
-                    move-result-object v7
+            // c() mantiene esattamente la sequenza di iniezione precedente.
+        // h() e' diverso: il percorso osservato raggiunge la scrittura originale
+        // e il logger successivo, ma salta le istruzioni inserite PRIMA di Lrs5.i().
+        // Lasciamo la scrittura originale intatta e aggiungiamo la prova
+        // immediatamente DOPO, nel percorso sicuramente eseguito.
+        val afterWriteSmali = when (methodName) {
+            "c" -> """
+                # c() - dopo la scrittura originale in x.
+                invoke-static {v11}, Lz5;->morpheIsolatedServerList(Ljava/lang/Object;)V
+                invoke-static {v1}, Lz5;->morpheLogCXAfterWrite(Lrs5;)V
+            """.trimIndent()
 
-                    move-object v11, v7
+            "h" -> """
+                # h() - dopo la scrittura di prova in x.
+                invoke-static {v9}, Lz5;->morpheIsolatedCacheList(Ljava/lang/Object;)V
+                invoke-static {v1}, Lz5;->morpheLogHXAfterWrite(Lrs5;)V
+            """.trimIndent()
 
-                    # La prova sostituisce v11 PRIMA dell'invoke originale:
-                    # la scrittura Lrs5.i riceve la lista demo in v11.
-                """.trimIndent()
+            else -> error("Flowx: metodo $methodName non previsto")
+        }
 
-                "h" -> """
-                    # ========== h() - CACHE ==========
-                    # v9 = lista ORIGINALE recuperata dalla cache.
-                    # v5 = registro temporaneo per la nostra lista di prova.
+        if (methodName == "c") {
+            // Sequenza c() invariata rispetto alla R8.
+            val beforeWriteSmali = """
+                # ========== c() - SERVER ==========
+                # v11 = lista ORIGINALE ottenuta dal server.
+                # v7  = registro temporaneo per la nostra lista di prova.
+                invoke-static {}, Lz5;->$probeName()Ljava/util/List;
+                move-result-object v7
+
+                move-object v11, v7
+
+                # La prova sostituisce v11 PRIMA dell'invoke originale:
+                # la scrittura Lrs5.i riceve la lista demo in v11.
+            """.trimIndent()
+            m.addInstructions(index, beforeWriteSmali)
+            // Tre istruzioni aggiunte prima della scrittura originale.
+            m.addInstructions(index + 4, afterWriteSmali)
+        } else {
+            // Il vecchio inserimento all'indice 'index' veniva probabilmente
+            // saltato da un branch diretto alla Lrs5.i() originale.
+            // In R9 lasciamo l'invoke originale al suo indice/target.
+            m.addInstructions(
+                index + 1,
+                """
+                    # ========== h() - CACHE (R9) ==========
+                    # Scrittura originale appena eseguita: qui passa
+                    # anche il ramo che saltava la vecchia iniezione.
+                    # v5 e' un temporaneo validato; v9 e' la lista per il logger.
                     invoke-static {}, Lz5;->$probeName()Ljava/util/List;
                     move-result-object v5
-
                     move-object v9, v5
 
-                    # La prova sostituisce v9 PRIMA dell'invoke originale:
-                    # la scrittura Lrs5.i riceve la lista demo in v9.
+                    # Sovrascrive x con la lista demo prima di chiamare k().
+                    invoke-virtual {v1, v9}, Lrs5;->i(Ljava/lang/Object;)V
                 """.trimIndent()
+            )
+            // Quattro istruzioni aggiunte DOPO l'invoke originale.
+            m.addInstructions(index + 5, afterWriteSmali)
+        }
 
-                else -> error("Flowx: metodo $methodName non previsto")
-            }
-
-            // Le istruzioni di prova precedono Lrs5.i, che rimane intatta.
-            m.addInstructions(index, beforeWriteSmali)
-
-            // Le 3 istruzioni aggiunte prima della scrittura spostano
-            // l'invoke Lrs5.i originale all'indice index+3.
-            // Il logger va a index+4, DOPO l'invoke, non a index+3.
-            // Oltre all'argomento passato alla scrittura leggiamo x via getValue().
-            val afterWriteSmali = when (methodName) {
-                "c" -> """
-                    # c() - dopo la scrittura originale in x.
-                    invoke-static {v11}, Lz5;->morpheIsolatedServerList(Ljava/lang/Object;)V
-                    invoke-static {v1}, Lz5;->morpheLogCXAfterWrite(Lrs5;)V
-                """.trimIndent()
-
-                "h" -> """
-                    # h() - dopo la scrittura originale in x.
-                    invoke-static {v9}, Lz5;->morpheIsolatedCacheList(Ljava/lang/Object;)V
-                    invoke-static {v1}, Lz5;->morpheLogHXAfterWrite(Lrs5;)V
-                """.trimIndent()
-
-                else -> error("Flowx: metodo $methodName non previsto")
-            }
-            m.addInstructions(index + 4, afterWriteSmali)
-
-            // Inserito per ultimo a indice 0: non altera gli indici
+        // Inserito per ultimo a indice 0: non altera gli indici
             // verificati per la chiamata Lrs5.i.
             val entryName = if (methodName == "c") "morpheLogCEntry" else "morpheLogHEntry"
             m.addInstructions(0, "invoke-static {}, Lz5;->$entryName()V")
