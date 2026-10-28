@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.3.0...v1.4.0) (2026-10-28)
+
+### ✨ New Features
+
+* **fonometro:** publish ad removal patch for v11.5 ([#12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues/12)) ([e7101ee](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e7101ee6b400e5fdb26c802f1a156aa1e6ff8f7d))
+
 ## [1.3.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.2.0...v1.3.0) (2026-10-28)
 
 ### 🐛 Bug Fixes
