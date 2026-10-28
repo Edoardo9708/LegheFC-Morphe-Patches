@@ -158,6 +158,36 @@ val spotifyPreviousUiGateTestPatch = bytecodePatch(
             }
         )
 
+        // Messaggio di revisione eseguito a OGNI ingresso in dpb1.e(),
+        // anche quando la restrizione non puo' essere superata.
+        // La diagnostica indipendente stampa un ID diverso.
+        val versionLogger = "morpheLogPreviousUiPatchVersion"
+        require(def.methods.none { it.name == versionLogger }) {
+            "Spotify Previous UI: version logger already exists"
+        }
+        def.methods.add(
+            ImmutableMethod(
+                clsName,
+                versionLogger,
+                emptyList(),
+                "V",
+                AccessFlags.PRIVATE.value or AccessFlags.STATIC.value,
+                null,
+                null,
+                MutableMethodImplementation(2)
+            ).toMutable().apply {
+                addInstructions(
+                    0,
+                    """
+                        const-string v0, "Spotify-Prev"
+                        const-string v1, "PATCH CODE ID SP-PREV-UI-R2 | UI gate patch entered"
+                        invoke-static {v0, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+                        return-void
+                    """.trimIndent()
+                )
+            }
+        )
+
         // L'originale ha appena scritto il risultato di isEmpty() in v3.
         // p0 e' il PlayerState; soltanto v3 (booleano UI) viene eventualmente
         // ricalcolato. Nessun altro registro originale viene toccato.
@@ -167,6 +197,12 @@ val spotifyPreviousUiGateTestPatch = bytecodePatch(
                 invoke-static {p0, v3}, Lp/dpb1;->morpheAllowPreviousMftOnly(Lcom/spotify/player/model/PlayerState;Z)Z
                 move-result v3
             """.trimIndent()
+        )
+        // Inserita per ultima: il nuovo indice 0 sposta correttamente in avanti
+        // l'iniezione gia' presente subito dopo isEmpty().
+        method.addInstructions(
+            0,
+            "invoke-static {}, Lp/dpb1;->morpheLogPreviousUiPatchVersion()V"
         )
     }
 }
