@@ -1,3 +1,9 @@
+## [1.5.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.7...v1.5.0-dev.8) (2026-10-29)
+
+### ✨ New Features
+
+* **dnschanger:** add Pro return diagnostic logging ([82840b5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/82840b58c8edd2e494d71b7dd7ca75a7987f4a3e))
+
 ## [1.5.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.6...v1.5.0-dev.7) (2026-10-29)
 
 ### ✨ New Features
