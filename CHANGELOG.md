@@ -1,3 +1,9 @@
+## [1.5.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.6...v1.5.0-dev.7) (2026-10-29)
+
+### ✨ New Features
+
+* **spotify:** add bytecode-free no-op control to isolate playback skips ([bebd2ff](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/bebd2ffd16726817c165c80ed4f9f102a9ddc7f9))
+
 ## [1.5.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.5...v1.5.0-dev.6) (2026-10-28)
 
 ### 🐛 Bug Fixes
