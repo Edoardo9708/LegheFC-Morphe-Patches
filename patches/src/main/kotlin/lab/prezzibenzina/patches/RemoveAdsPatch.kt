@@ -86,8 +86,7 @@ val prezziBenzinaRemoveAdsPatch = bytecodePatch(
             }
             val targetCalls = calls.count {
                 it.definingClass == target &&
-                    it.name == spec.calledMethod &&
-                    it.returnType == "Z"
+                    it.name == spec.calledMethod
             }
             require(
                 body.registerCount == 3 &&
