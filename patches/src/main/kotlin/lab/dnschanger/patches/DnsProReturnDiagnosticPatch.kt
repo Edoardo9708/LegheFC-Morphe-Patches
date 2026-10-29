@@ -26,8 +26,8 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
  */
 @Suppress("unused")
 val dnsProReturnDiagnosticPatch = bytecodePatch(
-    name = "DNS Changer - Diagnostica stato Pro",
-    description = "Registra in Logcat il valore originale restituito dal controllo Pro z(), senza modificare lo stato di acquisto.",
+    name = "DNS Changer - Pro status diagnostic",
+    description = "Logs the original return value of z() without changing purchases or Pro status.",
     default = false
 ) {
     compatibleWith(
