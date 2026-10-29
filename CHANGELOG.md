@@ -1,3 +1,9 @@
+## [1.5.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.8...v1.5.0-dev.9) (2026-10-29)
+
+### ✨ New Features
+
+* **dnschanger:** test forced true in Pro gate with D2 Logcat marker ([e57f477](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e57f4774ad14bd981f8819a6e21cb4a8200265fe))
+
 ## [1.5.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0-dev.7...v1.5.0-dev.8) (2026-10-29)
 
 ### ✨ New Features

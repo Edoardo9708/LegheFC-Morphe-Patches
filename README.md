@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.5.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.5.0-dev.8)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
+> **[v1.5.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.5.0-dev.9)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;10 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -50,7 +50,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [DNS Changer - Pro status diagnostic](#dns-changer-pro-status-diagnostic) | Logs the original return value of z() without changing purchases or Pro status. |  |
+| [DNS Changer - Force Pro test D2](#dns-changer-force-pro-test-d2) | Test only: forces z() to return true and logs the forced value; does not change purchases. |  |
 
 </details>
 
