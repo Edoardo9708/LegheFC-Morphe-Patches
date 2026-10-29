@@ -18,16 +18,16 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 /**
  * DNS Changer 3.0.0 (versionCode 64), verificato su base.apk nell'ASPK.
  *
- * Diagnostica di Lsi2;->z()Z: stampa il booleano ORIGINALE
- * immediatamente prima dei due return, senza modificarlo.
- * Non interviene su Billing, SharedPreferences o controlli Premium.
+ * TEST D2: Lsi2;->z()Z registra e restituisce sempre TRUE.
+ * L'originale z() rimane nel DEX ma non viene eseguito.
+ * Non modifica Billing, SharedPreferences o stati di acquisto persistenti.
  *
- * Codice di prova: DC-20261029-D1 (in ogni riga di Logcat).
+ * Codice di prova: DC-20261029-D2 (in ogni riga di Logcat).
  */
 @Suppress("unused")
 val dnsProReturnDiagnosticPatch = bytecodePatch(
-    name = "DNS Changer - Pro status diagnostic",
-    description = "Logs the original return value of z() without changing purchases or Pro status.",
+    name = "DNS Changer - Force Pro test D2",
+    description = "Test only: forces z() to return true and logs the forced value; does not change purchases.",
     default = false
 ) {
     compatibleWith(
@@ -52,8 +52,7 @@ val dnsProReturnDiagnosticPatch = bytecodePatch(
             ?: error("DNS Changer: z() non contiene bytecode")
         val original = body.instructions.toList()
 
-        // Nell'APK 3.0.0 il metodo ha 2 registri: v1 e' p0 inizialmente,
-        // ma in entrambi i percorsi e' il valore booleano del return.
+        // Guardiamo la struttura del metodo originale prima di effettuare il test.
         val returnIndexes = original.withIndex().filter { (_, instruction) ->
             instruction.opcode == Opcode.RETURN &&
                 (instruction as? OneRegisterInstruction)?.registerA == 1
@@ -82,7 +81,7 @@ val dnsProReturnDiagnosticPatch = bytecodePatch(
         }
 
         // Helper STATIC con 3 registri: v0 e v1 locali, p0 (=v2) parametro.
-        // Il metodo originale passa il suo risultato, ma non riceve modifiche.
+        // Riceve esclusivamente il booleano forzato, senza modificarlo.
         val targetClass = mutableClassDefBy(className)
         require(targetClass.methods.none { it.name == helperName }) {
             "DNS Changer: helper diagnostico gia' presente"
@@ -102,17 +101,17 @@ val dnsProReturnDiagnosticPatch = bytecodePatch(
                 addInstructions(
                     0,
                     """
-                        # p0 contiene il booleano restituito da z().
+                        # p0 contiene il valore che stiamo per restituire da z().
                         invoke-static {p0}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                         move-result-object v1
 
-                        # Crea il messaggio a partire dal valore reale.
-                        const-string v0, "z() RETURN = "
+                        # Crea il messaggio a partire dal valore forzato.
+                        const-string v0, "z() FORCED RETURN = "
                         invoke-virtual {v0, v1}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v1
 
                         # Identificativo della revisione della patch diagnostica.
-                        const-string v0, " [DC-20261029-D1]"
+                        const-string v0, " [DC-20261029-D2]"
                         invoke-virtual {v1, v0}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v1
 
@@ -125,13 +124,16 @@ val dnsProReturnDiagnosticPatch = bytecodePatch(
             }
         )
 
-        // Inseriamo DAL FONDO per mantenere validi gli indici originali.
-        // v1 rimane intatto e l'istruzione return v1 originale e' conservata.
-        for (index in returnIndexes.asReversed()) {
-            method.addInstructions(
-                index,
-                "invoke-static {v1}, Lsi2;->morpheLogZReturn(Z)V"
-            )
-        }
+        // La funzione originale non viene eseguita, il test e' in cima.
+        // v0 e' un registro locale (p0 e' v1), quindi non alteriamo p0.
+        // La chiamata helper e il log sono eseguiti PRIMA del return.
+        method.addInstructions(
+            0,
+            """
+                const/4 v0, 0x1
+                invoke-static {v0}, Lsi2;->morpheLogZReturn(Z)V
+                return v0
+            """.trimIndent()
+        )
     }
 }
