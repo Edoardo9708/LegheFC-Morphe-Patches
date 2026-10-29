@@ -1,3 +1,13 @@
+## [1.6.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.1...v1.6.0-dev.2) (2026-10-29)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** validate original ads-level method signature correctly ([f5842f2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f5842f2a7287d366cc58e207fd39ec0dca011569))
+
+### ✨ New Features
+
+* **prezzibenzina:** add opt-in ads-only test A1 with Logcat marker ([98dd675](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/98dd6759daae3c3d6b7891674b9f6b97dd041750))
+
 ## [1.6.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0...v1.6.0-dev.1) (2026-10-29)
 
 ### 🐛 Bug Fixes
