@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.6.0-dev.10",
+  "version": "1.6.0-dev.11",
   "patches": [
     {
       "name": "DNS Changer - Force Pro test D2",
@@ -210,9 +210,9 @@
       ],
       "options": [
         {
-          "key": "Custom signing certificate DER (Base64)",
-          "title": null,
-          "description": null,
+          "key": "signingCertificateDerBase64",
+          "title": "Custom signing certificate DER (Base64)",
+          "description": "Paste the Base64 contents of the public X.509 DER certificate (no PEM headers).",
           "required": true,
           "type": "kotlin.String",
           "default": null,

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-30T10:18:39",
-  "description": "## [1.6.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.9...v1.6.0-dev.10) (2026-10-30)\n\n### 🐛 Bug Fixes\n\n* **prezzibenzina:** expose F6 certificate option on selectable patch ([b4c61a7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/b4c61a7d1e817f8b6bc1f2810e191300f92af58c))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.10/patches-1.6.0-dev.10.mpp",
+  "created_at": "2026-10-30T12:16:28",
+  "description": "## [1.6.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.10...v1.6.0-dev.11) (2026-10-30)\n\n### 🐛 Bug Fixes\n\n* **prezzibenzina:** show F6 DER option as text input in Morphe ([7f00383](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7f003838cef615e911f34986505f999340dae2e9))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.11/patches-1.6.0-dev.11.mpp",
   "signature_download_url": "",
-  "version": "1.6.0-dev.10"
+  "version": "1.6.0-dev.11"
 }

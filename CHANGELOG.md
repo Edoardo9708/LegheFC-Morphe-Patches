@@ -1,3 +1,9 @@
+## [1.6.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.10...v1.6.0-dev.11) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** show F6 DER option as text input in Morphe ([7f00383](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7f003838cef615e911f34986505f999340dae2e9))
+
 ## [1.6.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.9...v1.6.0-dev.10) (2026-10-30)
 
 ### 🐛 Bug Fixes
