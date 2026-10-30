@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Bundle the pinned upstream diagnostic library only when the F1 patch
+      # Bundle the pinned upstream diagnostic library only when the F2 patch
       # is present. Morphe will not download executable code on the phone.
       - name: Prepare Prezzi Benzina Frida Gadget (ARM64, diagnostic)
         if: hashFiles('patches/src/main/kotlin/lab/prezzibenzina/patches/SignatureTracePatch.kt') != ''
@@ -44,12 +44,23 @@ jobs:
           mkdir -p "$directory"
           curl --fail --location --retry 3 --silent --show-error \
             -o /tmp/pb-frida-gadget.so.xz \
-            https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz
+            https://github.com/frida/frida/releases/download/17.24.3/frida-gadget-17.24.3-android-arm64.so.xz
+          echo "c5b86db3569d06769da2b29a80c7a275422c3bb292bd7881ea30566fd2161948  /tmp/pb-frida-gadget.so.xz" | sha256sum --check
           xz --test /tmp/pb-frida-gadget.so.xz
           xz --decompress --stdout /tmp/pb-frida-gadget.so.xz > "$directory/libpbfridagadget.so"
           test "$(stat -c '%s' "$directory/libpbfridagadget.so")" -gt 1000000
           file "$directory/libpbfridagadget.so"
           sha256sum /tmp/pb-frida-gadget.so.xz "$directory/libpbfridagadget.so"
+          # Frida 17 no longer embeds the Java bridge; bundle it into the
+          # standalone script consumed by Gadget on the phone (no PC needed).
+          npm install --no-save --no-package-lock --ignore-scripts \
+            frida-compile@19.1.0 frida-java-bridge@7.0.13
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-signature-agent.js" \
+            -o "$directory/libpbfridagadget.script.so"
+          test "$(stat -c '%s' "$directory/libpbfridagadget.script.so")" -gt 100000
+          grep -q PB-FRIDA-20261030-F2 "$directory/libpbfridagadget.script.so"
+
 
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
