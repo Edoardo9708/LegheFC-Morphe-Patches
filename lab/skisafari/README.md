@@ -43,5 +43,27 @@ powershell -ExecutionPolicy Bypass -File .\lab\skisafari\build-native.ps1
 ## Current limitations
 
 - The Android runtime call has not been exercised on-device. Unity thread safety, PairIP/license behavior after Morphe re-signing, save visibility after process exit, and the precise item catalog still require a disposable test installation.
-- No modified APK has been built or installed. A different APK signature can prevent updating the Play-installed original; keep the original app and its data untouched until a safe test plan exists.
-- Morphe Gradle compilation currently stops during plugin resolution: `app.morphe.patches:1.3.4` is hosted on GitHub Packages and this PC has no configured `gpr.user`/`gpr.key` or `GITHUB_TOKEN`. The official Morphe Patcher setup documentation requires GitHub Packages authentication even for public packages.
+- A different APK signature can prevent updating the Play-installed original; keep the original app and its data untouched until a safe test plan exists.
+- Standard Gradle compilation stops during plugin resolution: the existing GitHub credential receives HTTP 401 from GitHub Packages. Repository access is available; package-registry access is separate.
+
+## Local Desktop build
+
+The installed Morphe Desktop fat JAR provides the patcher API. `build-local.ps1` uses the installed Kotlin compiler, Java compiler and Android D8 to compile the new patch and merge it into an existing local bundle. Existing JVM classes and resources are preserved; D8 merges the patch and extension DEX files. This incremental local build does not replace verification of the complete repository with Gradle.
+
+```powershell
+.\lab\skisafari\build-local.ps1 -DesktopJar ..\morphe-desktop-1.20.0-all.jar -BaselineBundle ..\morphe-test-f13\patches-f13-local.mpp -OutputDirectory ..\morphe-test-skisafari-build2
+```
+
+For APK sets, `MergeApk.java` invokes the merger bundled in Morphe Desktop on a copy. The CLI patch command expects the resulting merged APK, not the ASPK container. All output stays on the PC; the scripts do not install applications.
+
+Local verification completed with Morphe Desktop 1.20.0:
+
+- Kotlin, Java and both DEX merges compiled successfully.
+- Morphe listed the patch with package `com.yodo1.skisafarigp`, version `2.5`.
+- The corrected resource loader resolves the helper through the patch bundle's classloader.
+- Patching, rebuilding and signing the merged APK succeeded. Android apksigner verified APK Signature Scheme v2.
+- `VerifyApk.java` found exactly one `onCreate` hook and the runtime extension in the final APK.
+- ZIP CRC validation and SHA-256 checks confirmed unchanged original IL2CPP/metadata and the correct helper.
+- Original bundle JVM classes and resources were preserved; only the combined DEX files and bundle manifest changed.
+
+Output directory on this PC: `morphe-test-skisafari-build2` (outside the repository). The test APK SHA-256 is `b1ab4624e372b63f56cda9591ea9e42b2f5de9ccfc2c2ea360011bfd3976fd3e`. No runtime execution or persistent save success has been established.

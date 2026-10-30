@@ -17,6 +17,10 @@ private const val IL2CPP_PATH = "lib/arm64-v8a/libil2cpp.so"
 private const val METADATA_PATH = "assets/bin/Data/Managed/Metadata/global-metadata.dat"
 private const val NATIVE_PATCH_PATH = "lib/arm64-v8a/libskisafariunlock.so"
 
+private object SkiSafariResources {
+    fun open(path: String) = SkiSafariResources::class.java.classLoader.getResourceAsStream(path)
+}
+
 // SHA-256 values are from the original Ski Safari 2.5 (108) APK set pulled from
 // the Galaxy S23+. The patch adds its own helper library and never rewrites
 // libil2cpp.so.
@@ -44,7 +48,7 @@ private val skiSafariUnlockNativeResources = rawResourcePatch {
             "Ski Safari Unlock: metadata IL2CPP assenti o diversi dalla build 2.5 (108); patch interrotta."
         }
 
-        val helper = javaClass.classLoader.getResourceAsStream("skisafari/libskisafariunlock.so")
+        val helper = SkiSafariResources.open("skisafari/libskisafariunlock.so")
             ?: error("Ski Safari Unlock: libreria helper ARM64 assente dal bundle Morphe.")
         val output = get(NATIVE_PATCH_PATH)
         require(output.parentFile?.mkdirs() == true || output.parentFile?.isDirectory == true) {
