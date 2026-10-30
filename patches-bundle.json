@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-30T08:57:14",
-  "description": "## [1.6.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.5...v1.6.0-dev.6) (2026-10-30)\n\n### ✨ New Features\n\n* **prezzibenzina:** add F4 single getPackageInfo signature trace ([10ebd71](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/10ebd71764d8539875cbd39a913ef125d532de3c))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.6/patches-1.6.0-dev.6.mpp",
+  "created_at": "2026-10-30T09:11:23",
+  "description": "## [1.6.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.6...v1.6.0-dev.7) (2026-10-30)\n\n### ✨ New Features\n\n* **prezzibenzina:** F5 read-only signing certificate return diagnostics ([2e888ca](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2e888ca1389c04d05504c8fc5a5d89750d14daaa))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.7/patches-1.6.0-dev.7.mpp",
   "signature_download_url": "",
-  "version": "1.6.0-dev.6"
+  "version": "1.6.0-dev.7"
 }

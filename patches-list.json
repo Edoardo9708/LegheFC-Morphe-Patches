@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.6.0-dev.6",
+  "version": "1.6.0-dev.7",
   "patches": [
     {
       "name": "DNS Changer - Force Pro test D2",
@@ -237,8 +237,8 @@
       "options": []
     },
     {
-      "name": "Prezzi Benzina - Signature trace F4 (ARM64)",
-      "description": "Experimental read-only trace of getPackageInfo(String,int) inside the app. Logs call stacks to PB-Signature. No signature changes.",
+      "name": "Prezzi Benzina - Signature trace F5 (ARM64)",
+      "description": "Experimental read-only inspection of returned PackageInfo signing certificates (SHA-1/SHA-256) and call stacks. No signature changes.",
       "default": false,
       "category": null,
       "compatiblePackages": [

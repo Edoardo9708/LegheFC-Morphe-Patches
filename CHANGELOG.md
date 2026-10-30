@@ -1,3 +1,9 @@
+## [1.6.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.6...v1.6.0-dev.7) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** F5 read-only signing certificate return diagnostics ([2e888ca](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2e888ca1389c04d05504c8fc5a5d89750d14daaa))
+
 ## [1.6.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.5...v1.6.0-dev.6) (2026-10-30)
 
 ### ✨ New Features
