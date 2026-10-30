@@ -1,31 +1,51 @@
-# Edoardo9708 Patches — Prezzi Benzina
+# Edoardo9708 Patches — Morphe
 
-Patch Morphe per **Prezzi Benzina** (`org.vernazza.androidfuel`), analizzate sulla versione **3.26.10.10**. La sorgente e il repository GitHub esistenti restano invariati.
+Repository unico di patch indipendenti per piu applicazioni Android, compatibile con **Morphe Manager**.
 
-[Release](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases) · [Problemi](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues)
+**Questo repository mantiene esattamente lo stesso indirizzo di Leghe FC**, gia presente nel catalogo Morphe. La sorgente originale non va rimossa e non e necessario aggiungerne una nuova.
 
-## Patch
+[**Aggiungi la sorgente a Morphe**](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches) · [Release](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases) · [Problemi](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues)
 
-- **Prezzi Benzina - microG token routing F13**: instrada soltanto il binding Maps `ApiTokenService` verso l'installazione esistente di `app.revanced.android.gms` e dichiara il digest pubblico originale dell'app. Richiede un GmsCore compatibile con `ApiTokenService` e con il supporto alla firma dichiarata. Non sostituisce l'API key e non modifica la firma privata dell'APK.
-- **Prezzi Benzina - Remove ads A1**: restituisce `false` dai controlli per banner e interstitial. Non modifica Premium, licenze, acquisti in-app o storico prezzi.
+## Applicazioni e patch
 
-Le patch sono facoltative. F13 e A1 sono state applicate insieme e verificate su un APK di test 3.26.10.10; il comportamento può variare con altre versioni dell'app, di Maps o di GmsCore. La prova non garantisce che ogni superficie pubblicitaria sia coperta.
+| App | Pacchetto Android | Versione analizzata | Patch |
+| --- | --- | --- | --- |
+| **Leghe FC** | `it.quadronica.leghe` | 13.2.1 (445) | Avvio e nome **3 campo**, percentuali, formazione suggerita e comparatore |
+| **Twilight** | `com.urbandroid.lux` | 14.32 (APKM) | Test sperimentale su `TrialFilter.isTrial()` e Logcat |
+| **Outdooractive** | `com.outdooractive.Outdooractive` | 3.23.20 | Diagnostica e test sperimentale dei getter di `Membership` |
 
-## Uso
+### Stato dei test
 
-Aggiungi questa sorgente a Morphe Manager tramite l'indirizzo GitHub del repository, aggiorna l'elenco e applica le patch compatibili con la versione dell'APK. Gli APK modificati sono firmati diversamente dall'originale e possono richiedere una reinstallazione con gestione attenta dei dati.
+- **Leghe FC:** le tre patch esistenti rimangono invariate; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
+- **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
+- **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). La pubblicazione sul canale stabile non certifica il corretto comportamento della patch nell'app.
 
-## Elenco delle patch
+## Installazione
+
+1. Apri Morphe Manager e aggiungi la [sorgente GitHub esistente](https://morphe.software/add-source?github=Edoardo9708/LegheFC-Morphe-Patches), se non presente.
+2. Aggiorna la sorgente e seleziona l'app desiderata (Leghe FC, Twilight o Outdooractive). Se avevi gia aggiunto solo Leghe FC, potrebbe essere necessario abilitare le altre app nelle impostazioni della sorgente.
+3. Per le versioni di sviluppo abilita **Pre-release patches**. La compilazione del bundle viene verificata su GitHub; il comportamento delle patch sperimentali nell'app va verificato separatamente.
+4. Se necessario abilita **Expert mode** e scegli le patch da applicare alla tua copia dell'APK.
+
+## Compatibilita
+
+Le patch sono legate alle versioni dell'app indicate. Possono causare errori, crash o comportamenti imprevisti. Conserva i dati originali; gli APK modificati possono avere una firma diversa da quella ufficiale. Il bundle non sostituisce eventuali verifiche remote di licenze o abbonamenti.
+
+## Struttura del progetto
+
+Il codice delle diverse app e separato per package sotto `patches/src/main/kotlin`. Si usa un solo build Gradle e una sola pipeline di release. Il link di questa sorgente resta invariato.
+
+## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
 > **[v1.6.0-dev.16](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.16)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;19 patches total
 <details open>
-<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 3.26.10.10 |
+| 3.0.0 |
 | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
@@ -152,6 +172,12 @@ Aggiungi questa sorgente a Morphe Manager tramite l'indirizzo GitHub del reposit
 
 <!-- PATCHES_END -->
 
-## Sviluppo
+## Sviluppo e licenze
 
-Il codice delle patch si trova in `patches/src/main/kotlin/lab/prezzibenzina/patches`. La pipeline GitHub compila il bundle Morphe e pubblica le release stabili da `main`; le prove sperimentali vanno sviluppate su `dev`.
+Lo sviluppo avviene su `dev`; le release stabili sono pubblicate dal ramo `main` tramite il workflow esistente. L'elenco qui sopra viene aggiornato automaticamente durante la pubblicazione: non modificare a mano `patches-list.json`, `patches-bundle.json` e `CHANGELOG.md`.
+
+Il repository deriva dal [template di Morphe](https://github.com/MorpheApp/morphe-patches-template). La modifica relativa alla sorgente d'installazione utilizza la [Morphe Patches Library](https://github.com/MorpheApp/morphe-patches-library) come dipendenza. Sono conservati i relativi termini e avvisi di licenza.
+
+**Progetto indipendente:** non affiliato né approvato dagli sviluppatori delle applicazioni interessate o dal progetto Morphe. Il nome Morphe indica esclusivamente la compatibilità tecnica.
+
+Licenza: [GPLv3](LICENSE). Vedi anche [NOTICE](NOTICE).

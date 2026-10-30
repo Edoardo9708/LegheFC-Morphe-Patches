@@ -3,21 +3,21 @@
   "version": "1.6.0-dev.16",
   "patches": [
     {
-      "name": "Prezzi Benzina - Remove ads A1",
-      "description": "Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases.",
+      "name": "DNS Changer - Force Pro test D2",
+      "description": "Test only: forces z() to return true and logs the forced value; does not change purchases.",
       "default": false,
       "category": null,
       "compatiblePackages": [
         {
-          "packageName": "org.vernazza.androidfuel",
-          "name": "Prezzi Benzina",
+          "packageName": "com.appplanex.dnschanger",
+          "name": "DNS Changer",
           "description": null,
           "apkFileType": null,
           "appIconColor": null,
           "signatures": null,
           "targets": [
             {
-              "version": "3.26.10.10",
+              "version": "3.0.0",
               "versionCodes": null,
               "isExperimental": false,
               "minSdk": null,
@@ -29,14 +29,14 @@
       "options": []
     },
     {
-      "name": "Prezzi Benzina - microG token routing F13",
-      "description": "Local test: route only Maps ApiTokenService to the existing app.revanced.android.gms and declare the original public certificate digest. No Frida; use alone, not with F5-F12.",
+      "name": "Flowx - Test stato Gold locale",
+      "description": "Inserisce dati dimostrativi Gold nella cache locale dell'app per verificarne il comportamento; non modifica l'abbonamento lato server.",
       "default": false,
       "category": null,
       "compatiblePackages": [
         {
-          "packageName": "org.vernazza.androidfuel",
-          "name": "Prezzi Benzina",
+          "packageName": "com.enzuredigital.weatherbomb",
+          "name": "Flowx",
           "description": null,
           "apkFileType": null,
           "appIconColor": null,

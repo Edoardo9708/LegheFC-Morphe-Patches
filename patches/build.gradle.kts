@@ -3,7 +3,7 @@ group = "lab.leghefc"
 patches {
     about {
         name = "Edoardo9708 Patches"
-        description = "Patch per Prezzi Benzina: routing token Maps via microG e disattivazione annunci banner/interstitial"
+        description = "Patch indipendenti per Leghe FC, Twilight e Outdooractive"
         source = "https://github.com/Edoardo9708/LegheFC-Morphe-Patches"
         author = "Edoardo9708"
         contact = "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/issues"
