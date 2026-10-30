@@ -1,3 +1,9 @@
+## [1.6.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.7...v1.6.0-dev.8) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** add optional personal Google Maps API key patch M1 ([7d03849](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7d03849d0e05a82bbe17219dcf021142f656eff7))
+
 ## [1.6.0-dev.7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.6...v1.6.0-dev.7) (2026-10-30)
 
 ### ✨ New Features
