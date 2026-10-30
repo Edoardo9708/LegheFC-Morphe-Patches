@@ -1,3 +1,9 @@
+## [1.6.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.3...v1.6.0-dev.4) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** update F2 Frida Gadget for Android 17 ([5641758](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/5641758322110e4bf10b23f717219ac6f2b1e8b6))
+
 ## [1.6.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.2...v1.6.0-dev.3) (2026-10-30)
 
 ### ✨ New Features
