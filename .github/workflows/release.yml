@@ -81,6 +81,13 @@ jobs:
             -o "$directory/libpbjavaonly.script.so"
           test "$(stat -c '%s' "$directory/libpbjavaonly.script.so")" -gt 1000
           grep -q PB-FRIDA-20261030-F8 "$directory/libpbjavaonly.script.so"
+          # F9: one getPackageInfo(String,int) hook, original call/return untouched.
+          # Separate script keeps F5-F8 unchanged.
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-noop-packageinfo-agent.js" \
+            -o "$directory/libpbnoop.script.so"
+          test "$(stat -c '%s' "$directory/libpbnoop.script.so")" -gt 1000
+          grep -q PB-FRIDA-20261030-F9 "$directory/libpbnoop.script.so"
 
 
 
