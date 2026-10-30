@@ -170,6 +170,21 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 </details>
 
+<details open>
+<summary>📦 Twilight&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 14.32 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Twilight - Test stato trial](#twilight-test-stato-trial) | Unlock Pro |  |
+
+</details>
+
 <!-- PATCHES_END -->
 
 ## Sviluppo e licenze
