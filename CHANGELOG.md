@@ -1,3 +1,9 @@
+## [1.6.0-dev.16](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.15...v1.6.0-dev.16) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** add F10 method lookup only diagnostic ([8aabb14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/8aabb14217aa9ebe2268493fdbafa5a7516d58a7))
+
 ## [1.6.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.14...v1.6.0-dev.15) (2026-10-30)
 
 ### ✨ New Features
