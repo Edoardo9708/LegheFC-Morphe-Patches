@@ -34,6 +34,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Bundle the pinned upstream diagnostic library only when the F1 patch
+      # is present. Morphe will not download executable code on the phone.
+      - name: Prepare Prezzi Benzina Frida Gadget (ARM64, diagnostic)
+        if: hashFiles('patches/src/main/kotlin/lab/prezzibenzina/patches/SignatureTracePatch.kt') != ''
+        run: |
+          set -euo pipefail
+          directory=patches/src/main/resources/pbdiag
+          mkdir -p "$directory"
+          curl --fail --location --retry 3 --silent --show-error \
+            -o /tmp/pb-frida-gadget.so.xz \
+            https://github.com/frida/frida/releases/download/16.7.19/frida-gadget-16.7.19-android-arm64.so.xz
+          xz --test /tmp/pb-frida-gadget.so.xz
+          xz --decompress --stdout /tmp/pb-frida-gadget.so.xz > "$directory/libpbfridagadget.so"
+          test "$(stat -c '%s' "$directory/libpbfridagadget.so")" -gt 1000000
+          file "$directory/libpbfridagadget.so"
+          sha256sum /tmp/pb-frida-gadget.so.xz "$directory/libpbfridagadget.so"
+
       # Semantic release runs its own Gradle build command.
       # Only dev and main branch will generate a release as specified by .releaserc
       - name: Release
