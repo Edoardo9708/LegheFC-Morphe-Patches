@@ -87,6 +87,12 @@ jobs:
             -o "$directory/libpbreadonly.script.so"
           test "$(stat -c '%s' "$directory/libpbreadonly.script.so")" -gt 1000
           grep -q PB-FRIDA-20261030-F9 "$directory/libpbreadonly.script.so"
+          # F10: resolve ApplicationPackageManager.getPackageInfo overload only; NO hook.
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-method-lookup-agent.js" \
+            -o "$directory/libpblookup.script.so"
+          test "$(stat -c '%s' "$directory/libpblookup.script.so")" -gt 1000
+          grep -q PB-FRIDA-20261030-F10 "$directory/libpblookup.script.so"
 
 
 
