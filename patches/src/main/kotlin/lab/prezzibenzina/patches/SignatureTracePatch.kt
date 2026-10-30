@@ -14,14 +14,14 @@ private object PbFridaAssetLoader {
 }
 
 /**
- * Esperimento F4: Frida Gadget 17.24.3, SOLO ARM64.
+ * Esperimento F5: Frida Gadget 17.24.3, SOLO ARM64.
  * Non modifica firme, token Maps, Billing, Premium o permessi.
  *
  * Preparazione delle risorse: il bundle contiene la libreria upstream,
  * la configurazione script-mode e un singolo hook Java di diagnostica.
  * Lo script registra in Logcat con il tag PB-Signature.
  *
- * Questa patch e' volutamente separata da Remove Ads A1.\n * F3 ha confermato che il caricamento nativo funziona.\n * F4 intercetta esclusivamente getPackageInfo(String,int) senza modificarne il risultato.
+ * Questa patch e' volutamente separata da Remove Ads A1.\n * F3 ha confermato che il caricamento nativo funziona.\n * F5 intercetta solo getPackageInfo(String,int), registra le impronte dei certificati restituiti e mantiene il risultato originale.
  */
 private val pbFridaSignatureResources = resourcePatch {
     execute {
@@ -67,13 +67,13 @@ private val pbFridaSignatureResources = resourcePatch {
 
 /**
  * Avvia Frida Gadget una sola volta dall'Application.onCreate(), prima della
- * logica applicativa. La libreria avvia automaticamente lo script di prova,
+ * logica applicativa. La libreria avvia automaticamente lo script diagnostico,
  * quindi sul telefono NON servono ADB, Termux, Objection o un client Frida.
  */
 @Suppress("unused")
 val prezziBenzinaFridaSignatureTracePatch = bytecodePatch(
-    name = "Prezzi Benzina - Signature trace F4 (ARM64)",
-    description = "Experimental read-only trace of getPackageInfo(String,int) inside the app. Logs call stacks to PB-Signature. No signature changes.",
+    name = "Prezzi Benzina - Signature trace F5 (ARM64)",
+    description = "Experimental read-only inspection of returned PackageInfo signing certificates (SHA-1/SHA-256) and call stacks. No signature changes.",
     default = false
 ) {
     compatibleWith(
