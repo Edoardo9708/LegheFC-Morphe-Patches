@@ -1,3 +1,9 @@
+## [1.6.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.11...v1.6.0-dev.12) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** robust F6 Base64 parsing and input diagnostics ([2775df7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2775df71ee506418c2aa1bbd806eb1dfc896a34f))
+
 ## [1.6.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.10...v1.6.0-dev.11) (2026-10-30)
 
 ### 🐛 Bug Fixes

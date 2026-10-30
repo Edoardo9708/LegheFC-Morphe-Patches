@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-30T12:16:28",
-  "description": "## [1.6.0-dev.11](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.10...v1.6.0-dev.11) (2026-10-30)\n\n### 🐛 Bug Fixes\n\n* **prezzibenzina:** show F6 DER option as text input in Morphe ([7f00383](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7f003838cef615e911f34986505f999340dae2e9))",
-  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.11/patches-1.6.0-dev.11.mpp",
+  "created_at": "2026-10-30T12:30:10",
+  "description": "## [1.6.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.11...v1.6.0-dev.12) (2026-10-30)\n\n### 🐛 Bug Fixes\n\n* **prezzibenzina:** robust F6 Base64 parsing and input diagnostics ([2775df7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/2775df71ee506418c2aa1bbd806eb1dfc896a34f))",
+  "download_url": "https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/download/v1.6.0-dev.12/patches-1.6.0-dev.12.mpp",
   "signature_download_url": "",
-  "version": "1.6.0-dev.11"
+  "version": "1.6.0-dev.12"
 }
