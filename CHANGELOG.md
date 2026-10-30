@@ -1,3 +1,9 @@
+## [1.6.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0...v1.6.1) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **repo:** restore six stable apps alongside Prezzi Benzina and guard release inventory ([e3d8b84](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e3d8b84c3fcc3164b7ab03db3f07efd2d13bb1ae))
+
 ## [1.6.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0...v1.6.0) (2026-10-30)
 
 ### ✨ New Features
