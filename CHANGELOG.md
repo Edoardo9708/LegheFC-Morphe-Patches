@@ -1,3 +1,9 @@
+## [1.6.0-dev.6](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.5...v1.6.0-dev.6) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** add F4 single getPackageInfo signature trace ([10ebd71](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/10ebd71764d8539875cbd39a913ef125d532de3c))
+
 ## [1.6.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.4...v1.6.0-dev.5) (2026-10-30)
 
 ### 🐛 Bug Fixes

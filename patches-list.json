@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.6.0-dev.5",
+  "version": "1.6.0-dev.6",
   "patches": [
     {
       "name": "DNS Changer - Force Pro test D2",
@@ -211,8 +211,8 @@
       "options": []
     },
     {
-      "name": "Prezzi Benzina - Frida startup test F3 (ARM64)",
-      "description": "Experimental startup isolation test: loads Frida Gadget without installing Java hooks. Logs PB-Signature, does not modify app behavior.",
+      "name": "Prezzi Benzina - Remove ads A1",
+      "description": "Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -237,8 +237,8 @@
       "options": []
     },
     {
-      "name": "Prezzi Benzina - Remove ads A1",
-      "description": "Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases.",
+      "name": "Prezzi Benzina - Signature trace F4 (ARM64)",
+      "description": "Experimental read-only trace of getPackageInfo(String,int) inside the app. Logs call stacks to PB-Signature. No signature changes.",
       "default": false,
       "category": null,
       "compatiblePackages": [
