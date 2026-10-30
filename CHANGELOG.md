@@ -1,3 +1,9 @@
+## [1.6.0-dev.5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.4...v1.6.0-dev.5) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** isolate Frida F3 startup without Java hooks ([e6ac12c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e6ac12cf8ab934739b0f1787fc6e5f711b0db92b))
+
 ## [1.6.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.3...v1.6.0-dev.4) (2026-10-30)
 
 ### 🐛 Bug Fixes
