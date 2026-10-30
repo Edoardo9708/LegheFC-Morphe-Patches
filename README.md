@@ -18,6 +18,23 @@ Aggiungi questa sorgente a Morphe Manager tramite l'indirizzo GitHub del reposit
 ## Elenco delle patch
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.6.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+<details open>
+<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 3.26.10.10 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Prezzi Benzina - Remove ads A1](#prezzi-benzina-remove-ads-a1) | Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases. |  |
+| [Prezzi Benzina - microG token routing F13](#prezzi-benzina-microg-token-routing-f13) | Local test: route only Maps ApiTokenService to the existing app.revanced.android.gms and declare the original public certificate digest. No Frida; use alone, not with F5-F12. |  |
+
+</details>
+
 <!-- PATCHES_END -->
 
 ## Sviluppo

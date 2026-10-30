@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.5.0...v1.6.0) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** keep F13 and ad removal patches ([e207587](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e207587c26168629896d99acea67d81b643b4f89))
+
 ## [1.5.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.4.0...v1.5.0) (2026-10-29)
 
 ### ✨ New Features
