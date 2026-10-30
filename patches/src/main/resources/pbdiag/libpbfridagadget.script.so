@@ -1,0 +1,84 @@
+'use strict';
+
+/**
+ * Prezzi Benzina / Maps diagnostic — PB-FRIDA-20261030-F1.
+ * Frida Gadget 16.7.19 (includes the Java bridge).
+ *
+ * Read-only: never changes return values, certificates, API keys, purchases,
+ * or Google Play Services. Logs only lookups concerning Prezzi Benzina.
+ */
+(function () {
+    var TAG = 'PB-Signature';
+    var ID = 'PB-FRIDA-20261030-F1';
+    var TARGET = 'org.vernazza.androidfuel';
+    var MAX_HITS = 50;
+
+    if (!Java.available) {
+        console.log(ID + ' Java not available');
+        return;
+    }
+
+    Java.perform(function () {
+        var PM = Java.use('android.app.ApplicationPackageManager');
+        var Log = Java.use('android.util.Log');
+        var Throwable = Java.use('java.lang.Throwable');
+        var hits = 0;
+
+        function info(message) {
+            try { Log.i(TAG, ID + ' ' + message); } catch (_) {}
+        }
+
+        function callStack() {
+            try {
+                return String(Log.getStackTraceString(Throwable.$new()))
+                    .split('\n')
+                    .slice(2, 14)
+                    .join(' | ')
+                    .substring(0, 1700);
+            } catch (e) {
+                return 'stack unavailable: ' + String(e);
+            }
+        }
+
+        function monitor(name) {
+            if (!PM[name]) {
+                info('UNAVAILABLE ' + name);
+                return;
+            }
+            var overloads = PM[name].overloads;
+            for (var i = 0; i < overloads.length; i++) {
+                (function (ov) {
+                    ov.implementation = function () {
+                        var args = Array.prototype.slice.call(arguments);
+                        var first = args.length ? String(args[0]) : '';
+                        var second = args.length > 1 ? String(args[1]) : '';
+                        var relevant = first.indexOf(TARGET) !== -1 ||
+                            (name === 'checkSignatures' && second.indexOf(TARGET) !== -1);
+                        if (relevant && hits < MAX_HITS) {
+                            hits++;
+                            info('HIT #' + hits + ' ' + name +
+                                '(' + args.map(function (a) {
+                                    if (a === null || a === undefined) return 'null';
+                                    var s = String(a);
+                                    return s.length > 100 ? s.substring(0, 100) : s;
+                                }).join(', ') + ')');
+                            info('STACK #' + hits + ' ' + callStack());
+                            if (hits === MAX_HITS) {
+                                info('LIMIT reached; additional events suppressed');
+                            }
+                        }
+                        // Always invoke the original Android implementation.
+                        return ov.apply(this, args);
+                    };
+                })(overloads[i]);
+            }
+            info('HOOKED ' + name + ' overloads=' + overloads.length);
+        }
+
+        ['getPackageInfo', 'getPackageInfoAsUser',
+         'getApplicationInfo', 'hasSigningCertificate',
+         'checkSignatures'].forEach(monitor);
+
+        info('READY; open Google Maps in Prezzi Benzina');
+    });
+})();
