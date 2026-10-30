@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.6.0-dev.12",
+  "version": "1.6.0-dev.13",
   "patches": [
     {
       "name": "DNS Changer - Force Pro test D2",
@@ -223,6 +223,32 @@
     {
       "name": "Prezzi Benzina - Entitlement diagnostics D1",
       "description": "Logs original Premium, price history and ads decisions without modifying purchases or feature access.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "org.vernazza.androidfuel",
+          "name": "Prezzi Benzina",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "3.26.10.10",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Prezzi Benzina - Gadget only F7 (ARM64)",
+      "description": "Experimental stability test: load Frida Gadget without Java bridge, Java hooks or certificate override. Does not fix Google Maps. Do not combine with F5/F6.",
       "default": false,
       "category": null,
       "compatiblePackages": [

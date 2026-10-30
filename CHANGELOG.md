@@ -1,3 +1,9 @@
+## [1.6.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.12...v1.6.0-dev.13) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** F7 Gadget-only diagnostic for native crash isolation ([39071b5](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/39071b5b3e007e06baf5ab8475132b571a449c85))
+
 ## [1.6.0-dev.12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.11...v1.6.0-dev.12) (2026-10-30)
 
 ### 🐛 Bug Fixes
