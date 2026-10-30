@@ -67,6 +67,13 @@ jobs:
             -o "$directory/libpbcustom.script.so"
           test "$(stat -c '%s' "$directory/libpbcustom.script.so")" -gt 1000
           grep -q PB-FRIDA-20261030-F6 "$directory/libpbcustom.script.so"
+          # F7 is core-only: no Frida Java bridge and no Java hooks.
+          # Keep it a separate compiled resource; do not alter F5/F6.
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-gadget-only-agent.js" \
+            -o "$directory/libpbgadgetonly.script.so"
+          test "$(stat -c '%s' "$directory/libpbgadgetonly.script.so")" -gt 500
+          grep -q PB-FRIDA-20261030-F7 "$directory/libpbgadgetonly.script.so"
 
 
 
