@@ -14,14 +14,14 @@ private object PbFridaAssetLoader {
 }
 
 /**
- * Esperimento F2: Frida Gadget 17.24.3, SOLO ARM64.
+ * Esperimento F3: Frida Gadget 17.24.3, SOLO ARM64.
  * Non modifica firme, token Maps, Billing, Premium o permessi.
  *
  * Preparazione delle risorse: il bundle contiene la libreria upstream,
- * la configurazione script-mode e uno script di tracciamento read-only.
+ * la configurazione script-mode e uno script native-only di avvio.
  * Lo script registra in Logcat con il tag PB-Signature.
  *
- * Questa patch e' volutamente separata da Remove Ads A1.\n * Il precedente Gadget 16.7.19 ha causato SIGSEGV su Android 17.
+ * Questa patch e' volutamente separata da Remove Ads A1.\n * F1 ha causato SIGSEGV: in F3 non si installa alcun hook Java.
  */
 private val pbFridaSignatureResources = resourcePatch {
     execute {
@@ -67,13 +67,13 @@ private val pbFridaSignatureResources = resourcePatch {
 
 /**
  * Avvia Frida Gadget una sola volta dall'Application.onCreate(), prima della
- * logica applicativa. La libreria avvia automaticamente lo script di tracing,
+ * logica applicativa. La libreria avvia automaticamente lo script di prova,
  * quindi sul telefono NON servono ADB, Termux, Objection o un client Frida.
  */
 @Suppress("unused")
 val prezziBenzinaFridaSignatureTracePatch = bytecodePatch(
-    name = "Prezzi Benzina - Signature trace F2 (ARM64)",
-    description = "Experimental: Frida 17.24.3 ARM64 signature lookup tracing for Android 17. Diagnostic only; leaves results unchanged.",
+    name = "Prezzi Benzina - Frida startup test F3 (ARM64)",
+    description = "Experimental startup isolation test: loads Frida Gadget without installing Java hooks. Logs PB-Signature, does not modify app behavior.",
     default = false
 ) {
     compatibleWith(
