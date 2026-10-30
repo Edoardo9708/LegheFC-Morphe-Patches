@@ -1,3 +1,9 @@
+## [1.6.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.14...v1.6.0-dev.15) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** F9 no-op getPackageInfo hook crash isolation ([5c4273e](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/5c4273e6e0781b324b5891a9a329873670df905b))
+
 ## [1.6.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.13...v1.6.0-dev.14) (2026-10-30)
 
 ### ✨ New Features

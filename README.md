@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.6.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.14)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;17 patches total
+> **[v1.6.0-dev.15](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.15)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;18 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -117,7 +117,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;7 patches</summary>
+<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;8 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -131,6 +131,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 | [Prezzi Benzina - Entitlement diagnostics D1](#prezzi-benzina-entitlement-diagnostics-d1) | Logs original Premium, price history and ads decisions without modifying purchases or feature access. |  |
 | [Prezzi Benzina - Gadget only F7 (ARM64)](#prezzi-benzina-gadget-only-f7-arm64) | Experimental stability test: load Frida Gadget without Java bridge, Java hooks or certificate override. Does not fix Google Maps. Do not combine with F5/F6. |  |
 | [Prezzi Benzina - Java bridge only F8 (ARM64)](#prezzi-benzina-java-bridge-only-f8-arm64) | Experimental stability test: load Frida Gadget and run Java.perform only, without Java hooks or certificate override. Does not fix Maps. Do not combine with F5/F6/F7. |  |
+| [Prezzi Benzina - No-op PackageInfo hook F9 (ARM64)](#prezzi-benzina-no-op-packageinfo-hook-f9-arm64) | Experimental stability test: intercept getPackageInfo(String,int) but return original PackageInfo unchanged. No certificate modification. Does not fix Maps. Use F9 alone, not with F5-F8. |  |
 | [Prezzi Benzina - Personal Google Maps key M1](#prezzi-benzina-personal-google-maps-key-m1) | Replace the Maps SDK manifest API key with your own Google Cloud key. Enter it in patch options; no certificate spoofing. | • Your Google Maps API key |
 | [Prezzi Benzina - Remove ads A1](#prezzi-benzina-remove-ads-a1) | Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases. |  |
 | [Prezzi Benzina - Signature trace F5 (ARM64)](#prezzi-benzina-signature-trace-f5-arm64) | Experimental read-only inspection of returned PackageInfo signing certificates (SHA-1/SHA-256) and call stacks. No signature changes. |  |
