@@ -89,6 +89,13 @@ jobs:
           test "$(stat -c '%s' "$directory/libpbnoop.script.so")" -gt 1000
           grep -q PB-FRIDA-20261030-F9 "$directory/libpbnoop.script.so"
 
+          # F10: Java.use + getPackageInfo overload lookup only, no hook or signing override.
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-method-lookup-agent.js" \
+            -o "$directory/libpblookup.script.so"
+          test "$(stat -c '%s' "$directory/libpblookup.script.so")" -gt 1000
+          grep -q PB-FRIDA-20261030-F10 "$directory/libpblookup.script.so"
+
 
 
       # Semantic release runs its own Gradle build command.
