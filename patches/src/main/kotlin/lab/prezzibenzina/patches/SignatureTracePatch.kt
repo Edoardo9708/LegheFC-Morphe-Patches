@@ -8,6 +8,11 @@ import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import org.w3c.dom.Element
 
+private object PbFridaAssetLoader {
+    fun open(path: String): java.io.InputStream? =
+        PbFridaAssetLoader::class.java.classLoader.getResourceAsStream(path)
+}
+
 /**
  * Esperimento F1: Frida Gadget 16.7.19, SOLO ARM64.
  * Non modifica firme, token Maps, Billing, Premium o permessi.
@@ -44,7 +49,7 @@ private val pbFridaSignatureResources = resourcePatch {
         // dal workflow di build. Nessun download sul telefono.
         for (name in names) {
             val path = "pbdiag/$name"
-            val input = classLoader.getResourceAsStream(path)
+            val input = PbFridaAssetLoader.open(path)
                 ?: error("Prezzi Benzina: risorsa Frida assente nel bundle: $path")
             val output = get("lib/arm64-v8a/$name")
             require(output.parentFile?.mkdirs() == true || output.parentFile?.isDirectory == true) {
