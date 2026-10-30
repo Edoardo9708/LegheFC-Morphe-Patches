@@ -62,8 +62,8 @@ jobs:
           grep -q PB-FRIDA-20261030-F5 "$directory/libpbfridagadget.script.so"
           # The optional F6 patch is independent of F5: its compiled agent
           # is bundled under another resource name, selected when patching.
-          ./node_modules/.bin/frida-compile \\
-            "$directory/frida-custom-signature-agent.js" \\
+          ./node_modules/.bin/frida-compile \
+            "$directory/frida-custom-signature-agent.js" \
             -o "$directory/libpbcustom.script.so"
           test "$(stat -c '%s' "$directory/libpbcustom.script.so")" -gt 1000
           grep -q PB-FRIDA-20261030-F6 "$directory/libpbcustom.script.so"
