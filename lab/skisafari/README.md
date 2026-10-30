@@ -12,7 +12,7 @@ Target: `com.yodo1.skisafarigp`, version 2.5 / versionCode 108, ARM64.
 
 These observations come from the exact original base APK and ARM64 split copied read-only from the Galaxy S23+. Il2CppDumper reported a protection warning, so the dump is treated as partial evidence; no protection bypass or runtime memory dump was used.
 
-The base manifest reports `allowBackup=true` and `extractNativeLibs=true`; no explicit backup-rule XML was present in the APK. The ARM64 split includes `libpairipcore.so` (SHA-256 `b4b4cc04d323507ff577d86fffa809106ff22de033a783cf3d37752e1da19c0b`). This patch does not modify or bypass PairIP, and its behavior after Morphe re-signing is unknown.
+The base manifest reports `allowBackup=true` and `extractNativeLibs=true`; no explicit backup-rule XML was present in the APK. The ARM64 split includes `libpairipcore.so` (SHA-256 `b4b4cc04d323507ff577d86fffa809106ff22de033a783cf3d37752e1da19c0b`). The main unlock patch does not modify PairIP. Observed startup failures and the later separate experiment are documented below and in `ONLINE-RESEARCH.md`.
 
 ## Runtime approach
 
@@ -86,6 +86,18 @@ All 12 original DEX files and all 15 native libraries in the merged control were
 
 The Java licensing omission was ineffective and was removed from the final patch. The game-thread dispatcher improvement is retained and compiles. No PairIP native instructions were changed speculatively. VMRunner is used by virtualized app code, so deleting the library would discard required execution machinery.
 
-Runtime success, unlock success, reading the restored profile, and persistent save success remain unverified. A verified solution for locally signed PairIP startup is required before further unlock tests. Current tablet installation after diagnostics is the re-signed original split control, not a working unlock build. Reverting to the original signature requires replacing that test installation again and restoring the external profile copy.
+Runtime success, unlock success, reading the restored profile, and persistent save success remain unverified. A verified solution for locally signed PairIP startup is required before further unlock tests. These controls left the re-signed original split control installed. It was subsequently replaced by the build 6 research experiment described in `ONLINE-RESEARCH.md`, which also fails before Unity. Reverting to the original signature requires replacing that test installation again and restoring the external profile copy.
 
 The final source (without the ineffective Java licensing change) was compiled into `morphe-test-skisafari-build4/patches-skisafari-local.mpp` and applied offline to produce `SkiSafari-unlock-experimental.apk`. Patching, rebuilding, signature verification, ZIP CRC checks and the DEX hook check passed. This final artifact was not installed for another redundant native-startup test.
+
+## Online research and save alternative
+
+See [ONLINE-RESEARCH.md](ONLINE-RESEARCH.md) for primary sources, tested startup strategies, their limits, and the independently verified save obfuscation routine. The failed startup experiment is retained outside compiled sources as a research diff.
+
+Read-only inspection of a profile copy:
+
+```powershell
+python .\lab\skisafari\inspect-profile.py path\to\ORIGINAL_40_CHARACTER_ID.profile
+```
+
+This tool validates the ID header, integer table, next-section count and exact XOR round trip. It does not implement an unlock edit or claim complete save-schema validation, and it never writes its input.
