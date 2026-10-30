@@ -48,15 +48,48 @@ private val pbCustomSignerResources = resourcePatch {
     execute {
         // Le opzioni Morphe sono impostate sul telefono prima del patching.
         // Non includiamo alcun certificato personale nel repository.
-        val certificateBase64 = pbCustomCertificateOption.value?.filterNot(Char::isWhitespace).orEmpty()
+        val input = pbCustomCertificateOption.value.orEmpty()
+
+        // Accept text copied from a .txt or PEM, including invisible Unicode
+        // formatting characters occasionally injected by Android keyboards.
+        // Do NOT silently discard arbitrary invalid characters: report the
+        // index/code point so clipboard truncation/corruption is visible.
+        val certificateBase64 = input
+            .replace("-----BEGIN CERTIFICATE-----", "", ignoreCase = true)
+            .replace("-----END CERTIFICATE-----", "", ignoreCase = true)
+            .filterNot { char ->
+                char.isWhitespace() ||
+                    Character.isSpaceChar(char) ||
+                    Character.getType(char) == Character.FORMAT.toInt()
+            }
+
         require(certificateBase64.length in 128..16000) {
-            "F6: inserire il certificato pubblico X.509 DER/Base64, non lo SHA-1"
+            "F6: lunghezza Base64 ricevuta=${certificateBase64.length}, " +
+                "originale=${input.length}. Inserire il certificato X.509 DER/Base64 completo."
+        }
+
+        val firstInvalid = certificateBase64.indexOfFirst { char ->
+            !(char in 'A'..'Z' ||
+                char in 'a'..'z' ||
+                char in '0'..'9' ||
+                char == '+' || char == '/' || char == '=')
+        }
+        require(firstInvalid == -1) {
+            val codePoint = certificateBase64[firstInvalid].code.toString(16)
+                .uppercase().padStart(4, '0')
+            "F6: carattere non Base64 U+$codePoint in posizione $firstInvalid, " +
+                "lunghezza=${certificateBase64.length}, originale=${input.length}. " +
+                "Copiare soltanto il testo Base64 dal file."
         }
 
         val bytes = try {
             Base64.getDecoder().decode(certificateBase64)
         } catch (_: IllegalArgumentException) {
-            error("F6: certificato Base64 non valido")
+            error(
+                "F6: Base64 non decodificabile; lunghezza=${certificateBase64.length}, " +
+                    "resto_mod4=${certificateBase64.length % 4}, originale=${input.length}. " +
+                    "Verificare che la stringa non sia stata troncata e che il padding finale == sia presente."
+            )
         }
         require(bytes.size in 128..12000) {
             "F6: lunghezza del certificato DER non valida"
@@ -72,6 +105,17 @@ private val pbCustomSignerResources = resourcePatch {
         require(cert.encoded.contentEquals(bytes)) {
             "F6: il certificato non e' un singolo DER X.509 canonico"
         }
+
+        // Log metadata only, never the certificate text or private material.
+        val sha1 = java.security.MessageDigest.getInstance("SHA-1")
+            .digest(bytes)
+            .joinToString(":") { byte ->
+                (byte.toInt() and 0xFF).toString(16).uppercase().padStart(2, '0')
+            }
+        println(
+            "F6 CERT INPUT OK: Base64=${certificateBase64.length} caratteri, " +
+                "DER=${bytes.size} byte, SHA1=$sha1"
+        )
 
         val androidNs = "http://schemas.android.com/apk/res/android"
         val propertyName = "lab.prezzibenzina.pbdiag.CUSTOM_CERT_DER"
