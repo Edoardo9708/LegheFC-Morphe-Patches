@@ -34,8 +34,13 @@ private object PbCustomSignerAssetLoader {
  */
 // A shared option must belong to the VISIBLE bytecode patch, not only its
 // unnamed resource dependency: otherwise Morphe cannot show the input field.
+// Morphe Manager infers a FOLDER picker from option keys containing
+// "custom", "icon" or "header". Keep the stored key free of those words;
+// the visible title can still contain "Custom".
 private val pbCustomCertificateOption = stringOption(
-    "Custom signing certificate DER (Base64)",
+    key = "signingCertificateDerBase64",
+    title = "Custom signing certificate DER (Base64)",
+    description = "Paste the Base64 contents of the public X.509 DER certificate; do not select a folder.",
     required = true
 )
 
