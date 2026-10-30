@@ -3,6 +3,7 @@ package lab.prezzibenzina.patches
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.resourcePatch
+import app.morphe.patcher.patch.stringOption
 import org.w3c.dom.Element
 
 /**
@@ -38,10 +39,10 @@ val prezziBenzinaPersonalMapsApiKeyPatch = resourcePatch(
 
     // Inserire la chiave tramite l'interfaccia delle opzioni di Morphe.
     // Evita di lasciare credenziali private nel sorgente GitHub.
-    val mapsApiKey by stringOption(name = "Your Google Maps API key")
+    val mapsApiKey by stringOption("Your Google Maps API key", required = true)
 
     execute {
-        val apiKey = mapsApiKey.trim()
+        val apiKey = mapsApiKey?.trim().orEmpty()
 
         // Una API key Google Maps standard inizia per AIza e ha 39 caratteri.
         // Non loggare mai la chiave o includerla nei messaggi d'errore.
