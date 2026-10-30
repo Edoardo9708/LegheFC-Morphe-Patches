@@ -1,3 +1,9 @@
+## [1.6.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.8...v1.6.0-dev.9) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** experimental F6 configurable signing response ([9d8b474](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/9d8b47464f480ec991ea275b54dd29579f13c30b))
+
 ## [1.6.0-dev.8](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.7...v1.6.0-dev.8) (2026-10-30)
 
 ### ✨ New Features
