@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Bundle the pinned upstream diagnostic library only when the F3 patch
+      # Bundle the pinned upstream diagnostic library only when the F4 patch
       # is present. Morphe will not download executable code on the phone.
       - name: Prepare Prezzi Benzina Frida Gadget (ARM64, diagnostic)
         if: hashFiles('patches/src/main/kotlin/lab/prezzibenzina/patches/SignatureTracePatch.kt') != ''
@@ -59,7 +59,7 @@ jobs:
             "$directory/frida-signature-agent.js" \
             -o "$directory/libpbfridagadget.script.so"
           test "$(stat -c '%s' "$directory/libpbfridagadget.script.so")" -gt 1000
-          grep -q PB-FRIDA-20261030-F3 "$directory/libpbfridagadget.script.so"
+          grep -q PB-FRIDA-20261030-F4 "$directory/libpbfridagadget.script.so"
 
 
       # Semantic release runs its own Gradle build command.
