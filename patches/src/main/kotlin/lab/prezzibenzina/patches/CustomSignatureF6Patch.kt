@@ -32,16 +32,18 @@ private object PbCustomSignerAssetLoader {
  * Non abilitarla insieme alla F5 diagnostica (stesso Frida Gadget).
  * M1 Maps key e Remove Ads A1 sono patch indipendenti.
  */
-private val pbCustomSignerResources = resourcePatch {
-    val certificateDerBase64 by stringOption(
-        "Custom signing certificate DER (Base64)",
-        required = true
-    )
+// A shared option must belong to the VISIBLE bytecode patch, not only its
+// unnamed resource dependency: otherwise Morphe cannot show the input field.
+private val pbCustomCertificateOption = stringOption(
+    "Custom signing certificate DER (Base64)",
+    required = true
+)
 
+private val pbCustomSignerResources = resourcePatch {
     execute {
         // Le opzioni Morphe sono impostate sul telefono prima del patching.
         // Non includiamo alcun certificato personale nel repository.
-        val certificateBase64 = certificateDerBase64?.filterNot(Char::isWhitespace).orEmpty()
+        val certificateBase64 = pbCustomCertificateOption.value?.filterNot(Char::isWhitespace).orEmpty()
         require(certificateBase64.length in 128..16000) {
             "F6: inserire il certificato pubblico X.509 DER/Base64, non lo SHA-1"
         }
@@ -127,6 +129,9 @@ val prezziBenzinaCustomSignatureF6Patch = bytecodePatch(
             targets = listOf(AppTarget(version = "3.26.10.10"))
         )
     )
+    // This option is exposed on the user-selectable F6 patch; the dependent
+    // resource patch reads the same Option object during execution.
+    pbCustomCertificateOption()
     dependsOn(pbCustomSignerResources)
 
     execute {
