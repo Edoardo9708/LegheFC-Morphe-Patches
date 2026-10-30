@@ -53,7 +53,7 @@ jobs:
           sha256sum /tmp/pb-frida-gadget.so.xz "$directory/libpbfridagadget.so"
           # Frida 17 no longer embeds the Java bridge; bundle it into the
           # standalone script consumed by Gadget on the phone (no PC needed).
-          npm install --no-save --no-package-lock --ignore-scripts \
+          npm install --no-save --no-package-lock \
             frida-compile@19.1.0 frida-java-bridge@7.0.13
           ./node_modules/.bin/frida-compile \
             "$directory/frida-signature-agent.js" \
