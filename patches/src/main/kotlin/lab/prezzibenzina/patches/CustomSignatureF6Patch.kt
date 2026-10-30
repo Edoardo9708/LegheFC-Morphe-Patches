@@ -40,7 +40,7 @@ private object PbCustomSignerAssetLoader {
 private val pbCustomCertificateOption = stringOption(
     key = "signingCertificateDerBase64",
     title = "Custom signing certificate DER (Base64)",
-    description = "Paste the Base64 contents of the public X.509 DER certificate; do not select a folder.",
+    description = "Paste the Base64 contents of the public X.509 DER certificate (no PEM headers).",
     required = true
 )
 
