@@ -16,9 +16,9 @@ The base manifest reports `allowBackup=true` and `extractNativeLibs=true`; no ex
 
 ## Runtime approach
 
-The experimental Morphe patch adds `libskisafariunlock.so` and a small Java extension. A handler on Android's UI thread waits for the IL2CPP domain, attaches that thread through the exported `il2cpp_thread_attach` API, then polls until both `GameState.PersistentProfile` and `ShopItemHelper.Instance` are non-null before calling the verified native method once. Static analysis shows the game method calls `GameState.Save()` when it changes unlock flags. A dedicated SharedPreferences marker is committed after the native method returns, preventing repeat calls on later launches. This marker is separate from the game profile.
+The experimental Morphe patch adds `libskisafariunlock.so` and a small Java extension. It uses the verified `UnityPlayer.queueGLThreadEvent(Runnable)` dispatcher. The extension checks that each task executes on the exact `m_MainThread` instance, waits for the IL2CPP domain and profile, then calls the verified native method once. Readiness retries are queued at 500 ms intervals; there is no injected per-frame hook. Static analysis shows the game method calls `GameState.Save()` when it changes unlock flags. A dedicated SharedPreferences marker is committed after the native method returns, preventing repeat calls on later launches. This marker is separate from the game profile.
 
-The UI-thread call is not proven safe: the Unity game loop may run on another thread, and direct native IL2CPP invocation could race game state or crash. The marker records that the method returned; it does not independently verify that changed items persisted. Do not use this build on the only copy of a live profile until a separate installation and a restart-based save check are available.
+The original UI-thread approach was replaced by Unity's own queue after inspecting its bytecode. Runtime execution is still unverified because startup fails inside PairIP before the bridge runs. The marker records that the method returned; it does not independently verify that changed items persisted. Do not use this build on the only copy of a live profile until a separate installation and a restart-based save check are available.
 
 The method walks the complete `ShopItem` catalog. Static analysis confirms it changes local `Unlocked` flags and does not make billing calls or write purchase receipts. The catalog was not fully resolved, so this patch should be treated as potentially enabling locally catalogued purchase-associated items; it does not simulate or record a purchase.
 
@@ -67,3 +67,25 @@ Local verification completed with Morphe Desktop 1.20.0:
 - Original bundle JVM classes and resources were preserved; only the combined DEX files and bundle manifest changed.
 
 Output directory on this PC: `morphe-test-skisafari-build2` (outside the repository). The test APK SHA-256 is `b1ab4624e372b63f56cda9591ea9e42b2f5de9ccfc2c2ea360011bfd3976fd3e`. No runtime execution or persistent save success has been established.
+
+## Tablet startup investigation (2026-10-30)
+
+The user authorized replacing the original tablet installation. The test device is Samsung SM-T870, Android 13. The profile copy was restored before launch, and its SHA-256 remained identical to the PC backup after all tests. App-private data were inaccessible before replacement, so the external copy is not represented as a complete backup.
+
+The locally signed app displays Google Play's "Download this game from Play" screen and exits before any `SkiSafari-Unlock` bridge log. Live crash capture identifies `SIGSEGV / SEGV_ACCERR` in `libpairipcore.so`, PC offset `0x5ECC4`, during startup. This is before Unity and before the native unlock helper is invoked.
+
+Three controls isolate the problem:
+
+| APK tested | Result |
+| --- | --- |
+| Unlock build with an experimental omission of Java license initialization | Same native crash before the bridge |
+| Merged original APK, no unlock changes, signed with the same test key | Same native crash |
+| Original base and ARM64 split kept separate, each signed with the test key | Same native crash |
+
+All 12 original DEX files and all 15 native libraries in the merged control were verified byte-for-byte against the original APK set. In the split control, manifests, resources, assets, DEX and native files were unchanged; the signer replaced signing metadata, including the original SourceStamp marker. The tablet's previously installed original base APK also matched the source base APK SHA-256. Thus the failure is reproduced by re-signing the original APK set; the split merger and unlock logic are not required to trigger it. PairIP's exact internal failure condition has not been decoded.
+
+The Java licensing omission was ineffective and was removed from the final patch. The game-thread dispatcher improvement is retained and compiles. No PairIP native instructions were changed speculatively. VMRunner is used by virtualized app code, so deleting the library would discard required execution machinery.
+
+Runtime success, unlock success, reading the restored profile, and persistent save success remain unverified. A verified solution for locally signed PairIP startup is required before further unlock tests. Current tablet installation after diagnostics is the re-signed original split control, not a working unlock build. Reverting to the original signature requires replacing that test installation again and restoring the external profile copy.
+
+The final source (without the ineffective Java licensing change) was compiled into `morphe-test-skisafari-build4/patches-skisafari-local.mpp` and applied offline to produce `SkiSafari-unlock-experimental.apk`. Patching, rebuilding, signature verification, ZIP CRC checks and the DEX hook check passed. This final artifact was not installed for another redundant native-startup test.

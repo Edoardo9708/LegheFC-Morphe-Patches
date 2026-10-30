@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.util.Log;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /** Runtime bridge for the verified Ski Safari 2.5 ARM64 native helper. */
 public final class SkiSafariUnlock {
@@ -17,7 +18,7 @@ public final class SkiSafariUnlock {
     private static final long RETRY_MS = 500L;
     private static final long TIMEOUT_MS = 120_000L;
 
-    private static boolean scheduled;
+    private static volatile boolean scheduled;
 
     private SkiSafariUnlock() { }
 
@@ -57,17 +58,90 @@ public final class SkiSafariUnlock {
             return;
         }
 
-        scheduled = true;
-        final long startedAt = SystemClock.elapsedRealtime();
+        try {
+            Field playerField = findField(activity.getClass(), "mUnityPlayer");
+            Object player = playerField.get(activity);
+            if (player == null) throw new IllegalStateException("UnityPlayer absent");
+            Method queue = player.getClass().getDeclaredMethod("queueGLThreadEvent", Runnable.class);
+            queue.setAccessible(true);
+            Thread unityThread = (Thread) findField(player.getClass(), "m_MainThread").get(player);
+            if (unityThread == null) throw new IllegalStateException("Unity thread absent");
+            scheduled = true;
+            UnlockTask task = new UnlockTask(app, player, queue, unityThread);
+            task.handler.post(task::enqueue);
+            task.handler.postDelayed(() -> {
+                if (!task.finished) {
+                    Log.e(TAG, "Errore: dispatcher Unity o profilo non pronto entro il timeout.");
+                    task.finish();
+                }
+            }, TIMEOUT_MS);
+        } catch (Exception e) {
+            scheduled = false;
+            Log.e(TAG, "Errore: dispatcher Unity verificato non disponibile.");
+        }
+    }
+
+    private static Field findField(Class<?> type, String name) throws NoSuchFieldException {
+        while (type != null) {
+            try {
+                Field field = type.getDeclaredField(name);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException e) {
+                type = type.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(name);
+    }
+
+    private static final class UnlockTask implements Runnable {
+        final Context app;
+        final Object player;
+        final Method queue;
+        final Thread unityThread;
         final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override public void run() {
+        volatile boolean finished;
+        boolean dispatched;
+
+        UnlockTask(Context app, Object player, Method queue, Thread unityThread) {
+            this.app = app;
+            this.player = player;
+            this.queue = queue;
+            this.unityThread = unityThread;
+        }
+
+        void finish() {
+            finished = true;
+            scheduled = false;
+        }
+
+        void enqueue() {
+            if (finished) return;
+            try {
+                queue.invoke(player, this);
+            } catch (Exception e) {
+                Log.e(TAG, "Errore: impossibile accodare il lavoro sul thread Unity.");
+                finish();
+            }
+        }
+
+        @Override public void run() {
+                if (finished) return;
+                if (Thread.currentThread() != unityThread) {
+                    Log.e(TAG, "Errore: dispatcher eseguito su thread diverso da Unity.");
+                    finish();
+                    return;
+                }
+                if (!dispatched) {
+                    Log.i(TAG, "Dispatcher sul thread Unity pronto.");
+                    dispatched = true;
+                }
                 final int result;
                 try {
                     result = tryUnlock();
                 } catch (Throwable t) {
                     Log.e(TAG, "Errore durante la chiamata nativa ShopItemHelper.");
-                    scheduled = false;
+                    finish();
                     return;
                 }
 
@@ -79,24 +153,18 @@ public final class SkiSafariUnlock {
                     } else {
                         Log.e(TAG, "Funzione completata, ma marcatore one-shot non persistito; potra' essere ripetuta al prossimo avvio.");
                     }
-                    scheduled = false;
+                    finish();
                     return;
                 }
 
                 if (result < 0) {
                     Log.e(TAG, "Errore: target IL2CPP non pronto o non corrispondente.");
-                    scheduled = false;
+                    finish();
                     return;
                 }
 
-                if (SystemClock.elapsedRealtime() - startedAt >= TIMEOUT_MS) {
-                    Log.e(TAG, "Errore: profilo o ShopItemHelper non pronto entro il timeout; sblocco non dichiarato.");
-                    scheduled = false;
-                    return;
-                }
-                handler.postDelayed(this, RETRY_MS);
-            }
-        });
+                handler.postDelayed(this::enqueue, RETRY_MS);
+        }
     }
 
     /** 0=IL2CPP absent, 1=profile not loaded, 2=shop helper absent, 3=called, 4=already called. */

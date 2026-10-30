@@ -71,7 +71,7 @@ private val skiSafariUnlockNativeResources = rawResourcePatch {
 @Suppress("unused")
 val skiSafariUnlockAllItemsPatch = bytecodePatch(
     name = "Ski Safari – Unlock All Items",
-    description = "Experimental: invokes the game's native ShopItemHelper.UnlockAllItems once after the saved profile and shop helper are ready. The game saves changed unlock flags through GameState.Save; runtime thread safety and persistence still require device verification.",
+    description = "Experimental: invokes ShopItemHelper.UnlockAllItems once through UnityPlayer's verified game-thread queue after the profile is ready. The game saves changed unlock flags through GameState.Save. Runtime execution is blocked by PairIP on the locally signed build and is not verified.",
     default = false
 ) {
     compatibleWith(
@@ -85,6 +85,21 @@ val skiSafariUnlockAllItemsPatch = bytecodePatch(
     extendWith("extensions/extension.mpe")
 
     execute {
+        val unityQueue = Fingerprint(
+            definingClass = "Lcom/unity3d/player/UnityPlayer;",
+            name = "queueGLThreadEvent",
+            returnType = "V",
+            parameters = listOf("Ljava/lang/Runnable;")
+        ).method
+        val queueCalls = unityQueue.implementation?.instructions?.mapNotNull {
+            (it as? ReferenceInstruction)?.reference as? MethodReference
+        } ?: error("Ski Safari Unlock: dispatcher Unity assente.")
+        require(queueCalls.any {
+            it.definingClass == "Ljava/util/concurrent/ConcurrentLinkedQueue;" && it.name == "add"
+        } && queueCalls.any {
+            it.definingClass == "Ljava/lang/Runnable;" && it.name == "run"
+        }) { "Ski Safari Unlock: dispatcher Unity differente dalla build verificata." }
+
         val unityActivity = Fingerprint(
             definingClass = "Lcom/unity3d/player/UnityPlayerActivity;",
             name = "onCreate",
