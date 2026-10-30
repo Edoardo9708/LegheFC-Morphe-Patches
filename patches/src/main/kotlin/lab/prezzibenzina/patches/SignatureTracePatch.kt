@@ -14,14 +14,14 @@ private object PbFridaAssetLoader {
 }
 
 /**
- * Esperimento F1: Frida Gadget 16.7.19, SOLO ARM64.
+ * Esperimento F2: Frida Gadget 17.24.3, SOLO ARM64.
  * Non modifica firme, token Maps, Billing, Premium o permessi.
  *
  * Preparazione delle risorse: il bundle contiene la libreria upstream,
  * la configurazione script-mode e uno script di tracciamento read-only.
  * Lo script registra in Logcat con il tag PB-Signature.
  *
- * Questa patch e' volutamente separata da Remove Ads A1.
+ * Questa patch e' volutamente separata da Remove Ads A1.\n * Il precedente Gadget 16.7.19 ha causato SIGSEGV su Android 17.
  */
 private val pbFridaSignatureResources = resourcePatch {
     execute {
@@ -72,8 +72,8 @@ private val pbFridaSignatureResources = resourcePatch {
  */
 @Suppress("unused")
 val prezziBenzinaFridaSignatureTracePatch = bytecodePatch(
-    name = "Prezzi Benzina - Signature trace F1 (ARM64)",
-    description = "Experimental: logs signature lookups made by Google Maps inside the app process. Diagnostic only; ARM64.",
+    name = "Prezzi Benzina - Signature trace F2 (ARM64)",
+    description = "Experimental: Frida 17.24.3 ARM64 signature lookup tracing for Android 17. Diagnostic only; leaves results unchanged.",
     default = false
 ) {
     compatibleWith(
