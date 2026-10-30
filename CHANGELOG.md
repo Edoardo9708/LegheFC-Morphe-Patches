@@ -1,3 +1,9 @@
+## [1.6.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.2...v1.6.0-dev.3) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** add read-only Frida signature trace F1 ([44bef6c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/44bef6cdb28faeffe8282a2e419f3a51a9335eef))
+
 ## [1.6.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.1...v1.6.0-dev.2) (2026-10-29)
 
 ### 🐛 Bug Fixes

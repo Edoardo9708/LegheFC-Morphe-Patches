@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.6.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;12 patches total
+> **[v1.6.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -117,7 +117,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -129,6 +129,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 |----------|----------------|-----------|
 | [Prezzi Benzina - Entitlement diagnostics D1](#prezzi-benzina-entitlement-diagnostics-d1) | Logs original Premium, price history and ads decisions without modifying purchases or feature access. |  |
 | [Prezzi Benzina - Remove ads A1](#prezzi-benzina-remove-ads-a1) | Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases. |  |
+| [Prezzi Benzina - Signature trace F1 (ARM64)](#prezzi-benzina-signature-trace-f1-arm64) | Experimental: logs signature lookups made by Google Maps inside the app process. Diagnostic only; ARM64. |  |
 
 </details>
 
