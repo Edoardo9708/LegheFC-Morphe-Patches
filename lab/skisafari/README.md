@@ -12,13 +12,13 @@ Target: `com.yodo1.skisafarigp`, version 2.5 / versionCode 108, ARM64.
 
 These observations come from the exact original base APK and ARM64 split copied read-only from the Galaxy S23+. Il2CppDumper reported a protection warning, so the dump is treated as partial evidence; no protection bypass or runtime memory dump was used.
 
-The base manifest reports `allowBackup=true` and `extractNativeLibs=true`; no explicit backup-rule XML was present in the APK. The ARM64 split includes `libpairipcore.so` (SHA-256 `b4b4cc04d323507ff577d86fffa809106ff22de033a783cf3d37752e1da19c0b`). The main unlock patch does not modify PairIP. Observed startup failures and the later separate experiment are documented below and in `ONLINE-RESEARCH.md`.
+The base manifest reports `allowBackup=true` and `extractNativeLibs=true`; no explicit backup-rule XML was present in the APK. The ARM64 split includes `libpairipcore.so` (SHA-256 `b4b4cc04d323507ff577d86fffa809106ff22de033a783cf3d37752e1da19c0b`). Native PairIP remains unchanged. The current experimental patch reconstructs Java startup around the unavailable VM initialization; see the latest tablet investigation below.
 
 ## Runtime approach
 
 The experimental Morphe patch adds `libskisafariunlock.so` and a small Java extension. It uses the verified `UnityPlayer.queueGLThreadEvent(Runnable)` dispatcher. The extension checks that each task executes on the exact `m_MainThread` instance, waits for the IL2CPP domain and profile, then calls the verified native method once. Readiness retries are queued at 500 ms intervals; there is no injected per-frame hook. Static analysis shows the game method calls `GameState.Save()` when it changes unlock flags. A dedicated SharedPreferences marker is committed after the native method returns, preventing repeat calls on later launches. This marker is separate from the game profile.
 
-The original UI-thread approach was replaced by Unity's own queue after inspecting its bytecode. Runtime execution is still unverified because startup fails inside PairIP before the bridge runs. The marker records that the method returned; it does not independently verify that changed items persisted. Do not use this build on the only copy of a live profile until a separate installation and a restart-based save check are available.
+The original UI-thread approach was replaced by Unity's own queue after inspecting its bytecode. The Java bridge now runs on the tablet, but native unlock execution remains unverified. The helper also waits for `GameState.IsLoadRequested` to become false and a nonempty catalog; it verifies every returned item ID with `IsItemUnlocked` after the call. Only successful in-memory verification permits a marker. The marker does not independently verify persistence across process restarts. Do not use this build on the only copy of a live profile.
 
 The method walks the complete `ShopItem` catalog. Static analysis confirms it changes local `Unlocked` flags and does not make billing calls or write purchase receipts. The catalog was not fully resolved, so this patch should be treated as potentially enabling locally catalogued purchase-associated items; it does not simulate or record a purchase.
 
@@ -92,7 +92,7 @@ The final source (without the ineffective Java licensing change) was compiled in
 
 ## Online research and save alternative
 
-See [ONLINE-RESEARCH.md](ONLINE-RESEARCH.md) for primary sources, tested startup strategies, their limits, and the independently verified save obfuscation routine. The failed startup experiment is retained outside compiled sources as a research diff.
+See [ONLINE-RESEARCH.md](ONLINE-RESEARCH.md) for primary sources, tested startup strategies, their limits, and the independently verified save obfuscation routine. The historical build 6 diff is retained separately; current compiled sources include the later guarded startup reconstruction.
 
 Read-only inspection of a profile copy:
 
@@ -101,3 +101,16 @@ python .\lab\skisafari\inspect-profile.py path\to\ORIGINAL_40_CHARACTER_ID.profi
 ```
 
 This tool validates the ID header, integer table, next-section count and exact XOR round trip. It does not implement an unlock edit or claim complete save-schema validation, and it never writes its input.
+
+## Latest startup reconstruction: builds 7–15
+
+This section supersedes the historical installed-build descriptions above. All tests target the SM-T870 tablet; the S23+ and original PC backup remain untouched.
+
+- The original APK includes direct, non-VM SDK alternatives: `SplashActivity1`, `Yodo1Application1.onCreate`, and `Yodo1LagacyUnityActivity`. The manifest selects the two alternative activities, while the existing Application retains its base initialization and reuses the shipped direct `onCreate` lifecycle sequence.
+- The legacy player's old `UnityPlayer(ContextWrapper)` call is adapted to the existing `UnityPlayer(Context)` constructor, preserving the object and arguments. The extension resolves inherited dispatcher methods correctly.
+- Guarded, local literal repairs restore the Google Games Binder descriptor from its own interface factory, the HTTP/2 `:method` constant, WorkManager's WorkName table/foreign-key pragma and three column names from the database schema, and two diagnostic log prefixes. A null-only HandlerThread label fallback is limited to its four-instruction constructor. No receipt, payment response, purchase callback or server identity is fabricated.
+- Build 13 reached the Java patch marker and loaded both `libmain.so` and the helper, then failed in an online-config diagnostic callback and OkHttp header initialization. Build 14 corrected those failures and remained alive for the initial 25-second observation, with a black screen while the tablet was dozing and keyguard was showing. A cold restart then exposed the missing WorkManager column literal repaired in build 15. A live process with no foreground focus is not proof of a working game.
+- The updated native helper uses `RTLD_NOLOAD` with the existing IL2CPP image instead of assuming globally visible exports. It waits for the game's load-request flag to clear, rejects an empty catalog, and verifies unlock flags in memory before returning success. Two native rebuilds produced identical SHA-256 `30b436e598dbcab85d00ac4978a6b8e235c77ebc1b73893b0eccf7056e590e4a`.
+- Desktop 1.20.0 full resource rebuilding consumed unchanged native input files twice when accessed with `ResourcePatchContext.get`. Identity checks now stream the source APK ZIP directly via the host's private `config.apkFile` fields. This workaround fails closed on unsupported host layouts; Manager/other patcher compatibility is unverified.
+
+Native unlock execution, item persistence and restored-profile visibility are still **unverified**. Build 15 requires a foreground test on an unlocked tablet. It must not be merged to a release branch as a working unlock patch.

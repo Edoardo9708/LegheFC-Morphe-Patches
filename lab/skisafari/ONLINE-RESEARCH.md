@@ -18,7 +18,14 @@ The initial direct VM-call scan found 24 caller methods, including startup calls
 
 Build 6 compiled, patched and signed successfully. On SM-T870 it reached the new Application log instead of the native `SIGSEGV`, then failed in `Yodo1Application.onCreate` on a null `java.lang.reflect.Method` (`TJheaMreAW.zYJ`). The original body behind that reflection target was not found among static methods with the matching typed signature. Other SplashActivity methods use the same initialization scheme. Skipping further SDK methods without reconstructing their bodies would risk breaking necessary startup and purchase-related behavior.
 
-The experiment is retained as a research diff, not included in the main unlock patch. The tablet currently has this failing build 6 installed; it has not reached Unity or unlocked items.
+The build 6 experiment is retained as a historical research diff. Later compiled sources reconstruct startup with direct alternatives shipped in the APK and narrowly scoped constant repairs; current progress is documented in the README's latest-build section. Native unlock and persistence have not been verified.
+
+Additional primary-source checks for the reconstructed literals:
+
+- AndroidX WorkName schema: https://android.googlesource.com/platform/frameworks/support/+/ad0c5ae108ee47df3e209ed81589a8c4db851866/work/work-runtime/src/schemas/androidx.work.impl.WorkDatabase/14.json — agrees with the WorkName validation block in this exact APK's schema 16 (columns, composite primary key, cascading WorkSpec foreign key).
+- OkHttp Header constants: https://raw.githubusercontent.com/square/okhttp/parent-4.12.0/okhttp/src/main/kotlin/okhttp3/internal/http2/Header.kt — confirms `TARGET_METHOD` encodes `:method`, which also remains in this APK as `TARGET_METHOD_UTF8`.
+
+These checks support specific constant repairs, not a generic PairIP bypass or complete SDK restoration. Tests exposed additional missing constants on later cold starts, so short process-survival observations cannot establish success.
 
 ## Save route: confirmed observations, not an applied edit
 

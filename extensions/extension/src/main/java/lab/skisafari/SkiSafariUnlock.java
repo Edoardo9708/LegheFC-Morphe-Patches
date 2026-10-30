@@ -19,8 +19,21 @@ public final class SkiSafariUnlock {
     private static final long TIMEOUT_MS = 120_000L;
 
     private static volatile boolean scheduled;
+    private static boolean diagnosticsInstalled;
 
     private SkiSafariUnlock() { }
+
+    public static synchronized void prepareUnity() {
+        Log.i(TAG, "Ingresso attivita': preparazione Unity.");
+        if (diagnosticsInstalled) return;
+        Thread thread = Thread.currentThread();
+        Thread.UncaughtExceptionHandler previous = thread.getUncaughtExceptionHandler();
+        thread.setUncaughtExceptionHandler((failedThread, error) -> {
+            Log.e(TAG, "Errore durante l'avvio Unity.", error);
+            if (previous != null) previous.uncaughtException(failedThread, error);
+        });
+        diagnosticsInstalled = true;
+    }
 
     public static synchronized void start(Activity activity) {
         if (activity == null) return;
@@ -62,8 +75,7 @@ public final class SkiSafariUnlock {
             Field playerField = findField(activity.getClass(), "mUnityPlayer");
             Object player = playerField.get(activity);
             if (player == null) throw new IllegalStateException("UnityPlayer absent");
-            Method queue = player.getClass().getDeclaredMethod("queueGLThreadEvent", Runnable.class);
-            queue.setAccessible(true);
+            Method queue = findQueueMethod(player.getClass());
             Thread unityThread = (Thread) findField(player.getClass(), "m_MainThread").get(player);
             if (unityThread == null) throw new IllegalStateException("Unity thread absent");
             scheduled = true;
@@ -92,6 +104,19 @@ public final class SkiSafariUnlock {
             }
         }
         throw new NoSuchFieldException(name);
+    }
+
+    private static Method findQueueMethod(Class<?> type) throws NoSuchMethodException {
+        while (type != null) {
+            try {
+                Method method = type.getDeclaredMethod("queueGLThreadEvent", Runnable.class);
+                method.setAccessible(true);
+                return method;
+            } catch (NoSuchMethodException e) {
+                type = type.getSuperclass();
+            }
+        }
+        throw new NoSuchMethodException("queueGLThreadEvent");
     }
 
     private static final class UnlockTask implements Runnable {
