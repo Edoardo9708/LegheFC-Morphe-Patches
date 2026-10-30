@@ -1,3 +1,9 @@
+## [1.6.0-dev.14](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.13...v1.6.0-dev.14) (2026-10-30)
+
+### ✨ New Features
+
+* **prezzibenzina:** F8 Java bridge-only diagnostic without hooks ([c006b0c](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/c006b0c780ab4b71c644b36e7740720ba7fe5f5f))
+
 ## [1.6.0-dev.13](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.12...v1.6.0-dev.13) (2026-10-30)
 
 ### ✨ New Features
