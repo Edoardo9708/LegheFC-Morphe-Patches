@@ -14,14 +14,14 @@ private object PbFridaAssetLoader {
 }
 
 /**
- * Esperimento F3: Frida Gadget 17.24.3, SOLO ARM64.
+ * Esperimento F4: Frida Gadget 17.24.3, SOLO ARM64.
  * Non modifica firme, token Maps, Billing, Premium o permessi.
  *
  * Preparazione delle risorse: il bundle contiene la libreria upstream,
- * la configurazione script-mode e uno script native-only di avvio.
+ * la configurazione script-mode e un singolo hook Java di diagnostica.
  * Lo script registra in Logcat con il tag PB-Signature.
  *
- * Questa patch e' volutamente separata da Remove Ads A1.\n * F1 ha causato SIGSEGV: in F3 non si installa alcun hook Java.
+ * Questa patch e' volutamente separata da Remove Ads A1.\n * F3 ha confermato che il caricamento nativo funziona.\n * F4 intercetta esclusivamente getPackageInfo(String,int) senza modificarne il risultato.
  */
 private val pbFridaSignatureResources = resourcePatch {
     execute {
@@ -72,8 +72,8 @@ private val pbFridaSignatureResources = resourcePatch {
  */
 @Suppress("unused")
 val prezziBenzinaFridaSignatureTracePatch = bytecodePatch(
-    name = "Prezzi Benzina - Frida startup test F3 (ARM64)",
-    description = "Experimental startup isolation test: loads Frida Gadget without installing Java hooks. Logs PB-Signature, does not modify app behavior.",
+    name = "Prezzi Benzina - Signature trace F4 (ARM64)",
+    description = "Experimental read-only trace of getPackageInfo(String,int) inside the app. Logs call stacks to PB-Signature. No signature changes.",
     default = false
 ) {
     compatibleWith(
