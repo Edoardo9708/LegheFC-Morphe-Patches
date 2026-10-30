@@ -1,3 +1,9 @@
+## [1.6.0-dev.10](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.9...v1.6.0-dev.10) (2026-10-30)
+
+### 🐛 Bug Fixes
+
+* **prezzibenzina:** expose F6 certificate option on selectable patch ([b4c61a7](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/b4c61a7d1e817f8b6bc1f2810e191300f92af58c))
+
 ## [1.6.0-dev.9](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0-dev.8...v1.6.0-dev.9) (2026-10-30)
 
 ### ✨ New Features
