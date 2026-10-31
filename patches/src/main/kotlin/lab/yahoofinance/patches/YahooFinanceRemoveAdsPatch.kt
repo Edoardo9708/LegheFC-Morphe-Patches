@@ -1,7 +1,7 @@
 package lab.yahoofinance.patches
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
@@ -14,7 +14,7 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 /**
  * Yahoo Finance 26.21.2, versionCode 1360038759 (base.apk/classes.dex).
  *
- * Test A1: the existing SubscriptionManagerHilt.p(SubscriptionFeature):boolean
+ * Test A2: the existing SubscriptionManagerHilt.p(SubscriptionFeature):boolean
  * returns true only for SubscriptionFeature.AdsFree. For all other features,
  * the original bytecode executes unchanged. No billing, purchase, tier or
  * persistent entitlement state is modified.
@@ -25,11 +25,11 @@ import com.android.tools.smali.dexlib2.iface.reference.MethodReference
  * and v1 is about to be overwritten by sget-object HAS_ACCESS. This allows
  * checking AdsFree in v1 without breaking the non-AdsFree fallthrough.
  *
- * Logcat: YF-RemoveAds / YF-20261031-A1.
+ * Logcat: YF-RemoveAds / YF-20261031-A2.
  */
 @Suppress("unused")
 val yahooFinanceRemoveAdsPatch = bytecodePatch(
-    name = "Yahoo Finance - Remove ads A1",
+    name = "Yahoo Finance - Remove ads A2",
     description = "Test: enables only the AdsFree UI check; leaves other subscription features and purchases unchanged. Logs YF-RemoveAds.",
     default = false
 ) {
@@ -90,13 +90,13 @@ val yahooFinanceRemoveAdsPatch = bytecodePatch(
         // At index 3, p0 is the already-computed access state, and p1 is no
         // longer needed: the next original instruction overwrites p1 with the
         // HAS_ACCESS enum. The non-AdsFree branch therefore remains intact.
-        method.addInstructions(
+        method.addInstructionsWithLabels(
             3,
             """
                 instance-of p1, p1, Lcom/yahoo/mobile/client/android/finance/subscription/v2/model/SubscriptionFeature${'$'}AdsFree;
                 if-eqz p1, :morphe_original
                 const-string p0, "YF-RemoveAds"
-                const-string p1, "YF-20261031-A1 AdsFree forced true"
+                const-string p1, "YF-20261031-A2 AdsFree forced true"
                 invoke-static {p0, p1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
                 const/4 p0, 0x1
                 return p0
