@@ -342,6 +342,22 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Stato/limiti:** APERTO. Occorre chiarire se la modifica dello stato fosse intenzionale, altrimenti ripristinare la natura passiva della diagnostica, quindi testare runtime e assenza di regressioni.
 - **Riferimenti:** `StateInputDiagnosticPatch.kt`, `patch_logLkmplDemo()`, `LXJX.invokeSuspend`, registro `v1`; branch `dev`, nessun nuovo commit.
 
+
+**Aggiornamento storico (23/10/2026, Leghe FC 13.2.1):** l'helper `patch_logLkmplDemo()` usa registri propri e crea una `ArrayList` con un elemento dimostrativo `Lkmpl`. La restituisce con `return-object v0`; il chiamante acquisisce il riferimento con `move-result-object`. **I registri dei due metodi non sono condivisi**: l'helper può restituire `v0` e il chiamante memorizzare in un registro diverso. Nel sorgente pubblicato su `dev` il risultato è assegnato a `v1`, usato come argomento `List` in `Lkqgs.<init>`: confermata la sostituzione della lista A (non diagnostica passiva). La vecchia firma `()V` non sarebbe compatibile con l'uso di `move-result-object`, ma non è documentata una prova runtime di questa combinazione. La correzione sintattica LFC-003 **non risolve** la sostituzione dello stato. **Stato invariato: APERTO.** Non testati separatamente formazione consigliata, comparatore o persistenza. Commit storici `e0b4e3d`, `2c95280`.
+
+
+### LFC-003 — Opcode Smali errato `move -result-object` — RISOLTO (parser)
+
+- **Ambito:** Leghe FC `it.quadronica.leghe`, versione **13.2.1 build 445**; Morphe Manager 2.0.0, Modificatore 2.0.0, Android 17 (API 37), bundle storico `Leghe FC LAB Patches 1.0.0-dev.19`. Sorgente `StateInputDiagnosticPatch.kt`.
+- **Sintomo:** l'applicazione della patch `Leghe FC - Diagnostica ingresso LXJX` si interrompe con `PatchException: Encountered 1 parser syntax errors and 0 lexer syntax errors!`. Stack: `InlineSmaliCompiler.compile(InlineSmaliCompiler.kt:59)` → `InstructionExtensions.addInstructions(InstructionExtensions.kt:146)` → `StateInputDiagnosticPatch.kt:161`.
+- **Causa verificata:** la stringa multilinea inserita da `method.addInstructions(afterInputsReady, ...)` conteneva `move -result-object v4`; l'opcode corretto è **un unico token**: `move-result-object`.
+- **Tentativo fallito:** applicazione della stringa Smali malformata; non risultano altri tentativi significativi.
+- **Soluzione:** correggere in `invoke-static {}, LXJX;->patch_logLkmplDemo()Ljava/util/List;` seguito immediatamente da `move-result-object v4`. Verificare firma del metodo chiamato `Ljava/util/List;` e ritorno `return-object` coerente. **Questo risolve la sintassi, non la semantica della sostituzione dei dati.**
+- **Verifica:** l'utente ha confermato «funziona» dopo la correzione; errore del parser superato. Nel sorgente attuale su `dev` compare `move-result-object v1`, sintatticamente valido: il registro differisce dall'esempio storico `v4`.
+- **Stato e limiti:** RISOLTO l'errore di parser; nessuna prova runtime conclusiva per ART, percentuali, formazione suggerita, comparatore, Premium o persistenza. Confrontare con **LFC-002**, che resta aperto.
+- **Riferimenti:** `StateInputDiagnosticPatch.kt`, `method.addInstructions(afterInputsReady,...)`, `patch_logLkmplDemo()`; release `v1.0.0-dev.19`, correzione nelle revisioni successive verso `v1.0.0-dev.20`.
+
+
 ### Regole riutilizzabili e attività aperte
 
 - **Nomi offuscati ≠ identità dei metodi.** Ad ogni versione confrontare firme, tipi, opcode, riferimenti e struttura del flusso, anche quando un vecchio nome continua a esistere.
@@ -485,6 +501,20 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Verifica:** nel workflow [`40085781321`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40085781321) risultano `DEX files found: ['classes.dex', 'generated/extensions/signature.dex']`. Il file `patches-1.2.0-dev.12.mpp` è stato ripubblicato con MIME `application/dash-patch+xml`, dimensione **1.342.529 byte**; workflow riuscito.
 - **Stato/limiti:** PARZIALMENTE RISOLTO. È verificata la correzione strutturale del bundle, **non** una successiva prova positiva del caricamento delle applicazioni in Manager, né compatibilità con versioni Manager diverse dalla 2.1.0. Il controllo sui DEX era un recupero storico, poi eliminato dal workflow ordinario durante MOR-REL-001; non affermare che faccia tuttora parte del workflow ufficiale.
 - **Riferimenti:** `.github/workflows/release.yml`, `gradle.properties`, log `morphe_logcat-2026-10-24-112220.log.txt` alle 11:20:37 e 11:20:48; commit `1c4a850`, `2dfb2db`. MOR-REL-001 per successivo ripristino della pipeline.
+
+
+### MOR-REL-005 — Release `v1.0.1` pubblicata ma backmerge fallito — PARZIALMENTE RISOLTO (storico)
+
+- **Ambito:** repository multipatch Morphe, GitHub Actions, `semantic-release`, `@cleyrop-org/semantic-release-backmerge`, branch `dev`/`main`; release stabile `v1.0.1` (23/10/2026).
+- **Sintomo:** workflow `Release` in stato `failure` **dopo** pubblicazione riuscita di `v1.0.1` e `patches-1.0.1.mpp`. Log: `Performing backmerge with "rebase" strategy` e `Command failed with exit code 1: git rebase origin/main`. Conflitti in `CHANGELOG.md`, `README.md`, `gradle.properties`, `patches-bundle.json`, `patches-list.json`.
+- **Causa verificata:** il plugin tentava il rebase del commit prerelease `v1.0.1-dev.1` su `origin/main` mentre i metadati generati della stabile `v1.0.1` divergevano. Il problema riguardava **solo la sincronizzazione successiva alla pubblicazione**, non build o caricamento del bundle.
+- **Tentativo fallito:** `git rebase origin/main` sul commit `dc54c3f`, bloccato da conflitti multipli.
+- **Soluzione durante la sessione:** nessuna correzione del backmerge. README aggiornato separatamente sui due branch, mantenendo i rispettivi blocchi generati. **Aggiornamento storico successivo:** configurazione documentata con `backmergeStrategy: "merge"` e `mergeMode: "ours"`; sincronizzazione riuscita in altra release (vedere MOR-REL-001 e il riepilogo delle promozioni), ma **non** è una prova di risoluzione del caso `v1.0.1` né di gestione di futuri conflitti.
+- **Verifica:** fasi Gradle e GitHub publish riuscite; release e bundle `patches-1.0.1.mpp` presenti; fallimento nel backmerge indicato dai log. Una release pubblicata **non** dimostra che `dev` e `main` siano sincronizzati, né che l'APK funzioni.
+- **Stato e limiti:** PARZIALMENTE RISOLTO per l'incidente storico: asset pubblicato, backmerge non completato; nessun test runtime specifico della release.
+- **Riferimenti:** workflow [`39936118763`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/39936118763), job `120355950357`; PR #2 (commit `6aa2913`), commit prerelease `dc54c3f`, README `f037573`, `.releaserc` e cinque file generati citati. Voci correlate FON-003 e MOR-REL-001.
+- **Numerazione:** l'ID `MOR-REL-005` è mantenuto dal resoconto originale; nel dizionario centrale consultato non figura ancora `MOR-REL-004`. La lacuna è intenzionalmente lasciata senza inventare una voce.
+
 
 ### FLOWX-META-001 — Nome "Diagnostica Gold" incoerente con la modifica dello stato locale — RISOLTO (metadati)
 
