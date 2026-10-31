@@ -27,6 +27,8 @@ Additional primary-source checks for the reconstructed literals:
 
 These checks support specific constant repairs, not a generic PairIP bypass or complete SDK restoration. Tests exposed additional missing constants on later cold starts, so short process-survival observations cannot establish success.
 
+For builds 17–18, AppLovin's official integration documentation identifies the SDK coordinate `com.applovin:applovin-sdk`: https://support.applovin.com/en/max/android/overview/manual-integration . The exact version in the game's BuildConfig is 13.3.1. Static comparison used https://repo.maven.apache.org/maven2/com/applovin/applovin-sdk/13.3.1/applovin-sdk-13.3.1.aar (SHA-256 `ce34810afff4e1f9ccc5686b52daf21fa48c80772ff610763be90dacc5484a03`). The comparison recovers nine missing settings keys in `com.applovin.impl.l4` and the literal `AppLovinSdk:` in `r5$c.newThread`. The AAR was inspected on the PC only, not installed or bundled as executable code.
+
 ## Save route: confirmed observations, not an applied edit
 
 `Profile.Obfuscate(string udid, byte[] data, int dataLength)` at RVA `0xBD93D0` XORs each byte with a character from the profile UDID: initial character index `3*length/4`, step two, wrap to zero. The observed routine iterates the entire byte array. The profile filename stem supplies the matching 40-character UDID.

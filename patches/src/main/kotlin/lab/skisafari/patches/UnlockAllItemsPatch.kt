@@ -362,9 +362,14 @@ val skiSafariUnlockAllItemsPatch = bytecodePatch(
             definingClass = "Lokhttp3/internal/http2/Header;", name = "<clinit>",
             returnType = "V", parameters = emptyList()
         ).method
+        val appLovinThreadFactory = Fingerprint(
+            definingClass = "Lcom/applovin/impl/r5\$c;", name = "newThread",
+            returnType = "Ljava/lang/Thread;", parameters = listOf("Ljava/lang/Runnable;")
+        ).method
         val literalFixes = listOf(
             Triple(onlineFailure, "Lcn/thinkinganalyticsclone/android/utils/Re/fgtmeC;->TxdD:Ljava/lang/String;", "Online configuration failed: "),
-            Triple(headerInit, "Lcom/moloco/sdk/xenoss/sdkdevkit/android/adrenderer/internal/templates/renderer/events/handlers/TGH/xgQksA;->WFP:Ljava/lang/String;", ":method")
+            Triple(headerInit, "Lcom/moloco/sdk/xenoss/sdkdevkit/android/adrenderer/internal/templates/renderer/events/handlers/TGH/xgQksA;->WFP:Ljava/lang/String;", ":method"),
+            Triple(appLovinThreadFactory, "Lcom/moloco/sdk/xenoss/sdkdevkit/android/adrenderer/internal/templates/renderer/events/handlers/TGH/xgQksA;->OrpOHqdJUUizXd:Ljava/lang/String;", "AppLovinSdk:")
         )
         for ((method, field, value) in literalFixes) {
             val loads = method.implementation!!.instructions.withIndex().filter { (_, instruction) ->
@@ -394,6 +399,43 @@ val skiSafariUnlockAllItemsPatch = bytecodePatch(
             val load = loads.single()
             method.replaceInstruction(load.index,
                 "const-string v${(load.value as OneRegisterInstruction).registerA}, \"$column\"")
+        }
+
+        // Keys recovered from the matching official AppLovin 13.3.1 AAR,
+        // SHA-256 ce34810afff4e1f9ccc5686b52daf21fa48c80772ff610763be90dacc5484a03.
+        // Restore literals at their use sites, retaining every original default.
+        val adSettings = Fingerprint(
+            definingClass = "Lcom/applovin/impl/l4;", name = "<clinit>",
+            returnType = "V", parameters = emptyList()
+        ).method
+        val adKeyFixes = listOf(
+            Triple("Lcom/bytedance/adsdk/mTK/Hk/Vs/cYQuUaEdRNe;->yBloQnRPW:Ljava/lang/String;", "g", "rss"),
+            Triple("Lcom/applovin/impl/privacy/cmp/kPb/cahijjeQHDGVHJ;->XivtyV:Ljava/lang/String;", "h", "rssoitf"),
+            Triple("Lcom/unity3d/services/ads/operation/fd/nBSvEzkkf;->xvbYiYcnEcjqOMx:Ljava/lang/String;", "r", "logcat_max_line_size"),
+            Triple("Lcom/bytedance/sdk/openadsdk/core/sm/mTK/phM/LgrO/JsLakKGcj;->oygfRtkyFvlvmF:Ljava/lang/String;", "j0", "ttc_acrsnv"),
+            Triple("Lcom/apm/insight/g/fJR/rxjeIjJoNJOcQ;->zmbCXxjYhkwa:Ljava/lang/String;", "P0", "mdafra"),
+            Triple("Lcom/mbridge/msdk/video/dynview/constant/WyVn/KcJixRj;->zkryZlKE:Ljava/lang/String;", "v2", "postitial_progress_bar_vertical_padding"),
+            Triple("Landroidx/compose/runtime/internal/NM/sYzcj;->chDIfTr:Ljava/lang/String;", "E2", "submit_web_tracker_timeout"),
+            Triple("Lcom/google/android/gms/common/internal/service/OAI/wKMUtYbMnXWqE;->awjR:Ljava/lang/String;", "M2", "http_socket_timeout"),
+            Triple("Lcn/thinkingdata/analytics/utils/Sw/nowPMAJe;->gBpfLw:Ljava/lang/String;", "k4", "tmas")
+        )
+        for ((field, setting, key) in adKeyFixes) {
+            val instructions = adSettings.implementation!!.instructions
+            val loads = instructions.withIndex().filter { (_, instruction) ->
+                instruction.opcode == Opcode.SGET_OBJECT &&
+                    (instruction as? ReferenceInstruction)?.reference.toString() == field
+            }
+            require(loads.size == 1) { "Chiave AppLovin non corrispondente: $setting" }
+            val load = loads.single()
+            val destination = instructions.drop(load.index + 1).take(14).firstOrNull {
+                it.opcode == Opcode.SPUT_OBJECT &&
+                    ((it as? ReferenceInstruction)?.reference as? FieldReference)?.definingClass == "Lcom/applovin/impl/l4;"
+            }
+            require(((destination as? ReferenceInstruction)?.reference as? FieldReference)?.name == setting) {
+                "Destinazione impostazione AppLovin inattesa: $setting"
+            }
+            adSettings.replaceInstruction(load.index,
+                "const-string v${(load.value as OneRegisterInstruction).registerA}, \"$key\"")
         }
 
         val legacyActivity = Fingerprint(

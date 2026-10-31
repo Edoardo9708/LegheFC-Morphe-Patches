@@ -27,7 +27,8 @@ typedef struct {
 
 static int g_unlock_called;
 static int g_profile_ready_logged;
-static void *g_attached_il2cpp_thread;
+static int g_runtime_ready;
+static int g_wait_logged;
 
 static int find_il2cpp(struct dl_phdr_info *info, size_t size, void *data) {
     (void) size;
@@ -52,27 +53,28 @@ Java_lab_skisafari_SkiSafariUnlock_tryUnlock(JNIEnv *env, jclass clazz) {
     dl_iterate_phdr(find_il2cpp, &image);
     if (image.base == 0) return 0;
 
-    if (g_attached_il2cpp_thread == NULL) {
-        typedef void *(*DomainGet)(void);
-        typedef void *(*ThreadAttach)(void *domain);
+    if (!g_runtime_ready) {
+        typedef void *(*RuntimeGetter)(void);
         // Unity may load IL2CPP with RTLD_LOCAL. Acquire only the existing image;
         // never load or initialize a second copy as a side effect of polling.
         void *handle = dlopen(image.path, RTLD_NOW | RTLD_NOLOAD);
         if (handle == NULL) return 0;
-        DomainGet domain_get = (DomainGet) dlsym(handle, "il2cpp_domain_get");
-        ThreadAttach thread_attach = (ThreadAttach) dlsym(handle, "il2cpp_thread_attach");
+        RuntimeGetter get_corlib = (RuntimeGetter) dlsym(handle, "il2cpp_get_corlib");
+        RuntimeGetter thread_current = (RuntimeGetter) dlsym(handle, "il2cpp_thread_current");
         dlclose(handle);
-        if (domain_get == NULL || thread_attach == NULL) {
-            LOGE("Errore: API IL2CPP domain/thread attach non esportate.");
+        if (get_corlib == NULL || thread_current == NULL) {
+            LOGE("Errore: API IL2CPP corlib/thread current non esportate.");
             return -1;
         }
-        void *domain = domain_get();
-        if (domain == NULL) return 0;
-        g_attached_il2cpp_thread = thread_attach(domain);
-        if (g_attached_il2cpp_thread == NULL) {
-            LOGE("Errore: thread Android non collegato al dominio IL2CPP.");
-            return -1;
+        // domain_get lazily allocates a domain even before Runtime::Init. A
+        // non-null domain therefore does not authorize thread_attach or game
+        // metadata calls. Let Unity initialize its existing thread itself.
+        if (get_corlib() == NULL || thread_current() == NULL) {
+            if (!g_wait_logged++) LOGI("Attesa inizializzazione IL2CPP sul thread Unity; nessun attach forzato.");
+            return 0;
         }
+        g_runtime_ready = 1;
+        LOGI("Runtime IL2CPP e thread Unity gia' inizializzati.");
     }
 
     typedef void *(*StaticGetter)(void *method_info);

@@ -6,7 +6,7 @@ Target: `com.yodo1.skisafarigp`, version 2.5 / versionCode 108, ARM64.
 
 - `ShopItemHelper.UnlockAllItems()` RVA `0xC8DC94`, file offset `0xC89C94`.
 - `ShopItemHelper.TestUnlockAll()` RVA `0xC8FB90`, file offset `0xC8BB90`; its only instruction is `B 0xC8DC94`.
-- The `UnlockAllItems` loop checks each catalog item's `Unlocked` property, sets locked entries to unlocked, clears their `IsNew` flag, and calls `GameState.Save()` (`0xBC23F0`) when changes were made.
+- The `UnlockAllItems` loop checks each catalog item's virtual `Unlocked` property, sets locked entries to unlocked, clears their `IsNew` flag, and calls `GameState.Save()` (`0xBC23F0`) after the catalog loop. The save call is unconditional on that path, including when no flags changed.
 - `GameState.Save()` calls `Profile.Save(true)`; `Profile.Save(bool)` serializes/encrypts the profile and completes its local persistence path before returning.
 - The profile class includes the saved coin count and stats separately; the unlock routine does not call coin setters or replace the Profile object.
 
@@ -114,3 +114,16 @@ This section supersedes the historical installed-build descriptions above. All t
 - Desktop 1.20.0 full resource rebuilding consumed unchanged native input files twice when accessed with `ResourcePatchContext.get`. Identity checks now stream the source APK ZIP directly via the host's private `config.apkFile` fields. This workaround fails closed on unsupported host layouts; Manager/other patcher compatibility is unverified.
 
 Native unlock execution, item persistence and restored-profile visibility are still **unverified**. Build 15 requires a foreground test on an unlocked tablet. It must not be merged to a release branch as a working unlock patch.
+
+## Foreground results: build 18 (2026-10-31)
+
+This section supersedes the earlier runtime status. The tested build is compiled from the current Kotlin/native sources; no new install or save restore is needed to reproduce the user's current tablet installation.
+
+- Build 15 reached the Unity dispatcher but terminated with signal 11 before profile readiness. Static inspection showed `il2cpp_domain_get` lazily allocates a domain even before runtime initialization. Build 16 removes domain creation/thread attachment and waits for `il2cpp_get_corlib` plus an already attached `il2cpp_thread_current` on Unity's own thread. Unity now initializes normally and reaches the persistent profile.
+- AppLovin 13.3.1 initialization then exposed missing configuration keys and a thread-name prefix. These literals were recovered by comparing the same classes with the official Maven Central AAR, retaining the original settings and defaults. No replacement SDK or original APK was added to Git.
+- Build 18 compiled, patched, signed and installed successfully. It displayed the game's privacy screen and remained alive after several minutes. Logcat recorded `Profilo persistente pronto` and the actual `Avvio ShopItemHelper.UnlockAllItems()` call at 01:38:46, followed by the method's return.
+- The postcondition reported some catalog entries still locked, so no successful one-shot marker was written. This is a real incomplete verification, not an unlock-all success. `Item_Booster.get_Unlocked` is verified to always return false and its setter is a single RET; other specialized categories also require separate examination. The current generic error text does not identify the failed category.
+- The original imported profile stayed byte-for-byte unchanged. The game created an additional device-specific profile and saved data there. Static inspection confirms `GameState.CoinCount` adds the persistent profile's coins to the other-profile coin total; the active profile's separate zero coin field alone does not demonstrate loss of imported coins. Full progress visibility and persistence still require UI/restart verification.
+- The user reports that the behavior they care about appears to work. This is recorded as user feedback, not proof that every item category or a cold-restart save check passed.
+
+Runtime helper SHA-256: `c25c0db59c0eb45f55bd1df42407e4e56d790fd1af90dc5c0a40744a36d1b4b4`. Local artifacts remain outside Git under `morphe-test-skisafari-build18`. The branch remains experimental; no merge to dev/main or stable release was performed.
