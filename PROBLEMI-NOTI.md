@@ -351,6 +351,50 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## Fonometro — 11.5 (versionCode 82), 28–31 ottobre 2026
+
+- **Applicazione:** `com.ktwapps.soundmeter`; APK `Fonometro-82-11.5.aspk`, DEX `classes2.dex`, patch Morphe `DisableAdsPatch.kt`.
+- **Perimetro:** l'utente ha confermato il risultato della patch; non sono disponibili nella sessione log runtime o test sistematici delle superfici pubblicitarie. Le problematiche generali di firma e installazione restano nelle sezioni trasversali.
+
+### FON-001 — Disabilitazione banner/interstitial senza alterare Premium — RISOLTO (caso d'uso)
+
+- **Sintomo/obiettivo:** eliminare banner e interstitial evitando modifiche ad acquisti, licenze ed entitlement Premium.
+- **Struttura identificata:** `Lc5/v;->f(Context)I` legge la preferenza locale `premium` (default `-1`); `MainActivity.C1()` carica banner e `n1()` li rimuove; `Detail.m1()` gestisce annunci e `Z0()` rimuove il banner nei dettagli; `Lc5/a.l(Activity)` e `m(Activity)` caricano annunci; `Lc5/a.o(Activity,I)` gestisce interstitial con callback `Lc5/a$e.E(I)`.
+- **Soluzione:** patch `Fonometro - Remove ads`, `default = false`, compatibilità limitata a `11.5`. All'inizio di `MainActivity.C1()` invoca `n1()`, sgancia riferimenti annunci tramite `Lc5/a.i()`/`j()`, richiama `j1()` e termina. In `Detail.m1()` richiama `Z0()` e termina. In `Lc5/a.l()` e `m()` inserisce `return-void` per evitare caricamenti. In `Lc5/a.o()` chiama `Lc5/a$e.E(I)` con l'argomento originale, poi termina: **non** salta indiscriminatamente la callback al chiamante.
+- **Controlli di sicurezza:** fingerprint di classe/firma, conteggio registri, riferimenti attesi, e stop esplicito se il bytecode non coincide. Lo stato Premium e il Billing non sono alterati dalla patch.
+- **Tentativi falliti:** nessuno documentato; non è stato tentato di modificare Premium.
+- **Verifica:** sorgente e presenza nel catalogo Morphe controllati; pre-release `v1.4.0-dev.1`; l'utente ha detto «Per me è già ok» e ha chiesto la pubblicazione stabile. Non risultano test automatici dedicati, log runtime, schermate prima/dopo o test esaustivi.
+- **Stato/limiti:** RISOLTO **per l'utilizzo confermato dall'utente**, con copertura tecnica parziale. Da verificare callback interstitial via Logcat, tutte le schermate/formati, richieste residue agli SDK, comportamento dopo riavvio e bundle stabile `v1.8.0`. Nessuna garanzia per versioni successive a 11.5.
+- **Riferimenti:** `patches/src/main/kotlin/lab/fonometro/patches/DisableAdsPatch.kt`; commit `2b6f67d`, `dev`; pre-release `v1.4.0-dev.1`.
+
+### FON-002 — Escaping di classe DEX annidata nei literal Kotlin — RISOLTO (sorgente)
+
+- **Sintomo:** nel codice Kotlin che compone Smali, il nome DEX annidato `Lc5/a$e;` deve contenere un dollaro letterale, mentre `$` è interpretato come interpolazione dal compilatore Kotlin.
+- **Causa:** usare il riferimento senza un escaping corretto può creare un errore di compilazione o un riferimento Smali errato. Un tentativo intermedio di correzione non ha prodotto la rappresentazione finale voluta; **non è documentato un errore Gradle specifico**.
+- **Soluzione:** rappresentare il dollaro con `$` anche nelle stringhe multilinea, sia nei riferimenti al tipo del campo `d` sia nelle chiamate `invoke-interface`. Esempio Kotlin: `"Lc5/a$e;->E"`.
+- **Verifica:** rilettura di `DisableAdsPatch.kt` su `dev`; riferimenti Kotlin corretti nel sorgente e catalogo successivamente generato. Non disponibile una prova separata di fallimento/successo compilazione per ogni revisione intermedia.
+- **Stato/limiti:** RISOLTO nel sorgente. Regola riutilizzabile per classi DEX annidate nominate nelle stringhe Kotlin.
+- **Riferimenti:** `DisableAdsPatch.kt`; commit intermedi `cb3cddd`, `7493a4b`; metodo `Lc5/a$e;->E(I)V`.
+
+### FON-003 — Pubblicazione stabile senza metadati pre-release — RISOLTO (integrazione)
+
+- **Ambito/sintomo:** nel confronto `main...dev` comparivano anche `CHANGELOG.md`, `README.md`, `gradle.properties`, `patches-list.json`, `patches-bundle.json` generati da semantic-release per `dev`. Un merge indiscriminato avrebbe trasferito metadati del canale di sviluppo su `main`.
+- **Causa:** il processo di release aggiorna metadati e catalogo durante le pre-release. **Non** si è verificato un merge errato: la divergenza è stata riconosciuta preventivamente.
+- **Soluzione:** aggiornare su `dev` la denominazione `Fonometro - Remove ads` e la descrizione inglese `Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases.`; creare `release/fonometro-remove-ads` da `main`; trasferire **solo** `DisableAdsPatch.kt` e verificare diff di un unico file; squash merge della PR #12; lasciare alla pipeline la rigenerazione dei metadati stabili.
+- **Verifica:** PR #12 integrata, commit `e7101ee`; sorgente su `main` con descrizione corretta, catalogo `patches-list.json` contenente Fonometro; `patches-bundle.json` ha successivamente riportato `v1.8.0`, mentre il controllo iniziale riportava ancora `v1.3.0`.
+- **Stato/limiti:** RISOLTO per integrazione e catalogo. La pubblicazione non prova il comportamento sul dispositivo del bundle stabile `v1.8.0`; nessun test d'installazione di tale bundle documentato. È un caso concreto della regola di pubblicazione selettiva già riportata per altre patch: **non** assume un errore di merge effettivo.
+- **Riferimenti:** commit descrizione `997ea57`, PR [#12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/pull/12), commit `e7101ee`, ramo `release/fonometro-remove-ads`, `.releaserc`, `patches-list.json`, `patches-bundle.json`.
+
+### Regole riutilizzabili e verifiche mancanti
+
+- Distinguere **caricamento, visualizzazione, rimozione e callback** della pubblicità: un ritorno anticipato non deve eliminare una notifica ancora necessaria.
+- Riutilizzare, quando presenti, i percorsi originali di pulizia UI per non confondere rimozione degli annunci e cambio dello stato Premium.
+- Nelle stringhe Kotlin destinate a Smali controllare il carattere `$` letterale dei nomi di classi annidate, comprese le stringhe multilinea.
+- Verificare fingerprint/registri/riferimenti prima di patchare; pubblicare selettivamente i sorgenti lasciando che semantic-release generi i metadati per il canale corretto.
+- **Ancora aperto:** Logcat dell'effettiva callback interstitial; copertura completa di schermate/formati e richieste residue; prova dopo arresto/riavvio; test runtime con bundle stabile `v1.8.0`; analisi su versioni diverse da `11.5`.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
