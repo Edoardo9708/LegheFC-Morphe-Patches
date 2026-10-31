@@ -171,6 +171,21 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
+<summary>📦 Ski Safari&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 2.5 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Ski Safari – Unlock All Items](#ski-safari-unlock-all-items) | Experimental: invokes ShopItemHelper.UnlockAllItems once through UnityPlayer's verified game-thread queue after the profile is ready. Includes local APK startup compatibility; native VM callbacks and save persistence require device verification. |  |
+
+</details>
+
+<details open>
 <summary>📦 Twilight&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
