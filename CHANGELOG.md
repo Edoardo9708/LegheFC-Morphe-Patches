@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.1...v1.7.0) (2026-10-31)
+
+### ✨ New Features
+
+* **skisafari:** add experimental unlock-all patch for 2.5 ([7fe0e28](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/7fe0e2888bee2c85daefe35e7cfefcf11049f5dc))
+
 ## [1.6.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.6.0...v1.6.1) (2026-10-30)
 
 ### 🐛 Bug Fixes
