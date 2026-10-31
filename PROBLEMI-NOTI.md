@@ -385,6 +385,8 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Stato/limiti:** RISOLTO per integrazione e catalogo. La pubblicazione non prova il comportamento sul dispositivo del bundle stabile `v1.8.0`; nessun test d'installazione di tale bundle documentato. È un caso concreto della regola di pubblicazione selettiva già riportata per altre patch: **non** assume un errore di merge effettivo.
 - **Riferimenti:** commit descrizione `997ea57`, PR [#12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/pull/12), commit `e7101ee`, ramo `release/fonometro-remove-ads`, `.releaserc`, `patches-list.json`, `patches-bundle.json`.
 
+**Caso aggiuntivo (release `v1.3.0`, PR #9/#10; distinto dalla pubblicazione Fonometro PR #12):** il confronto `main...dev` mostrava fino a 69 commit, ma solo sei file diversi (cinque generati e il sorgente Flowx, modificato esclusivamente in nome/descrizione). La PR #9 era integrabile, ma fu **chiusa senza merge** per changelog duplicato e metadati Flowx imprecisi. Dopo ripristino workflow, pulizia changelog e modifica del testo Flowx, fu pubblicata la dev `v1.3.0-dev.2` e **integrata la PR #10 con merge senza squash** (commit `8938194`), preservando la cronologia richiesta dal template. `semantic-release` generò la stabile `v1.3.0`; bundle `patches-1.3.0.mpp` da **1.342.804 byte**, MIME `application/dash-patch+xml`, workflow [40746604764](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40746604764) riuscito, inclusa attestazione. Alla fine di **quella sessione storica** `main` e `dev` erano sincronizzati al commit `34dffe3`; ciò non descrive necessariamente il loro stato attuale. Non è stata modificata la logica delle patch in tale promozione e la release non equivale a test applicativo. Per dettagli sul changelog e i metadati Flowx: MOR-REL-002 e FLOWX-META-001.
+
 ### Regole riutilizzabili e verifiche mancanti
 
 - Distinguere **caricamento, visualizzazione, rimozione e callback** della pubblicità: un ritorno anticipato non deve eliminare una notifica ancora necessaria.
@@ -438,12 +440,54 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Stato/limiti:** APERTO; correggere i permessi richiede ancora un'azione e una prova del risultato.
 - **Riferimenti:** `.github/workflows/open_pull_request.yml` nel repository Twilight; [workflow PR fallito, run 39969220531](https://github.com/Edoardo9708/Twilight-Morphe-Patches/actions/runs/39969220531); [workflow Release riuscito, run 39969220587](https://github.com/Edoardo9708/Twilight-Morphe-Patches/actions/runs/39969220587); commit `643ba68`.
 
+**Aggiornamento comparativo (altro repository, non correzione Twilight):** in `Edoardo9708/LegheFC-Morphe-Patches` lo stesso errore GraphQL è stato risolto dall'utente abilitando `Settings > Actions > General > Workflow permissions > Allow GitHub Actions to create and approve pull requests`. Il run [40742453207](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40742453207) inizialmente fallito è riuscito rieseguendo il job `123007350279`; create automaticamente PR #9 e, successivamente, PR #10 (poi integrata). Il permesso è specifico del repository: **TWI-002 resta APERTO** finché il repository Twilight non è corretto e verificato autonomamente.
+
 ### Regole riutilizzabili e verifiche ancora necessarie
 
 - Un messaggio Logcat costante non certifica il valore restituito: mantenere coerenti **bytecode, log e descrizione** e verificare i registri quando si aggiunge logging Smali.
 - `addInstructions(0,...)` con `return` cambia il flusso di esecuzione senza modificare necessariamente il campo o lo stato originale. Distinguere **compilazione, pubblicazione, patch applicata, installazione, runtime e persistenza**.
 - Le pipeline Release e creazione PR sono indipendenti: il successo della prima non risolve problemi di autorizzazione della seconda.
 - **Aperto:** correggere log/descrizione; acquisire Logcat dopo patch; testare avvio, funzionalità interessate, controlli licenza indipendenti e persistenza; abilitare e verificare i permessi di creazione PR.
+
+---
+
+## Manutenzione release Morphe e metadati Flowx — 28 ottobre 2026
+
+**Ambito:** `Edoardo9708/LegheFC-Morphe-Patches`; GitHub Actions, Gradle, Morphe Patches Plugin e `semantic-release`. Sono incidenti storici distinti dal funzionamento runtime delle singole patch. Le regole generali sulle pubblicazioni selettive erano già documentate in FON-003.
+
+### MOR-REL-001 — Recuperi temporanei rimasti nel workflow di release — RISOLTO (workflow)
+
+- **Sintomo:** `.github/workflows/release.yml` nel canale `dev` conteneva 166 righe, contro le 59 del template ufficiale `MorpheApp/morphe-patches-template`, con recuperi specifici per `v1.2.0-dev.12` e `v1.3.0-dev.1`.
+- **Cause storiche documentate nel workflow:** aggiunta di una procedura per ricostruire `refs/notes/semantic-release-v1.2.0-dev.12` mancante, `continue-on-error` per proseguire dopo `semantic-release`, recupero con `./gradlew publish`, verifica dei DEX nel `.mpp` e cancellazione/ricaricamento degli asset tramite GitHub API. **La causa radice originaria del problema delle Git note non è stata riprodotta.** Questi recuperi erano serviti in passato ma non erano più appropriati come percorso ordinario; potevano intervenire sugli asset già pubblicati.
+- **Soluzione:** sostituito **solo** il workflow `dev` con quello identico al template ufficiale; eliminati recuperi temporanei e percorso di pubblicazione alternativo; nessuna patch Kotlin modificata.
+- **Verifica:** identità con il template tramite contenuto e SHA Git; commit [`6b80f199`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6b80f199966172e94567abd090eeb389b4463adb); run [40742453189](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40742453189) riuscito; pubblicata `v1.3.0-dev.1` con asset `.mpp`; workflow successivi su `dev` e `main` completati.
+- **Stato/limiti:** RISOLTO il ripristino del workflow, **non** la causa storica delle Git note. Successi futuri non garantiti in caso di nuove anomalie di sincronizzazione.
+
+### MOR-REL-002 — Sezioni duplicate di `1.2.0-dev.12` nel changelog — RISOLTO
+
+- **Sintomo:** `CHANGELOG.md` conteneva **sette** intestazioni `1.2.0-dev.12`, con date ed elenchi di commit in parte diversi, e mancavano le sezioni stabili `1.0.1`, `1.1.0` e `1.2.0`.
+- **Causa verificata:** ripetuti recuperi della stessa prerelease avevano accumulato sezioni progressivamente più estese ma associate allo **stesso numero di versione**. I recuperi precedenti avevano consentito di proseguire senza pulire il file.
+- **Soluzione:** preso il `CHANGELOG.md` dal tag pubblicato `v1.2.0-dev.12`; identificata e preservata **testualmente** la sezione originale; eliminate sei duplicazioni e ripristinate da `main` le tre sezioni stabili, lasciando intatte le altre prerelease.
+- **Verifica:** sezioni dev.12 da 7 a 1, tre sezioni stabili recuperate, sezione originale identica al tag. Commit [`b634777`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/b63477741332404be5a867be0761c2791284982c) con **solo** `CHANGELOG.md`. Run [40744561955](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40744561955) riuscito senza creare una nuova release.
+- **Stato/limiti:** RISOLTO il file storico identificato. Non corregge retroattivamente le note delle release GitHub né impedisce automaticamente nuovi duplicati.
+
+### FLOWX-META-001 — Nome "Diagnostica Gold" incoerente con la modifica dello stato locale — RISOLTO (metadati)
+
+- **Ambito:** Flowx `com.enzuredigital.weatherbomb` 4.650, patch R9, `FlowxEntitlementDiagnosticPatch.kt`; release `v1.2.0` e `v1.3.0`.
+- **Sintomo:** su `dev` il nome `Flowx - Diagnostica autorizzazione Gold` poteva far pensare a una lettura passiva; su `main` compariva anche la vecchia denominazione `Flowx - Sblocca Gold`.
+- **Causa verificata nel sorgente:** la patch crea dati dimostrativi di entitlement `gold`/`active` e li inserisce nella cache/nei percorsi locali: helper `morpheCreateDemoRows`, metodi `Lz5;->c()`, `Lz5;->h()`, interazioni con `Lrs5;->i(Ljava/lang/Object;)V`. **Non è una pura diagnostica passiva**, ma non è provata alcuna variazione dell'abbonamento server.
+- **Soluzione:** corretto **solo** il testo su `dev`: nome `Flowx - Test stato Gold locale`, descrizione `Inserisce dati dimostrativi Gold nella cache locale dell'app per verificarne il comportamento; non modifica l'abbonamento lato server.`. Bytecode e logica operativa **invariati**.
+- **Verifica:** commit [`eccd1e2`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/eccd1e28fa67e30281ddb3f20e6a9b8a25a89341) con i due campi modificati; `v1.3.0-dev.2` compilata e pubblicata, testo corretto dopo merge anche nella stabile `v1.3.0`.
+- **Stato/limiti:** RISOLTO **solo** per la coerenza dei metadati. Nessun nuovo test runtime, controllo delle funzionalità Gold o prova di persistenza dopo riavvio. Una build riuscita non dimostra lo sblocco completo.
+
+### Aggiornamenti correlati, verifiche aperte e regole riutilizzabili
+
+- **Permessi PR (già TWI-002):** errore `GraphQL: GitHub Actions is not permitted to create or approve pull requests` risolto **nel repository unificato**, dopo modifica delle autorizzazioni e nuova esecuzione del job. Non cambiare lo stato TWI-002 relativo al **diverso repository Twilight**.
+- **Promozione dei branch (già FON-003):** PR #9 chiusa senza merge per changelog duplicato e descrizione Flowx imprecisa; PR #10 integrata con merge senza squash, release stabile `v1.3.0`, commit `8938194` e release `34dffe3`. Il workflow, la pulizia changelog e la correzione di metadati sono documentati nelle tre voci sopra e nella nota aggiunta a FON-003.
+- **Attenzione a `semantic-release`:** dopo il ripristino del workflow con commit `chore(ci)`, la nuova `v1.3.0-dev.1` includeva `feat:` storici, coerentemente con la regola `feat → minor` di `.releaserc`. È una spiegazione sostenuta dai metadati, non isolata in un esperimento separato.
+- **Backmerge:** `.releaserc` include `backmergeStrategy: "merge"` e `mergeMode: "ours"`. La sincronizzazione `main`/`dev` è riuscita nel caso documentato; il comportamento con futuri conflitti non è verificato.
+- **Regole:** confrontare il workflow con il template prima di aggiungere workaround permanenti; per correggere un changelog storico utilizzare tag e sezioni autentiche; considerare i **file realmente diversi**, non il solo numero dei commit; distinguere pipeline di release, PR, merge, pubblicazione bundle e test dell'applicazione; descrivere correttamente se una patch modifica **stato locale** anziché registrare soltanto.
+- **Aperto/non dimostrato:** causa radice originaria delle Git note `dev.12`; comportamento del backmerge in conflitti futuri; efficacia e persistenza della patch Flowx Gold nella release stabile; nessun test nuovo di Leghe FC, Twilight o Outdooractive in questa manutenzione.
 
 ---
 
