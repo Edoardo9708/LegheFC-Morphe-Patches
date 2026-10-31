@@ -310,6 +310,47 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## Leghe FC — migrazione 13.2.1 (445) → 13.2.2 (446), 28–31 ottobre 2026
+
+- **Applicazione:** `it.quadronica.leghe`. Confronto statico di `leghe-fg-13-2-1.xapk` e `Leghe-Fantacalcio-Serie-A_13.2.2_apkcube.apks` (sette DEX per archivio).
+- **Perimetro:** le osservazioni riguardano i metodi analizzati, non l'intera applicazione. Nessuna patch aggiornata per 13.2.2, build, installazione o prova runtime documentata in questa sessione.
+
+### LFC-001 — Nuova offuscazione: i nomi della 13.2.1 individuano metodi diversi nella 13.2.2 — PARZIALMENTE RISOLTO
+
+- **Sintomo:** la patch 13.2.1 si basa su classi offuscate che non corrispondono più alle stesse funzioni in 13.2.2; cercando `LXJX.invokeSuspend` nella nuova versione si trova un metodo con **3 registri**, non gli **8** attesi. L'`AppTarget` della patch esistente limita inoltre la compatibilità a 13.2.1; **non risulta un tentativo di patching 13.2.2**.
+- **Causa verificata:** i DEX originali presentano corrispondenze strutturali tra il vecchio metodo `LXJX.invokeSuspend` e il nuovo `LWzU.invokeSuspend`, entrambi con **8 registri, 2 registri di parametri e 70 unità DEX**. Le **36 istruzioni su 36** conservano opcode e uso dei registri; **49 unità su 70** sono identiche e le **21 diverse** riguardano gli operandi di riferimento. Il costruttore dello stato mantiene i parametri `List, boolean, Set, String`; il costruttore dell'elemento mantiene `(JLjava/lang/String;Ljava/lang/String;JLjava/lang/String;)V`.
+- **Corrispondenze individuate:** `LXJX.invokeSuspend` → `LWzU.invokeSuspend`; classe stato `Lkqgs` → `LjoEq`; classe elemento lista `Lkmpl` → `LjlPY`. I cambiamenti sono **compatibili con una nuova offuscazione**, non dimostrano nuove protezioni o una modifica della logica Premium.
+- **Tentativo/approccio non valido:** cercare il vecchio nome `LXJX` restituisce il metodo sbagliato; modificare soltanto il numero dei registri attesi non risolverebbe l'errore di identificazione. Nessuna modifica o tentativo applicativo eseguito durante il confronto.
+- **Procedura proposta, non implementata:** cercare metodi con fingerprint strutturali, firma, opcode e flusso; riverificare registri, parametri, riferimenti e costruttori; individuare le classi equivalenti, adattare i riferimenti Smali e `AppTarget`; interrompere il patching se la struttura non coincide.
+- **Verifica:** confronto statico dei due APK originali e dei rispettivi costruttori. **Non** verificati tutti i campi di `LjoEq` (in particolare il booleano che prima si modificava in `Lkqgs.B`), né Premium, percentuali, formazione consigliata/comparatore o persistenza su 13.2.2.
+- **Stato/limiti:** PARZIALMENTE RISOLTO **solo come identificazione del codice equivalente**. Compatibilità runtime non ripristinata né dimostrata; nessuna garanzia per versioni successive.
+- **Riferimenti:** `patches/src/main/kotlin/lab/leghefc/patches/StateInputDiagnosticPatch.kt`, `RewardedFlowDiagnosticPatch.kt`; branch consultato `dev`; nessun nuovo commit per questo confronto.
+
+### LFC-002 — Diagnostica A/C modifica la lista A originale — APERTO
+
+- **Ambito:** Leghe FC 13.2.1 (445), `StateInputDiagnosticPatch.kt` sul branch `dev`, metodo `LXJX.invokeSuspend`, tag `LegheFC-LXJX`.
+- **Sintomo:** i commenti descrivono un'analisi diagnostica delle collezioni A/C con lista dimostrativa separata, ma il codice **sostituisce** il valore usato nella costruzione dello stato originale.
+- **Causa verificata staticamente:** l'helper `patch_logLkmplDemo()` crea e restituisce una `ArrayList` con un elemento dimostrativo `Lkmpl`. La sequenza inserita
+  ```smali
+  invoke-static {}, LXJX;->patch_logLkmplDemo()Ljava/util/List;
+  move-result-object v1
+  ```
+  sovrascrive il registro `v1`, che prima conteneva la lista A originale, **prima** della costruzione di `Lkqgs`. Non è quindi una diagnostica passiva.
+- **Tentativi falliti:** nessun tentativo di correzione effettuato nella sessione.
+- **Correzione proposta, non applicata:** preservare il riferimento originale di `v1`; eseguire l'helper senza alterare la lista destinata al costruttore, eliminando `move-result-object v1` o utilizzando un temporaneo realmente sicuro **dopo verifica della liveness e della validità bytecode**. Controllare che le collezioni passate al costruttore restino identiche alle originali.
+- **Verifica:** riscontrata nel sorgente la sovrascrittura del registro; **non** eseguito test runtime specifico per misurarne gli effetti. La deviazione del flusso dei dati è dimostrata, eventuali crash o alterazioni percepibili **non** lo sono.
+- **Stato/limiti:** APERTO. Occorre chiarire se la modifica dello stato fosse intenzionale, altrimenti ripristinare la natura passiva della diagnostica, quindi testare runtime e assenza di regressioni.
+- **Riferimenti:** `StateInputDiagnosticPatch.kt`, `patch_logLkmplDemo()`, `LXJX.invokeSuspend`, registro `v1`; branch `dev`, nessun nuovo commit.
+
+### Regole riutilizzabili e attività aperte
+
+- **Nomi offuscati ≠ identità dei metodi.** Ad ogni versione confrontare firme, tipi, opcode, riferimenti e struttura del flusso, anche quando un vecchio nome continua a esistere.
+- **Una diagnostica passiva non deve modificare i dati usati dall'app.** Verificare liveness dei registri, istruzioni iniettate e valori consegnati ai costruttori.
+- **Livelli di prova separati:** equivalenza statica, compilazione, applicazione, runtime, funzionamento effettivo e persistenza non sono intercambiabili.
+- **Aperto:** implementare/verificare supporto 13.2.2; confermare i campi dello stato `LjoEq` incluso il booleano equivalente a `Lkqgs.B`; correggere/chiarire la diagnostica A/C; eseguire test runtime e persistenza; valutare fingerprint strutturali più robusti.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
