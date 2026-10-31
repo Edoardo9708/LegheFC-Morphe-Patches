@@ -267,6 +267,49 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## DNS Changer e gestione aggiornamenti Morphe — 29–31 ottobre 2026
+
+### DNS-001 — Controllo locale Pro `Lsi2;->z()Z` — WORKAROUND
+
+- **Ambito:** DNS Changer 3.0.0 (versionCode 64), `com.appplanex.dnschanger`, APK `DNS Changer-64-3.0.0.aspk`; patch D1 e D2.
+- **Sintomo:** la diagnostica D1 su `Lsi2;->z()Z` mostrava solo `false` in molte chiamate. **Questo non prova un errore nel controllo originale**: può riflettere correttamente l'assenza di un'autorizzazione Pro.
+- **Causa/struttura verificata:** metodo equivalente a `return B() || x();`, con `B()Z` associato a `is_subscribed` e `x()Z` a `is_in_app_done`. Verificati due registri, due `return v1` e una chiamata a ciascun metodo. `z()` viene realmente eseguito, ma non è dimostrato che governi da solo tutte le funzioni Pro.
+- **Diagnostica D1:** helper `morpheLogZReturn(Z)V` prima dei due ritorni originali senza alterarne il risultato. Riscontro: **25 chiamate in 24,446 secondi**, tutte `false`, marcatore `z() RETURN = false [DC-20261029-D1]`. Non è un tentativo fallito: era una prova passiva.
+- **Workaround D2:** ritorno immediato `true` all'ingresso di `z()`, con logging `morpheLogZReturn(true)`; non viene più eseguita la logica originale del metodo. Smali:
+  
+  ```smali
+  const/4 v0, 0x1
+  invoke-static {v0}, Lsi2;->morpheLogZReturn(Z)V
+  return v0
+  ```
+  
+  La patch verifica registri, opcode e riferimenti del metodo originale e interrompe l'applicazione se la struttura differisce.
+- **Verifica:** struttura DEX analizzata; D1 verificata via Logcat; utente dopo D2: «A me sembra ok» e richiesta di pubblicazione stabile. **Non disponibile nella sessione un Logcat D2 con `z() FORCED RETURN = true [DC-20261029-D2]` né un inventario sistematico delle funzioni testate.** Release stabile `v1.5.0` include D2 secondo `patches-list.json`: la pubblicazione, da sola, non prova il comportamento.
+- **Stato e limiti:** WORKAROUND specifico della build 64. Non altera direttamente Google Play Billing, SharedPreferences, acquisti persistenti o autorizzazioni server. Non provate persistenza dopo riavvio, copertura completa Pro o regressioni automatiche. Altre build richiedono nuova analisi DEX.
+- **Riferimenti:** `patches/src/main/kotlin/lab/dnschanger/patches/DnsProReturnDiagnosticPatch.kt`; commit D1 `51bb26d`, `82840b5`; D2 `e57f477` su `dev`; pubblicazione selettiva `e3d914e` su `main`; release `v1.5.0`; log `logcat-d-vtime-sDNS-Pro-Diag_I'__S'.txt`; marcatori `DC-20261029-D1` / `DC-20261029-D2`.
+- **Comando di diagnostica (aShell con accesso Logcat):** `logcat -d -v time -s DNS-Pro-Diag:I '*:S'`.
+
+### MOR-001 — Avvisi di aggiornamento per app senza patch modificate — APERTO
+
+- **Ambito:** Morphe Manager 2.2.0; repository multipatch `Edoardo9708/LegheFC-Morphe-Patches`, branch `main` / `dev`. Analizzato il sorgente ufficiale al tag `v2.2.0`; **non** ricontrollata in questa analisi la versione effettivamente installata.
+- **Sintomo riportato:** modificando una sola patch nel bundle condiviso, Morphe indica aggiornamenti anche per altre applicazioni. Non è dimostrata alcuna alterazione del codice delle altre app.
+- **Causa concreta:** **non individuata**. La lettura del sorgente mostra: versione `.mpp` comune; `HomeApps.checkInstalledAppsForUpdates()` confronta la versione patchata con quella disponibile; `ChangelogParser.hasChangesFor()` cerca modifiche pertinenti all'app. Esiste un fallback che segnala l'aggiornamento quando il changelog non è recuperabile o il nome app è indisponibile per il confronto. Inoltre vengono esaminate **tutte le release successive** a quella utilizzata per patchare l'app: modifiche storiche o commit privi di scope applicativo esplicito possono influire. Questi sono **meccanismi verificati nel codice, non una diagnosi del caso osservato**.
+- **Tentativi/prove:** nessuna correzione eseguita e nessuna prova differenziale completata. Era stata suggerita la disattivazione delle pre-release per confronto, ma non risulta eseguita.
+- **Mitigazione documentata, non soluzione:** commit di release con scope esplicito `dnschanger: publish stable Force Pro test D2 without Spotify`; workflow semantic-release continua a produrre un bundle con versione globale, non versioni per singola app. Scope coerenti (`feat(dnschanger)`, `fix(flowx)`, ecc.) facilitano il parsing, ma non assicurano l'eliminazione degli avvisi.
+- **Verifiche:** utente con pre-release abilitate; changelog `dev` visualizzato in Morphe con `dnschanger / test forced true in Pro gate with D2 Logcat marker`, riconducibile a `v1.5.0-dev.9`. **La visualizzazione manuale del changelog non certifica che il recupero sia riuscito anche durante il controllo automatico degli aggiornamenti.** Nessun log della funzione di controllo, confronto per-app delle versioni registrate o esito con pre-release disattivate.
+- **Stato/limiti:** APERTO. Le pre-release abilitate non sono, da sole, prova di bug. Da verificare versioni bundle memorizzate per app, intervallo di release analizzato, eventuali errori di rete/fallback, storico del changelog e confronto con pre-release disattivate.
+- **Riferimenti:** sorgenti ufficiali Morphe Manager v2.2.0: `HomeApps.kt`, `ChangelogParser.kt`, `RemotePatchBundle.kt`, `MorpheAPI.kt`; test `ChangelogSubjectTest.kt`; nel repository personale `.releaserc`, `CHANGELOG.md`, `patches-bundle.json`, `patches-list.json`; release `v1.5.0` e `v1.5.0-dev.9`. [Documentazione aggiornamenti Morphe](https://github.com/MorpheApp/morphe-manager/blob/main/docs/updating-patched-apps.md).
+
+### Regole riutilizzabili dalle due indagini
+
+- Separare **diagnostica passiva, override funzionale, risultato osservato nell'app e persistenza**: sono prove diverse; identificare ogni revisione con marcatori differenti.
+- Iniezioni Smali solo dopo controllo di fingerprint, registri, opcode e riferimenti, con abort se il metodo non coincide.
+- Distinguere **versione globale del bundle** da modifiche realmente applicabili alla singola app. Usare scope applicativi chiari nei commit e riesaminare lo storico in caso di avvisi inattesi.
+- **Pubblicazioni selettive:** quando `dev` contiene esperimenti non pronti per `main`, trasferire esclusivamente i sorgenti previsti. Nella pubblicazione DNS erano presenti due file Spotify sperimentali; il trasferimento selettivo li ha esclusi dalla stabile. **È una precauzione, non un incidente di pubblicazione avvenuto.**
+- **Ancora aperto:** per DNS, Logcat D2 e controlli Pro sistematici/persistenza; per Morphe, causa concreta degli avvisi e confronto fra condizioni di aggiornamento. Nessun crash o errore di build DNS documentato in questa sessione.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
