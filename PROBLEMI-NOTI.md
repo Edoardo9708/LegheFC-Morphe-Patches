@@ -371,7 +371,61 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 - **Sintomo:** nel codice Kotlin che compone Smali, il nome DEX annidato `Lc5/a$e;` deve contenere un dollaro letterale, mentre `$` è interpretato come interpolazione dal compilatore Kotlin.
 - **Causa:** usare il riferimento senza un escaping corretto può creare un errore di compilazione o un riferimento Smali errato. Un tentativo intermedio di correzione non ha prodotto la rappresentazione finale voluta; **non è documentato un errore Gradle specifico**.
-- **Soluzione:** rappresentare il dollaro con `$` anche nelle stringhe multilinea, sia nei riferimenti al tipo del campo `d` sia nelle chiamate `invoke-interface`. Esempio Kotlin: `"Lc5/a$e;->E"`.
+- **Soluzione:** rappresentare il dollaro con `${'
+- **Verifica:** rilettura di `DisableAdsPatch.kt` su `dev`; riferimenti Kotlin corretti nel sorgente e catalogo successivamente generato. Non disponibile una prova separata di fallimento/successo compilazione per ogni revisione intermedia.
+- **Stato/limiti:** RISOLTO nel sorgente. Regola riutilizzabile per classi DEX annidate nominate nelle stringhe Kotlin.
+- **Riferimenti:** `DisableAdsPatch.kt`; commit intermedi `cb3cddd`, `7493a4b`; metodo `Lc5/a$e;->E(I)V`.
+
+### FON-003 — Pubblicazione stabile senza metadati pre-release — RISOLTO (integrazione)
+
+- **Ambito/sintomo:** nel confronto `main...dev` comparivano anche `CHANGELOG.md`, `README.md`, `gradle.properties`, `patches-list.json`, `patches-bundle.json` generati da semantic-release per `dev`. Un merge indiscriminato avrebbe trasferito metadati del canale di sviluppo su `main`.
+- **Causa:** il processo di release aggiorna metadati e catalogo durante le pre-release. **Non** si è verificato un merge errato: la divergenza è stata riconosciuta preventivamente.
+- **Soluzione:** aggiornare su `dev` la denominazione `Fonometro - Remove ads` e la descrizione inglese `Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases.`; creare `release/fonometro-remove-ads` da `main`; trasferire **solo** `DisableAdsPatch.kt` e verificare diff di un unico file; squash merge della PR #12; lasciare alla pipeline la rigenerazione dei metadati stabili.
+- **Verifica:** PR #12 integrata, commit `e7101ee`; sorgente su `main` con descrizione corretta, catalogo `patches-list.json` contenente Fonometro; `patches-bundle.json` ha successivamente riportato `v1.8.0`, mentre il controllo iniziale riportava ancora `v1.3.0`.
+- **Stato/limiti:** RISOLTO per integrazione e catalogo. La pubblicazione non prova il comportamento sul dispositivo del bundle stabile `v1.8.0`; nessun test d'installazione di tale bundle documentato. È un caso concreto della regola di pubblicazione selettiva già riportata per altre patch: **non** assume un errore di merge effettivo.
+- **Riferimenti:** commit descrizione `997ea57`, PR [#12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/pull/12), commit `e7101ee`, ramo `release/fonometro-remove-ads`, `.releaserc`, `patches-list.json`, `patches-bundle.json`.
+
+### Regole riutilizzabili e verifiche mancanti
+
+- Distinguere **caricamento, visualizzazione, rimozione e callback** della pubblicità: un ritorno anticipato non deve eliminare una notifica ancora necessaria.
+- Riutilizzare, quando presenti, i percorsi originali di pulizia UI per non confondere rimozione degli annunci e cambio dello stato Premium.
+- Nelle stringhe Kotlin destinate a Smali controllare il carattere `$` letterale dei nomi di classi annidate, comprese le stringhe multilinea.
+- Verificare fingerprint/registri/riferimenti prima di patchare; pubblicare selettivamente i sorgenti lasciando che semantic-release generi i metadati per il canale corretto.
+- **Ancora aperto:** Logcat dell'effettiva callback interstitial; copertura completa di schermate/formati e richieste residue; prova dopo arresto/riavvio; test runtime con bundle stabile `v1.8.0`; analisi su versioni diverse da `11.5`.
+
+---
+
+## Modello per le prossime voci
+
+Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
+}` anche nelle stringhe multilinea, sia nei riferimenti al tipo del campo `d` sia nelle chiamate `invoke-interface`. Esempio Kotlin: `"Lc5/a${'
+- **Verifica:** rilettura di `DisableAdsPatch.kt` su `dev`; riferimenti Kotlin corretti nel sorgente e catalogo successivamente generato. Non disponibile una prova separata di fallimento/successo compilazione per ogni revisione intermedia.
+- **Stato/limiti:** RISOLTO nel sorgente. Regola riutilizzabile per classi DEX annidate nominate nelle stringhe Kotlin.
+- **Riferimenti:** `DisableAdsPatch.kt`; commit intermedi `cb3cddd`, `7493a4b`; metodo `Lc5/a$e;->E(I)V`.
+
+### FON-003 — Pubblicazione stabile senza metadati pre-release — RISOLTO (integrazione)
+
+- **Ambito/sintomo:** nel confronto `main...dev` comparivano anche `CHANGELOG.md`, `README.md`, `gradle.properties`, `patches-list.json`, `patches-bundle.json` generati da semantic-release per `dev`. Un merge indiscriminato avrebbe trasferito metadati del canale di sviluppo su `main`.
+- **Causa:** il processo di release aggiorna metadati e catalogo durante le pre-release. **Non** si è verificato un merge errato: la divergenza è stata riconosciuta preventivamente.
+- **Soluzione:** aggiornare su `dev` la denominazione `Fonometro - Remove ads` e la descrizione inglese `Removes banner and interstitial ads without modifying Premium status, licenses, or in-app purchases.`; creare `release/fonometro-remove-ads` da `main`; trasferire **solo** `DisableAdsPatch.kt` e verificare diff di un unico file; squash merge della PR #12; lasciare alla pipeline la rigenerazione dei metadati stabili.
+- **Verifica:** PR #12 integrata, commit `e7101ee`; sorgente su `main` con descrizione corretta, catalogo `patches-list.json` contenente Fonometro; `patches-bundle.json` ha successivamente riportato `v1.8.0`, mentre il controllo iniziale riportava ancora `v1.3.0`.
+- **Stato/limiti:** RISOLTO per integrazione e catalogo. La pubblicazione non prova il comportamento sul dispositivo del bundle stabile `v1.8.0`; nessun test d'installazione di tale bundle documentato. È un caso concreto della regola di pubblicazione selettiva già riportata per altre patch: **non** assume un errore di merge effettivo.
+- **Riferimenti:** commit descrizione `997ea57`, PR [#12](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/pull/12), commit `e7101ee`, ramo `release/fonometro-remove-ads`, `.releaserc`, `patches-list.json`, `patches-bundle.json`.
+
+### Regole riutilizzabili e verifiche mancanti
+
+- Distinguere **caricamento, visualizzazione, rimozione e callback** della pubblicità: un ritorno anticipato non deve eliminare una notifica ancora necessaria.
+- Riutilizzare, quando presenti, i percorsi originali di pulizia UI per non confondere rimozione degli annunci e cambio dello stato Premium.
+- Nelle stringhe Kotlin destinate a Smali controllare il carattere `$` letterale dei nomi di classi annidate, comprese le stringhe multilinea.
+- Verificare fingerprint/registri/riferimenti prima di patchare; pubblicare selettivamente i sorgenti lasciando che semantic-release generi i metadati per il canale corretto.
+- **Ancora aperto:** Logcat dell'effettiva callback interstitial; copertura completa di schermate/formati e richieste residue; prova dopo arresto/riavvio; test runtime con bundle stabile `v1.8.0`; analisi su versioni diverse da `11.5`.
+
+---
+
+## Modello per le prossime voci
+
+Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
+}e;->E"`.
 - **Verifica:** rilettura di `DisableAdsPatch.kt` su `dev`; riferimenti Kotlin corretti nel sorgente e catalogo successivamente generato. Non disponibile una prova separata di fallimento/successo compilazione per ogni revisione intermedia.
 - **Stato/limiti:** RISOLTO nel sorgente. Regola riutilizzabile per classi DEX annidate nominate nelle stringhe Kotlin.
 - **Riferimenti:** `DisableAdsPatch.kt`; commit intermedi `cb3cddd`, `7493a4b`; metodo `Lc5/a$e;->E(I)V`.
