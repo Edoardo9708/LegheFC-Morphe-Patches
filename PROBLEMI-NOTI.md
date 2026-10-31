@@ -395,6 +395,58 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## Twilight — versione 14.32 (617), 23 ottobre 2026
+
+- **App:** `com.urbandroid.lux`, APKM (APK base e split configurativi), `classes.dex`. **Repository originale della patch:** [Twilight-Morphe-Patches](https://github.com/Edoardo9708/Twilight-Morphe-Patches), branch `dev`. Le voci qui riportate riguardano la pre-release `v1.0.0-dev.4`, non l'efficacia dimostrata della modifica sul dispositivo.
+- **Nota di ambito:** nel repository Twilight, al momento dell'analisi, `main` conteneva il template iniziale; `dev` conteneva la patch sperimentale e quattro pre-release. La pubblicazione di un bundle `.mpp` non dimostra installazione e funzionamento dell'APK patchato.
+
+### TWI-001 — Log `isTrial()` incoerente con il valore effettivamente restituito — APERTO
+
+- **Sintomo verificato nel sorgente:** il messaggio diagnostico è `TW-isTrial=true`, ma la patch forza il ritorno booleano `false`. Estratto:
+  
+  ```smali
+  const-string v0, "TW-isTrial=true"
+  invoke-static {v0, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+  const/4 v0, 0x0
+  return v0
+  ```
+  
+  Non è un risultato Logcat osservato sul dispositivo: è una **incoerenza statica** tra testo e istruzioni.
+- **Causa:** la stringa di log è costante, non deriva dal valore restituito. Il commit `643ba68` ha modificato il ritorno da `0x1` a `0x0`, senza aggiornare il log né la descrizione («Fa restituire true...»).
+- **Dettaglio DEX:** l'originale `TrialFilter.isTrial():Z` usa un registro (`registers_size=1`, `ins_size=1`), legge il campo `isTrial` e lo restituisce. `addInstructions(0,...)` inserisce un ritorno anticipato; `v0` coincide inizialmente con `p0`, viene riutilizzato per entrambe le stringhe di `Log.d` e poi per `const/4 v0, 0x0`. Il codice originale rimane nel metodo ma normalmente non è raggiungibile dopo il ritorno inserito. `TrialFilter.reevaluate()` non è stato modificato.
+- **Tentativi:** modifiche sperimentali del valore forzato in più commit; **nessun crash o VerifyError documentato**. Le variazioni true/false non costituiscono di per sé test del funzionamento.
+- **Correzione proposta (non implementata):** allineare descrizione e messaggio al ritorno reale. Se si mantiene `false`, usare `TW-isTrial=false` (oppure creare un log legato al valore effettivo); usare `true` nel messaggio solo quando il metodo restituisce effettivamente `0x1`.
+- **Verifica svolta:** struttura del metodo originale verificata nel DEX, confronto di sorgente e commit; workflow Release completato e bundle `patches-1.0.0-dev.4.mpp` pubblicato. **Nessun Logcat runtime, applicazione patch, installazione o test funzionale documentato.**
+- **Stato/limiti:** APERTO; difetto diagnostico verificato, correzione non applicata. Non dimostrati sblocco Pro, eventuali controlli di licenza aggiuntivi, avvio stabile o persistenza dopo riavvio.
+- **Riferimenti:** `patches/src/main/kotlin/app/edoardo9708/twilight/patches/TrialStatusExperimentPatch.kt`, `TrialStatusFingerprint`, `TrialFilter.isTrial()`; commit `4bab57f`, `b4149aa`, `2afedeec`, `be27343`, `643ba68`; `v1.0.0-dev.4`.
+
+### TWI-002 — GitHub Actions non può creare automaticamente la Pull Request — APERTO
+
+- **Sintomo:** il workflow `Open a PR to main` fallisce sul branch `dev` con:
+  
+  ```text
+  GraphQL: GitHub Actions is not permitted
+  to create or approve pull requests
+  (createPullRequest)
+  ```
+  
+  Il job termina con exit code 1, pur essendo indipendente dal workflow Release.
+- **Causa verificata dal messaggio di GitHub:** al token usato da GitHub Actions non è consentita la creazione di Pull Request nel repository, nonostante il workflow dichiari `pull-requests: write`. Non è un errore di build Kotlin o della patch.
+- **Tentativi falliti:** esecuzioni ripetute del workflow, incluso il commit `643ba68`; nessuna modifica delle autorizzazioni documentata.
+- **Procedura proposta, non verificata:** nel repository Twilight, `Settings > Actions > General > Workflow permissions`, abilitare `Allow GitHub Actions to create and approve pull requests`, quindi rieseguire il workflow e verificare che la PR venga creata. Non è stata effettuata la modifica e potrebbero emergere ulteriori errori dopo averla abilitata.
+- **Verifiche:** log del workflow fallito con errore GraphQL; workflow `Release` completato separatamente con pre-release `v1.0.0-dev.4` e bundle `.mpp`. La riuscita della release **non** implica riuscita della PR.
+- **Stato/limiti:** APERTO; correggere i permessi richiede ancora un'azione e una prova del risultato.
+- **Riferimenti:** `.github/workflows/open_pull_request.yml` nel repository Twilight; [workflow PR fallito, run 39969220531](https://github.com/Edoardo9708/Twilight-Morphe-Patches/actions/runs/39969220531); [workflow Release riuscito, run 39969220587](https://github.com/Edoardo9708/Twilight-Morphe-Patches/actions/runs/39969220587); commit `643ba68`.
+
+### Regole riutilizzabili e verifiche ancora necessarie
+
+- Un messaggio Logcat costante non certifica il valore restituito: mantenere coerenti **bytecode, log e descrizione** e verificare i registri quando si aggiunge logging Smali.
+- `addInstructions(0,...)` con `return` cambia il flusso di esecuzione senza modificare necessariamente il campo o lo stato originale. Distinguere **compilazione, pubblicazione, patch applicata, installazione, runtime e persistenza**.
+- Le pipeline Release e creazione PR sono indipendenti: il successo della prima non risolve problemi di autorizzazione della seconda.
+- **Aperto:** correggere log/descrizione; acquisire Logcat dopo patch; testare avvio, funzionalità interessate, controlli licenza indipendenti e persistenza; abilitare e verificare i permessi di creazione PR.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
