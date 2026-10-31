@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.6.0-dev.16](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.6.0-dev.16)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;19 patches total
+> **[v1.8.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.8.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;22 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -117,7 +117,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;9 patches</summary>
+<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;10 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -136,6 +136,22 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 | [Prezzi Benzina - Personal Google Maps key M1](#prezzi-benzina-personal-google-maps-key-m1) | Replace the Maps SDK manifest API key with your own Google Cloud key. Enter it in patch options; no certificate spoofing. | • Your Google Maps API key |
 | [Prezzi Benzina - Remove ads A1](#prezzi-benzina-remove-ads-a1) | Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases. |  |
 | [Prezzi Benzina - Signature trace F5 (ARM64)](#prezzi-benzina-signature-trace-f5-arm64) | Experimental read-only inspection of returned PackageInfo signing certificates (SHA-1/SHA-256) and call stacks. No signature changes. |  |
+| [Prezzi Benzina - microG token routing F13](#prezzi-benzina-microg-token-routing-f13) | Local test: route only Maps ApiTokenService to the existing app.revanced.android.gms and declare the original public certificate digest. No Frida; use alone, not with F5-F12. |  |
+
+</details>
+
+<details open>
+<summary>📦 Ski Safari&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 2.5 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Ski Safari – Unlock All Items](#ski-safari-unlock-all-items) | Experimental: invokes ShopItemHelper.UnlockAllItems once through UnityPlayer's verified game-thread queue after the profile is ready. Includes local APK startup compatibility; native VM callbacks and save persistence require device verification. |  |
 
 </details>
 
@@ -171,32 +187,17 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Ski Safari&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 Yahoo Finance&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 2.5 |
+| 26.21.2 |
 | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Ski Safari – Unlock All Items](#ski-safari-unlock-all-items) | Experimental: invokes ShopItemHelper.UnlockAllItems once through UnityPlayer's verified game-thread queue after the profile is ready. Includes local APK startup compatibility; native VM callbacks and save persistence require device verification. |  |
-
-</details>
-
-<details open>
-<summary>📦 Twilight&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
-<br>
-
-**🎯 Supported versions:**
-
-| 14.32 |
-| :---: |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [Twilight - Test stato trial](#twilight-test-stato-trial) | Unlock Pro |  |
+| [Yahoo Finance - Remove ads A1](#yahoo-finance-remove-ads-a1) | Test: enables only the AdsFree UI check; leaves other subscription features and purchases unchanged. Logs YF-RemoveAds. |  |
 
 </details>
 
