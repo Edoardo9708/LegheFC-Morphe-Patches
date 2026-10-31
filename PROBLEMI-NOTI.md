@@ -67,23 +67,23 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 - **Risultato e limite:** invariati gli altri byte logici dei progressi, incluse le **45.198 monete**; il contenuto codificato del file può invece cambiare.
 - **Stato:** ripristino confermato dall'utente su build 108; procedura da rivalidare per altri formati di salvataggio.
 
-### SKI-008 — ADB non rilevava il telefono oppure dava “Accesso negato”
+### SKI-008 — ADB non rilevava il telefono
 
-Due problemi distinti, con cause e rimedi differenti:
-
-**A. Dispositivo non rilevato**
+- **Sintomo:** dispositivo assente nell'elenco dei dispositivi ADB.
 - **Causa individuata:** collegamento ADB wireless assente.
-- **Soluzione e verifica:** ripristinato il collegamento; controllati seriale e modello prima delle operazioni sul dispositivo.
+- **Soluzione adottata:** ripristinato il collegamento wireless.
+- **Risultato e verifica:** controllati seriale e modello del dispositivo prima di eseguire ulteriori operazioni.
 - **Stato:** verificato.
 
-**B. Errore “Accesso negato” dal PC**
-- **Causa individuata:** restrizione dell'ambiente di esecuzione Windows.
-- **Soluzione e verifica:** rieseguiti i comandi con i permessi necessari.
+### SKI-009 — ADB restituiva “Accesso negato” sul PC
+
+- **Sintomo:** comandi ADB bloccati con errore di accesso nell'ambiente Windows.
+- **Causa individuata:** restrizioni dei permessi nell'ambiente di esecuzione Windows, distinte dai problemi di connessione al dispositivo.
+- **Soluzione adottata:** rieseguiti i comandi con i permessi necessari.
+- **Risultato e verifica:** i comandi sono tornati eseguibili.
 - **Stato:** verificato.
 
-> Regola: non interpretare i due messaggi come lo stesso problema. Identificare prima se il blocco è sul collegamento al dispositivo oppure nei permessi dell'ambiente Windows.
-
-### SKI-009 — Build Gradle bloccata da HTTP 401
+### SKI-010 — Build Gradle bloccata da HTTP 401
 
 - **Sintomo:** impossibile completare la build per il recupero delle dipendenze.
 - **Causa individuata:** risposta HTTP 401 da GitHub Packages per alcune dipendenze.
