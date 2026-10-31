@@ -10,14 +10,17 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 - **Branch di riferimento:** `feature/skisafari-unlock-all`
 - **Commit di riferimento:** `129c9f6` (`129c9f609bfc28a8fdeba53d7b1fa6016de5ae28`)
 - **Stato generale:** le soluzioni qui riportate riguardano la build 108; nessuna compatibilità garantita con altre versioni.
+- **Dispositivi documentati:** tablet Samsung SM-T870 (Android 13) e Galaxy S23+ (Android 17), secondo i singoli test. La build locale 18 e l'APK successivamente ripatchato dall'utente sul telefono non sono automaticamente lo stesso artefatto.
 
-### SKI-001 — Salvataggi privati Android non accessibili
+### SKI-001 — Backup ADB limitato ai dati esterni accessibili
 
-- **Sintomo:** impossibile recuperare tutti i dati del gioco mediante `run-as` in assenza di root.
-- **Causa individuata:** APK non debuggabile (`run-as` negato) e dispositivo senza accesso root.
-- **Soluzione adottata:** copiati e verificati i dati esterni accessibili.
-- **Risultato e limite:** backup utilizzabile per il ripristino dei dati accessibili, **non** backup completo della memoria privata Android.
-- **Stato:** risultato verificato per i dati esterni; copertura parziale del backup.
+- **Ambito:** Ski Safari 2.5 (108); Galaxy S23+, Android 17, ADB senza root.
+- **Sintomo/causa:** `run-as: package not debuggable`; la build non consente accesso ADB ai dati privati dell'app.
+- **Tentativo fallito:** `run-as`. Non è stato tentato di ottenere privilegi aggiuntivi.
+- **Soluzione:** backup dei file esterni accessibili, inventario, confronto SHA-256 fra telefono e PC e controllo che i dati fossero stabili durante la copia; conservazione degli APK originali.
+- **Verifica:** 44 file accessibili, 17.146.650 byte; hash corrispondenti. Profilo controllato strutturalmente e tramite ricodifica XOR identica all'originale.
+- **Stato:** PARZIALMENTE RISOLTO. Non è un backup della memoria privata Android: preferenze, credenziali/autenticazioni e altri dati interni non sono garantiti. `allowBackup=true` non dimostra da solo la disponibilità di un backup completo.
+- **Riferimenti:** report locale del backup; `lab/skisafari/inspect-profile.py`, `lab/skisafari/README.md`.
 
 ### SKI-002 — APK modificato non installabile sopra quello originale
 
@@ -27,45 +30,58 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 - **Risultato e limite:** installazione riuscita, ma la disinstallazione può eliminare dati interni non inclusi nel backup (vedere SKI-001).
 - **Stato:** verificato sulla build indicata.
 
-### SKI-003 — APK modificato non si avviava
+### SKI-003 — Crash PairIP dopo la rifirma dell'APK
 
-- **Sintomo:** il gioco non completava la sequenza di avvio dopo la modifica.
-- **Causa individuata:** avvio dipendente da PairIP e da inizializzazioni Java protette.
-- **Soluzione adottata:** ricostruito il percorso di avvio riutilizzando codice già presente nell'APK; recuperati alcuni valori SDK mancanti.
-- **Risultato e limite:** avvio ripristinato; correzione specifica per questa versione, non trasferibile automaticamente ad altri APK o build.
-- **Stato:** verificato su Ski Safari 2.5 (108).
+- **Ambito:** Ski Safari 2.5 (108), ARM64; Samsung SM-T870, Android 13; successivo gameplay osservato su Galaxy S23+.
+- **Sintomo:** messaggio Google Play «Download this game from Play», quindi uscita con `SIGSEGV / SEGV_ACCERR` in `libpairipcore.so` (offset PC `0x5ECC4`), prima dei log `SkiSafari-Unlock`.
+- **Causa verificata/parzialmente ignota:** crash riproducibile anche rifirmando l'originale senza patch di sblocco. La correlazione con la rifirma è verificata, **non** la precisa condizione interna di PairIP.
+- **Tentativi falliti:** saltare soltanto l'inizializzazione Java della licenza, APK originale unificato e rifirmato, oppure base/split mantenuti separati e rifirmati. Il merger e la funzione di sblocco non sono necessari per riprodurre il crash.
+- **Workaround:** ricostruzione del percorso Java con componenti già nell'APK (`SplashActivity1`, `Yodo1LagacyUnityActivity`, inizializzazioni di `Yodo1Application1.onCreate()`); adeguamento locale dei punti di inizializzazione protetta e del costruttore Unity. **Nessuna modifica a `libpairipcore.so`.**
+- **Verifica:** build locale 18 fino all'interfaccia Unity, log del profilo pronto e chiamata allo sblocco; gameplay osservato in seguito su Galaxy S23+.
+- **Stato:** WORKAROUND, non soluzione generale per PairIP. Non verificati tutti i percorsi di autenticazione, annunci, acquisti e SDK virtualizzati.
+- **Riferimenti:** `feature/skisafari-unlock-all`, `129c9f6`, `patches/src/main/kotlin/lab/skisafari/patches/UnlockAllItemsPatch.kt`, `lab/skisafari/README.md`, log `morphe-test-skisafari-build3/*runtime.log` e `morphe-test-skisafari-build18/runtime.log`.
 
-### SKI-004 — Crash durante l'inizializzazione IL2CPP
+### SKI-004 — Accesso prematuro al runtime IL2CPP
 
-- **Sintomo:** crash quando la patch interagiva con IL2CPP durante l'avvio.
-- **Causa individuata:** accesso al runtime quando non era ancora pronto.
-- **Soluzione adottata:** attesa dell'inizializzazione già prevista dall'app e successiva esecuzione sul thread Unity tramite il relativo dispatcher.
-- **Risultato e limite:** sequenza corretta senza accesso anticipato al runtime; verificare nuovamente gli hook a ogni cambio di versione.
-- **Stato:** verificato sulla build indicata.
+- **Ambito:** Ski Safari 2.5 (108) ARM64, helper JNI.
+- **Sintomo:** build 15: segnale 11 dopo l'accesso al dispatcher Unity, ma prima del messaggio «profilo pronto».
+- **Causa:** ottenere il dominio con `il2cpp_domain_get` e collegare un thread poteva intervenire prima che IL2CPP fosse inizializzato. Libreria caricata ≠ runtime pronto.
+- **Tentativo fallito:** uso anticipato di `il2cpp_domain_get` / thread attach, basato sulla sola presenza della libreria.
+- **Soluzione:** esecuzione tramite `UnityPlayer.queueGLThreadEvent(Runnable)` e controllo del thread Unity effettivo; recupero della libreria già caricata con `RTLD_NOLOAD`; attesa di `il2cpp_get_corlib` e di un `il2cpp_thread_current` già valido, senza creare il dominio né forzare l'attach. Attesa ulteriore del profilo caricato e del catalogo non vuoto.
+- **Verifica:** dalla build 16 superato il crash; build 18: log in sequenza di runtime inizializzato, profilo pronto e chiamata a `ShopItemHelper.UnlockAllItems()`.
+- **Stato:** RISOLTO **per il crash osservato**, non validazione generale del codice nativo. RVA, strutture e ipotesi sul thread devono essere controllati in altre build.
+- **Riferimenti:** `129c9f6`, `patches/src/main/resources/skisafari/native/skisafariunlock.c`, log locali build 15/16/18.
 
-### SKI-005 — Controllo dello sblocco dichiarava un risultato incompleto
+### SKI-005 — Postcondizione di UnlockAllItems incompatibile con alcune categorie
 
-- **Sintomo:** un controllo generico segnalava categorie non sbloccate dopo l'operazione.
-- **Causa individuata:** il controllo includeva anche categorie, come i booster, per cui il getter restituisce sempre `false`.
-- **Soluzione/verifica adottata:** verificata l'esecuzione di `UnlockAllItems()`; separato questo dato dall'effettivo stato di ogni singola categoria.
-- **Risultato e limite:** l'utente ha confermato il funzionamento degli oggetti di interesse. **Non** è stato dimostrato lo sblocco di tutte le categorie.
-- **Stato:** conferma utente parziale; niente dichiarazioni di sblocco universale.
+- **Ambito:** Ski Safari 2.5 (108), catalogo e marcatore persistente della patch.
+- **Sintomo:** il log conferma la chiamata a `ShopItemHelper.UnlockAllItems()`, ma poi indica «catalogo non completamente sbloccato; nessun marcatore persistente».
+- **Causa:** controllo di tutti gli ID del catalogo tramite `IsItemUnlocked()` non valido per ogni categoria. Verificato che `Item_Booster.get_Unlocked` restituisce sempre `false` e che il setter è un semplice `RET`.
+- **Tentativo non valido:** usare l'esito aggregato «tutte le categorie vere» come prova universale. Il successivo messaggio «target IL2CPP non pronto o non corrispondente» è eccessivamente generico per questa postcondizione.
+- **Esito adottato:** nessun falso marcatore di successo quando la postcondizione fallisce. **Non** è stato corretto definitivamente il controllo per categoria.
+- **Verifica:** esecuzione e ritorno del metodo nel Logcat; utente ha confermato gli oggetti di suo interesse. L'analisi statica mostra che `UnlockAllItems()` chiama `GameState.Save()` dopo il ciclo, anche senza variazioni ai flag.
+- **Stato:** PARZIALMENTE RISOLTO. Non dimostrati sblocco universale e persistenza completa dopo riavvio; senza marcatore la chiamata può ripetersi in processi successivi (one-shot tra avvii incompleto).
+- **Riferimenti:** `skisafariunlock.c`, README Ski Safari (sezione build 18), `morphe-test-skisafari-build18/runtime.log`.
 
-### SKI-006 — Profilo copiato, ma progressi assenti sul telefono
+### SKI-006 — Profilo originale ignorato dopo la reinstallazione
 
-- **Sintomo:** i file trasferiti erano presenti, ma i progressi non risultavano caricati nel gioco.
-- **Causa individuata:** il gioco utilizzava un nuovo identificativo del profilo.
-- **Soluzione adottata:** salvato il profilo corrente; adattati identificativo interno e codifica del backup al nuovo ID; sovrascritto il file solo a gioco fermo.
-- **Risultato e limite:** ripristino dei progressi confermato dall'utente all'interno del gioco.
-- **Stato:** verificato dall'utente su build 108.
+- **Ambito:** Ski Safari 2.5 (108), Galaxy S23+; APK infine ripatchato dall'utente sul telefono.
+- **Sintomo:** copia iniziale eseguita ma progressi assenti; al controllo successivo rimaneva un profilo con ID differente, mentre il vecchio file non era più nella directory esterna.
+- **Causa verificata:** il gioco usava un nuovo ID di profilo, presente nell'intestazione e utilizzato nella codifica XOR. **Non è nota la causa precisa della scomparsa del vecchio file.**
+- **Tentativo fallito:** ripristinare il file con il vecchio nome. La sola rinomina non basta (SKI-007).
+- **Soluzione:** salvare il profilo attivo, arrestare il gioco e adattare **una copia** del backup originale all'ID corrente (dettagli in SKI-007), poi sovrascrivere il profilo attivo con autorizzazione.
+- **Verifica:** controlli strutturali e di hash del salvataggio trasferito; ripristino confermato nel gioco dall'utente («Ok funziona»). **Nessuna verifica separata documentata dopo un ulteriore riavvio.**
+- **Stato:** RISOLTO **nel caso osservato**. Non identificare automaticamente l'APK finale ripatchato dall'utente con la build locale 18.
+- **Riferimenti:** `inspect-profile.py`, `ONLINE-RESEARCH.md`, copie locali del profilo prima/dopo, conferma dell'utente.
 
-### SKI-007 — La sola rinomina del file di salvataggio non basta
+### SKI-007 — Rinomina del salvataggio insufficiente: intestazione e XOR legati all'ID
 
-- **Sintomo:** cambiare nome al backup non lo rende utilizzabile da un profilo con ID diverso.
-- **Causa individuata:** nome del file, intestazione e codifica XOR dipendono dall'ID del profilo.
-- **Soluzione adottata:** decodifica con il vecchio ID, sostituzione dell'intestazione del profilo, ricodifica con il nuovo ID.
-- **Risultato e limite:** invariati gli altri byte logici dei progressi, incluse le **45.198 monete**; il contenuto codificato del file può invece cambiare.
-- **Stato:** ripristino confermato dall'utente su build 108; procedura da rivalidare per altri formati di salvataggio.
+- **Sintomo:** il profilo copiato non è caricato usando un ID nuovo: nome, intestazione e codifica dipendono dall'ID.
+- **Soluzione verificata su Ski Safari 2.5 (108):** conservare gli originali; decodificare la copia con l'ID vecchio; sostituire **soltanto i 40 byte iniziali** dell'intestazione con il nuovo ID; ricodificare l'intero buffer con l'ID nuovo; eseguire la sostituzione del file a gioco fermo.
+- **Dettaglio algoritmo osservato:** XOR con i caratteri dell'ID; indice iniziale `3 * lunghezza / 4`, incremento di 2 e ritorno a 0 al raggiungimento della lunghezza. Riferimento `Profile.Obfuscate()`, RVA `0xBD93D0`.
+- **Verifiche:** corrispondenza di ogni byte **decodificato** dopo l'intestazione (compresi i progressi e le 45.198 monete); struttura parziale e ricodifica verificate; SHA-256 del file adattato sul PC uguale a quello trasferito sul telefono. Gli hash del vecchio e nuovo file **non** devono coincidere quando cambia la codifica.
+- **Stato:** RISOLTO nel ripristino osservato (SKI-006); formato completo del salvataggio non decodificato. `lab/skisafari/inspect-profile.py` è **solo di lettura**, non implementa l'adattamento: per questo è stato usato uno script locale ad hoc.
+- **Limite:** procedura non garantita per altre versioni o formati.
 
 ### SKI-008 — ADB non rilevava il telefono
 
@@ -83,13 +99,39 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 - **Risultato e verifica:** i comandi sono tornati eseguibili.
 - **Stato:** verificato.
 
-### SKI-010 — Build Gradle bloccata da HTTP 401
+### SKI-010 — Build Gradle bloccata da HTTP 401 di GitHub Packages
 
-- **Sintomo:** impossibile completare la build per il recupero delle dipendenze.
-- **Causa individuata:** risposta HTTP 401 da GitHub Packages per alcune dipendenze.
-- **Soluzione adottata:** compilazione locale con strumenti e dipendenze Morphe già disponibili nell'ambiente.
-- **Risultato e limite:** APK generato e provato sui dispositivi; il workaround non implica che l'autenticazione a GitHub Packages sia stata risolta.
-- **Stato:** verificato nel contesto di build utilizzato.
+- **Ambito:** repository Morphe, PC Windows.
+- **Sintomo:** Gradle si interrompe risolvendo le dipendenze/plugin con `HTTP 401`.
+- **Causa osservata:** il registro GitHub Packages non era accessibile con le credenziali utilizzate; accesso Git al repository ≠ accesso al registro pacchetti.
+- **Tentativo fallito:** build Gradle standard nella configurazione disponibile.
+- **Workaround:** build locale con le API del fat JAR Morphe Desktop installato, compilatore Kotlin, Java e D8 disponibili, inserendo la patch in un bundle locale di riferimento.
+- **Verifica:** compilazione Kotlin/Java, merge DEX, rilevamento patch compatibile con 2.5, applicazione all'APK, firma v2 e controllo delle classi/risorse del bundle di riferimento.
+- **Stato:** WORKAROUND. **La build Gradle completa resta non verificata** e la pipeline incrementale locale non equivale alla pipeline ufficiale.
+- **Riferimenti:** `lab/skisafari/build-local.ps1`, `MergeApk.java`, `VerifyApk.java`, README Ski Safari. Distinguere dal problema di risoluzione del plugin `app.morphe.patches:1.3.4` documentato nella sezione PC/Git.
+
+
+### SKI-011 — Valori SDK mancanti nei percorsi Java alternativi
+
+- **Ambito:** Ski Safari 2.5 (108); Google Games, WorkManager, OkHttp, AppLovin 13.3.1.
+- **Sintomi:** errori a cascata dopo il workaround PairIP durante creazione di thread, database e componenti SDK, talvolta solo a un successivo avvio.
+- **Causa individuata:** mancavano valori necessari in percorsi Java raggiunti, inclusi descrittore Binder, costanti SQL, nomi colonne, `:method` HTTP/2 e impostazioni SDK.
+- **Tentativo insufficiente:** correggere solo il primo errore; la semplice sopravvivenza del processo non dimostra la correttezza di tutte le inizializzazioni.
+- **Workaround:** recupero puntuale da codice equivalente nell'APK o dalla medesima versione delle dipendenze: Binder Google Games dalla factory; schema `WorkName`, pragma foreign key e colonne WorkManager; `:method` dal sorgente OkHttp; impostazioni e prefissi thread dall'AAR ufficiale AppLovin 13.3.1. Aggiunto fallback limitato al nome nullo di un `HandlerThread` e ripristinati prefissi diagnostici.
+- **Verifica:** build 18 avviata con superamento dei blocchi osservati; non è stata verificata la totalità degli SDK. Nessuno SDK completo sostituito e nessuna ricevuta o risposta di pagamento inventata.
+- **Stato:** WORKAROUND specifico di versioni e classi analizzate.
+- **Riferimenti:** `129c9f6`, `UnlockAllItemsPatch.kt`, `lab/skisafari/ONLINE-RESEARCH.md`, log build 13–18.
+
+### SKI-012 — ResourcePatchContext.get consuma risorse native durante rebuild completo
+
+- **Ambito:** Morphe Desktop 1.20.0; patch Ski Safari con risorse complete.
+- **Sintomo:** file nativi invariati venivano consumati due volte dal rebuild quando la patch li leggeva tramite `ResourcePatchContext.get`.
+- **Causa osservata:** interazione tra lettura delle risorse originali e gestione dei file nel rebuild completo del patcher.
+- **Tentativo fallito:** usare `ResourcePatchContext.get` per il controllo d'identità delle librerie originali nel percorso interessato.
+- **Workaround:** lettura diretta dello ZIP dell'APK sorgente per calcolare hash; accesso al file tramite i campi **privati** `config.apkFile` del contesto; arresto esplicito quando la struttura interna del patcher non coincide con quella attesa.
+- **Verifica:** patch applicata, rebuild e firma completati; verificata offline l'identità dei file IL2CPP/metadati originali e la presenza dell'helper previsto.
+- **Stato:** WORKAROUND fragile, legato ai dettagli privati di Morphe Desktop 1.20.0. Compatibilità con Morphe Manager o altre versioni non verificata.
+- **Riferimenti:** `UnlockAllItemsPatch.kt`, README Ski Safari, artefatti locali build 18.
 
 ### Procedura consolidata per futuri ripristini Ski Safari
 
@@ -99,6 +141,15 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 4. **Adattare una copia del backup:** decodificare usando il vecchio ID, cambiare l'intestazione e ricodificare usando il nuovo ID; non modificare i dati logici dei progressi.
 5. **Controllare l'integrità con SHA-256** e conservare gli hash dei file originali e di quelli prodotti. **Non aspettarsi hash identici** tra due salvataggi se cambiano intestazione e codifica: il controllo serve a tracciare esattamente i file e a rilevare modifiche accidentali.
 6. **Controllare i progressi nel gioco**, sul dispositivo di destinazione, prima di considerare riuscito il ripristino.
+
+
+### Verifiche trasversali e questioni ancora aperte (build 18)
+
+**Distinguere sempre le prove:** build riuscita, APK patchato e firmato, avvio Unity, esecuzione di `UnlockAllItems()`, stato degli oggetti e persistenza dopo riavvio sono verifiche differenti. Un processo vivo o uno schermo nero su dispositivo bloccato **non** dimostrano un avvio riuscito. Per analisi native, verificare librerie e metadati tramite identità binaria e istruzioni: gli RVA isolati non bastano.
+
+**Aperto o non dimostrato:** postcondizione per categorie e one-shot tra avvii (SKI-005); persistenza dello sblocco con confronto dedicato dopo riavvio; backup e ripristino completi dei dati privati (SKI-001); build Gradle standard (SKI-010); compatibilità del workaround risorse con altri host (SKI-012); copertura completa dei percorsi SDK/virtualizzati (SKI-003, SKI-011). Non sono stati effettuati root, modifiche alle protezioni di sistema o simulazioni di transazioni/ricevute.
+
+**Cronologia:** `129c9f6` è il commit storico documentato per la sessione/build 18. È presente anche il commit successivo `7fe0e28` relativo alla patch Ski Safari, ma **non** dedurre dallo storico che sia già incorporato nel branch o nella build del dispositivo. Il README contiene anche sezioni superate: per gli esiti sul dispositivo considerare le prove della build locale 18 e il successivo ripristino confermato sul telefono.
 
 **Confine di validità:** tutto quanto sopra è documentato per **Ski Safari 2.5, build 108**. Su altre versioni occorre riesaminare formato, ID, inizializzazione, dipendenze e comportamento.
 
