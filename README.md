@@ -17,12 +17,15 @@ Repository unico di patch indipendenti per piu applicazioni Android, compatibile
 | **Flowx** | `com.enzuredigital.weatherbomb` | 4.650 | Test stato Gold locale |
 | **Fonometro** | `com.ktwapps.soundmeter` | 11.5 | Rimozione annunci |
 | **Prezzi Benzina** | `org.vernazza.androidfuel` | 3.26.10.10 | Routing Maps tramite GmsCore F13, Remove Ads A1 |
+| **Yahoo Finance** | `com.yahoo.mobile.client.android.finance` | 26.21.2 (1360038759) | Remove Ads A2, GOLD diagnostico A3, accesso Google microG A5, diagnostica analisi A7 |
 
 ### Stato dei test
 
 - **Leghe FC:** le tre patch esistenti rimangono invariate; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
 - **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
 **Prezzi Benzina:** F13 instrada il servizio del token Maps verso un GmsCore compatibile già installato; A1 interviene sui controlli per banner/interstitial. Il funzionamento è stato verificato dall'utente sulla versione 3.26.10.10; F13 richiede un ambiente GmsCore compatibile.
+
+- **Yahoo Finance:** Remove Ads A2 verificata su dispositivo; accesso Google via GmsCore A5 confermato. GOLD A3 simula solo il livello locale e non sblocca le funzioni server; A7 registra soltanto stati e risultati di accesso per la diagnostica. Tutte le patch sono disabilitate per default. [Resoconto prove](lab/yahoofinance/README.md).
 
 - **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). La pubblicazione sul canale stabile non certifica il corretto comportamento della patch nell'app.
 
