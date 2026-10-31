@@ -1,0 +1,7 @@
+{
+  "interaction": {
+    "type": "script",
+    "path": "libpbfridagadget.script.so",
+    "on_change": "ignore"
+  }
+}
