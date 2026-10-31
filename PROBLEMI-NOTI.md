@@ -491,6 +491,57 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## Outdooractive — Membership 3.23.20 (23 ottobre 2026)
+
+**Ambito:** `com.outdooractive.Outdooractive`, `classes4.dex`, Morphe Patcher/Kotlin/dexlib2, ADB Logcat, [repository Outdooractive](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches) (`dev`), prerelease `v1.0.0-dev.1`–`dev.4`. I riferimenti ai log sono locali. Distinguere il codice del repository separato dalle versioni confluite nel [repository centrale](https://github.com/Edoardo9708/LegheFC-Morphe-Patches).
+
+### OA-001 — Logging Membership eccessivo — PARZIALMENTE RISOLTO
+
+- **Sintomo:** diagnostica dev.1 con **6.807 righe in 7,36 s**: 137 chiamate `isProUser()` tutte `false` e 51 `getLevel()` tutte `0`, nessuna `FATAL EXCEPTION` nel file osservato.
+- **Causa verificata:** `morpheDiagPro()` e `morpheDiagLevel()` usavano `Log.i(tag,message,Throwable())` a ogni getter, generando stack trace completi anche su letture ripetute da LiveData, mappe e UI.
+- **Soluzione (dev.2):** logger compatto che legge `Throwable.getStackTrace()[2]`, non stampa l'intero stack e deduplica con `ConcurrentHashMap.putIfAbsent()` per combinazione metodo/valore/chiamante. Esempio `OA-Membership: isProUser = false | caller: tdk.H(UserBarrier.kt:10)`. Nessun altro tentativo fallito documentato.
+- **Verifica:** compilazione e pubblicazione `v1.0.0-dev.2` riuscite; **non** misurata sul dispositivo la riduzione dei messaggi: i conteggi si riferiscono alla **dev.1**.
+- **Limiti:** costruzione dello stack comunque eseguita per ogni chiamata; inizializzazione pigra della mappa non sincronizzata, con rischio di deduplicazioni temporaneamente perse o duplicate.
+- **Riferimenti:** `MembershipDiagnosticPatch.kt` / `addLogger()`; log `Testo incollato(2).txt` del 23/10/2026; commit `ef8b7d9`, `v1.0.0-dev.2`.
+
+### OA-002 — Getter DEX con un registro: ricostruzione del metodo — PARZIALMENTE RISOLTO
+
+- **Causa verificata:** `Membership.isProUser():Z` e `getLevel():I` contenevano solo `iget-boolean v0,p0; return v0` e `iget v0,p0; return v0`. Un registro totale per ciascun getter d'istanza: `v0` coincide con `p0`, dunque nessun locale libero. L'API `MutableMethod` disponibile non esponeva modifica diretta del `registerCount`.
+- **Tentativi:** non risulta un tentativo fallito di impostare direttamente il numero di registri; limite identificato analizzando le API.
+- **Soluzione (dev.3):** `instrumentGetter()` ricrea il metodo con `ImmutableMethod` e `MutableMethodImplementation(3)`, preservando firma, flag, annotazioni e restrizioni API; layout `v0` valore originale, `v1` registro aggiuntivo, `v2/p0` istanza. Fingerprint rigido su registro, due istruzioni, opcode, campo e tipo; abort se non corrisponde.
+- **Verifica:** build e pre-release `v1.0.0-dev.3` riuscite; successivamente utente riferisce comportamento apparentemente funzionante col getter modificato, **senza dump DEX installato** o test esaustivo dei percorsi runtime.
+- **Limiti:** validato staticamente per Outdooractive 3.23.20; compilazione e pubblicazione non dimostrano da sole la validità di ogni esecuzione ART.
+- **Riferimenti:** `MembershipDiagnosticPatch.kt` / `instrumentGetter()`; `docs/ANALYSIS.md`; commit `6597887`; `v1.0.0-dev.3`.
+
+### OA-003 — Descrizione «solo diagnostica» falsa dopo override dei getter — APERTO
+
+- **Sintomo:** sul branch `dev` del **repository Outdooractive separato**, anche dopo `v1.0.0-dev.4`, commenti, nome e descrizione dichiarano conservazione dei valori originali, ma le istruzioni generate contengono `#return v0` e `return v1`.
+- **Causa verificata:** dal commit `bab86cd` il getter `isProUser()` restituisce il valore di prova `1`, `getLevel()` il valore `2` (parametro `example` in `instrumentGetter()`). I campi originali sono letti/loggati, ma i risultati restituiti sono modificati. Nessun crash o errore di compilazione documentato.
+- **Verifica:** dev.4 pubblicata; utente riferisce app funzionante e livello **ProPlus** visibile. Mancano test sistematici di funzioni/servizi remoti e persistenza dopo riavvio.
+- **Correzione proposta e non applicata nel repository separato:** riportare `return v0` se la patch deve restare passiva, oppure allineare nome, descrizione, README e piano di test all'override locale.
+- **Differenza verificata il 31/10/2026:** nel repository **centrale** su `dev` i metadati sono già `Outdooractive - Test getter abbonamento` e descrizione `Unlock Pro`, con commento esplicito sulla modifica dei getter; anche lì resta `return v1`. **I repository non sono identici**. La dicitura `Unlock Pro` non prova che siano accessibili servizi/entitlement sul backend.
+- **Stato:** APERTO per coerenza del repository separato e verifica funzionale. Non è stata apportata alcuna correzione alla patch durante questa documentazione.
+- **Riferimenti:** `MembershipDiagnosticPatch.kt`, `README.md`, `docs/ANALYSIS.md`, `docs/TEST_PLAN.md`; commit `bab86cd`, `v1.0.0-dev.4`, PR #1.
+
+### OA-004 — Getter Membership locali e autorizzazioni backend sono livelli distinti — PARZIALMENTE RISOLTO
+
+- **Questione:** quali componenti consultano `isProUser()`/`getLevel()` e quali diritti ne dipendono realmente?
+- **Analisi verificata:** gli stack trace dev.1 individuano chiamanti da `UserBarrier.kt`, `UserMapsLiveData.kt`, `MapRequestHelper.java`, `MapFragment.java`, `FabMenu.kt`, `MainActivity.java`, `ProMembershipUpgradeView`, `FirebaseAppAnalytics.kt`, `CrashlyticsAccess.kt`, oltre a `RepositoryLiveData`, `BaseRequest` e callback asincrone. L'analisi statica mostra `/sync/user/profile` e `/user/profile/membership`, entrambi basati su oggetti `Membership` **non necessariamente della stessa istanza**.
+- **Soluzione parziale:** associare le letture ai chiamanti mediante logging, distinguendole da risposte API, controlli server e cache; nessun tentativo fallito specifico documentato.
+- **Verifica:** getter intercettati in Logcat e ProPlus comparso in UI dopo cambio locale; ciò non verifica accesso alle funzioni remote. Nessuna risposta API completa acquisita.
+- **Limiti:** non determinati i percorsi esclusivamente locali, backend, ulteriori proprietà o controlli; manca validazione dopo riavvio, su mappe, profilo e percorsi.
+- **Riferimenti:** log `Testo incollato(2).txt`, `docs/ANALYSIS.md`, `v1.0.0-dev.1`/`dev.4`.
+
+### Regole generali e verifiche mancanti
+
+- Controllare `registers_size`, parametri e opcode prima di usare registri Smali; nelle ricostruzioni DEX preservare firma e metadata del metodo.
+- Verificare il bytecode **generato** dai parametri Kotlin, non basarsi sul nome o sui commenti; distinguere log passivo da override.
+- Deduplicare il logging sui percorsi frequenti, misurando anche costo del recupero stack e accessi concorrenti.
+- **Distinguere** build/bundle, installazione, runtime, modifica UI, autorizzazioni server e persistenza.
+- **Aperto:** verifica prestazioni e concorrenza logger, test funzionali/riavvio, autorizzazioni remote, riallineamento metadata nel repository separato.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
