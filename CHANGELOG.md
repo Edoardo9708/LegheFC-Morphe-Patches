@@ -1,3 +1,9 @@
+## [1.8.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.8.0-dev.1...v1.8.0-dev.2) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* **yahoo-finance:** stabilize ads patch and add microG login diagnostics ([1d0bf53](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1d0bf530895a63c40bb0b671eb23ddc1b748a3a5))
+
 ## [1.8.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.7.0...v1.8.0-dev.1) (2026-10-31)
 
 ### 🐛 Bug Fixes
