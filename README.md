@@ -47,7 +47,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.7.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.7.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;11 patches total
+> **[v1.8.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.8.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;15 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -168,6 +168,24 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Twilight - Test stato trial](#twilight-test-stato-trial) | Unlock Pro |  |
+
+</details>
+
+<details open>
+<summary>📦 Yahoo Finance&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 26.21.2 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Yahoo Finance - Analysis diagnostics A7](#yahoo-finance-analysis-diagnostics-a7) | Logs finance analysis response status and local subscription access outcomes without changing results. |  |
+| [Yahoo Finance - GOLD diagnostic A3](#yahoo-finance-gold-diagnostic-a3) | Experimental: simulates GOLD in local subscription state. Server feature maps remain original; does not establish premium content access. |  |
+| [Yahoo Finance - Remove ads A2](#yahoo-finance-remove-ads-a2) | Test: enables only the AdsFree UI check; leaves other subscription features and purchases unchanged. Logs YF-RemoveAds. |  |
+| [Yahoo Finance - microG login A5](#yahoo-finance-microg-login-a5) | Experimental: route Google identity sign-in/authorization to existing ReVanced GmsCore, using the bundled credential provider. |  |
 
 </details>
 
