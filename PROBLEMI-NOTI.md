@@ -463,6 +463,8 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Verifica:** identità con il template tramite contenuto e SHA Git; commit [`6b80f199`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/6b80f199966172e94567abd090eeb389b4463adb); run [40742453189](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40742453189) riuscito; pubblicata `v1.3.0-dev.1` con asset `.mpp`; workflow successivi su `dev` e `main` completati.
 - **Stato/limiti:** RISOLTO il ripristino del workflow, **non** la causa storica delle Git note. Successi futuri non garantiti in caso di nuove anomalie di sincronizzazione.
 
+**Aggiornamento storico (24/10, `v1.2.0-dev.12`):** il primo `semantic-release` aveva creato il tag `v1.2.0-dev.12`, ma il push di `refs/notes/semantic-release-v1.2.0-dev.12` fu rifiutato con `missing necessary objects`. Nei run successivi `git tag v1.2.0-dev.12` falliva con exit code 128 perché il tag esisteva già. Il recupero manuale sostituiva l'asset pubblicato **sotto lo stesso numero di versione**, rendendo impossibile distinguere in modo affidabile sorgenti e bundle dal solo numero `dev.12`; il tag talvolta esisteva senza una GitHub Release corrispondente e i sorgenti differivano tra tag e `dev`. È documentato il successivo ritorno al workflow ufficiale, **non la causa radice del rifiuto Git notes**. Ripetere job o ricaricare un asset non fornisce una nuova identità di versione; preferire release distinte. Non è stato dimostrato che la cache Morphe abbia effettivamente conservato un bundle obsoleto. Riferimenti: commit `6144e22`, `4550b49`, `e5c2ddf`; workflow `40079801244`, `40080613788`, `40081316851`.
+
 ### MOR-REL-002 — Sezioni duplicate di `1.2.0-dev.12` nel changelog — RISOLTO
 
 - **Sintomo:** `CHANGELOG.md` conteneva **sette** intestazioni `1.2.0-dev.12`, con date ed elenchi di commit in parte diversi, e mancavano le sezioni stabili `1.0.1`, `1.1.0` e `1.2.0`.
@@ -470,6 +472,19 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Soluzione:** preso il `CHANGELOG.md` dal tag pubblicato `v1.2.0-dev.12`; identificata e preservata **testualmente** la sezione originale; eliminate sei duplicazioni e ripristinate da `main` le tre sezioni stabili, lasciando intatte le altre prerelease.
 - **Verifica:** sezioni dev.12 da 7 a 1, tre sezioni stabili recuperate, sezione originale identica al tag. Commit [`b634777`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/b63477741332404be5a867be0761c2791284982c) con **solo** `CHANGELOG.md`. Run [40744561955](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40744561955) riuscito senza creare una nuova release.
 - **Stato/limiti:** RISOLTO il file storico identificato. Non corregge retroattivamente le note delle release GitHub né impedisce automaticamente nuovi duplicati.
+
+**Precisazione storica `dev.12`:** le sette sezioni con lo stesso numero erano correlate ai tentativi di recupero/ripubblicazione con versione riutilizzata dopo il rifiuto del push delle Git notes (vedi MOR-REL-001). La rimozione delle duplicazioni corregge il changelog, non l'identità degli asset storicamente sostituiti. L'ipotesi di cache locale Morphe obsoleta non è stata confermata.
+
+### MOR-REL-003 — Bundle `.mpp` ZIP valido ma privo del payload DEX — PARZIALMENTE RISOLTO
+
+- **Ambito:** repository Morphe multipatch, prerelease `v1.2.0-dev.12`, Morphe Manager **2.1.0**, GitHub Actions, Gradle, `semantic-release` (24 ottobre 2026).
+- **Sintomo:** dopo l'aggiornamento Morphe riconosceva sorgente e versione `dev.12`, ma mostrava **zero applicazioni**. Logcat: `Failed to load bundle Edoardo9708 Patches`; `IllegalStateException: Patch bundle is corrupted or incomplete`; causa interna `PatchException: APK contains no DEX files to patch`. **L'errore riguardava il bundle**, non gli APK da modificare.
+- **Causa verificata:** durante il recupero manuale era stato caricato il primo `.mpp` generato **prima** della fase finale `Gradle publish`. Il file era leggibile come ZIP ma **non conteneva i DEX** necessari a Morphe. Non bastavano esistenza, dimensione, apertura come ZIP o correzione del MIME type.
+- **Tentativi non risolutivi:** ripubblicazione del bundle preliminare; verifiche superficiali ZIP/dimensione; modifica del MIME senza rifare il payload.
+- **Workaround adottato:** eseguire `./gradlew publish` e verificare **il bundle finale**, cercando file `.dex` sia tra le voci ZIP sia in eventuali JAR interni, prima di caricarlo su GitHub.
+- **Verifica:** nel workflow [`40085781321`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/actions/runs/40085781321) risultano `DEX files found: ['classes.dex', 'generated/extensions/signature.dex']`. Il file `patches-1.2.0-dev.12.mpp` è stato ripubblicato con MIME `application/dash-patch+xml`, dimensione **1.342.529 byte**; workflow riuscito.
+- **Stato/limiti:** PARZIALMENTE RISOLTO. È verificata la correzione strutturale del bundle, **non** una successiva prova positiva del caricamento delle applicazioni in Manager, né compatibilità con versioni Manager diverse dalla 2.1.0. Il controllo sui DEX era un recupero storico, poi eliminato dal workflow ordinario durante MOR-REL-001; non affermare che faccia tuttora parte del workflow ufficiale.
+- **Riferimenti:** `.github/workflows/release.yml`, `gradle.properties`, log `morphe_logcat-2026-10-24-112220.log.txt` alle 11:20:37 e 11:20:48; commit `1c4a850`, `2dfb2db`. MOR-REL-001 per successivo ripristino della pipeline.
 
 ### FLOWX-META-001 — Nome "Diagnostica Gold" incoerente con la modifica dello stato locale — RISOLTO (metadati)
 
@@ -488,6 +503,39 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 - **Backmerge:** `.releaserc` include `backmergeStrategy: "merge"` e `mergeMode: "ours"`. La sincronizzazione `main`/`dev` è riuscita nel caso documentato; il comportamento con futuri conflitti non è verificato.
 - **Regole:** confrontare il workflow con il template prima di aggiungere workaround permanenti; per correggere un changelog storico utilizzare tag e sezioni autentiche; considerare i **file realmente diversi**, non il solo numero dei commit; distinguere pipeline di release, PR, merge, pubblicazione bundle e test dell'applicazione; descrivere correttamente se una patch modifica **stato locale** anziché registrare soltanto.
 - **Aperto/non dimostrato:** causa radice originaria delle Git note `dev.12`; comportamento del backmerge in conflitti futuri; efficacia e persistenza della patch Flowx Gold nella release stabile; nessun test nuovo di Leghe FC, Twilight o Outdooractive in questa manutenzione.
+
+---
+
+## Flowx 4.650 — prove R7/R8 sulle autorizzazioni Gold (24 ottobre 2026)
+
+**Ambito:** `com.enzuredigital.weatherbomb`, `FlowxEntitlementDiagnosticPatch.kt`, Kotlin/Smali e Logcat; distinguere i log **R7** dalle modifiche introdotte nella **R8** e dai successivi esperimenti **R9**. FLOWX-META-001 documenta già la descrizione non completamente passiva della patch: le seguenti voci riguardano il comportamento dei dati.
+
+### FLOWX-001 — Test `gold/active` positivo ma lista effettiva vuota — RISOLTO (diagnosi); Gold APERTO
+
+- **Sintomo R7:** `TEST gold/active B() = true`, ma `h() cache WRITE ARG size = 0`, `h() cache WRITE ARG elements = []`, `h() cache x AFTER write size = 0` e `k() entitlement list size = 0`. La lista sintetica aveva invece `h() cache TEST size = 1`, con `EntitlementRow(product=gold, status=active, ...)`.
+- **Causa verificata:** l'helper `morpheIsolatedCacheList` costruiva una lista **separata** con oggetti di prova, non la assegnava a `Lz5.x`. Il metodo `Ldw6.B(Lxi1;J)Z` accettava il singolo oggetto dimostrativo, ma `Lz5.k()` consultava una lista reale senza elementi. Un controllo booleano sintetico positivo **non** dimostra un entitlement Gold effettivamente presente.
+- **Tentativo di interpretazione errato:** trattare `B() = true` sulla riga di prova come prova di disponibilità della funzione Gold. Non è un test del recupero dello stato originale.
+- **Soluzione diagnostica:** confrontare separatamente l'argomento originale passato alla scrittura `Lrs5.i()`, la lista di prova, il valore effettivamente memorizzato in `Lz5.x` dopo la scrittura e quello letto da `Lz5.k()`. Non confondere cache e test sintetico.
+- **Verifica:** log R7 con percorso `Lz5.h()` eseguito, dati dimostrativi creati, `x` ancora vuoto e `k()` che legge `size=0`. Marcatore `FX-20261024-R7`, commit `c69323a`.
+- **Stato/limiti:** RISOLTO **il significato dei log**, APERTO il funzionamento Gold. Non dimostrato cosa restituisca il server, se ci siano altri caricamenti, se la lista venga riempita altrove o cancellata in seguito, né accesso alle funzioni premium/persistenza.
+- **Riferimenti:** `FlowxEntitlementDiagnosticPatch.kt`, `morpheIsolatedCacheList`, `Lz5.h()`/`k()`/`x`, `Lrs5.i()`, `Ldw6.B()`; revision R7.
+
+### FLOWX-002 — Reset alternativo di `Lz5.x` non coperto dalla prima diagnostica — PARZIALMENTE RISOLTO
+
+- **Sintomo:** R7 controllava le scritture attraverso `Lz5.c()` e `Lz5.h()`, ma non poteva stabilire se la lista venisse **svuotata successivamente** da altri percorsi.
+- **Causa verificata staticamente:** `Lz5.b()` contiene una chiamata a `Lrs5.j(current, emptyList)`, diversa dalla scrittura `Lrs5.i()`; il codice identifica il riferimento a `Lrs5.j()` e alla lista vuota `Lmh1.k`. **Non è dimostrato nei log R7** che questo reset sia stato eseguito.
+- **Lacuna del precedente tentativo:** loggare solo `i()` e il risultato finale di `k()` non consente di attribuire a `b()` un eventuale svuotamento.
+- **Soluzione diagnostica R8:** aggiunti `morpheLogBResetBefore` e `morpheLogBResetAfter`, che leggono `x` prima/dopo l'operazione originale `Lrs5.j()` senza rimuoverla. Marcatori previsti `FX-R8 b() RESET BEFORE x size = ...`, `FX-R8 b() RESET AFTER x size = ...`, `FX-R8 demo factory RETURN size = ...`, `PATCH CODE ID FX-20261024-R8`.
+- **Verifica:** codice R8 introdotto, commit `3c3eae5`, pipeline GitHub completate; **nessun log runtime R8** disponibile in questa sessione per confermare che `b()` abbia effettivamente azzerato una lista prima non vuota.
+- **Stato/limiti:** PARZIALMENTE RISOLTO: individuato e strumentato un possibile reset, senza prova dell'esecuzione o persistenza. R8 introduce anche prove di inserimento della lista dimostrativa nei percorsi locali di scrittura, quindi **non è soltanto passiva**. Non attribuire risultati R7 o R9 alla R8.
+- **Riferimenti:** `FlowxEntitlementDiagnosticPatch.kt`, `Lz5.b()`, `Lrs5.j()`, `Lmh1.k`, `morpheLogBResetBefore/After`, `morpheCreateDemoRows`; R8.
+
+### Regole riutilizzabili e questioni aperte
+
+- Un bundle `.mpp` ZIP valido non implica presenza dei DEX; verificare il contenuto della **fase finale** di pubblicazione (MOR-REL-003), e usare versioni distinte per contenuti differenti (MOR-REL-001).
+- Tracciare **oggetto di prova, argomento di scrittura, stato memorizzato, stato letto e reset** come cinque eventi distinti. Un oggetto che supera `B()` non è prova di autorizzazione dell'app o del server.
+- Usare marcatori di revisione nei log per distinguere APK effettivamente eseguiti: `v1.2.0-dev.12` è stata riutilizzata per bundle diversi; identificazione del codice e versione GitHub possono divergere.
+- **Aperto:** log R8/R9 per dimostrare se e quando `Lz5.x` si svuota; funzionamento effettivo Gold e persistenza dopo chiusura/riavvio; causa originaria del rifiuto Git notes; prova positiva del caricamento in Morphe Manager del bundle DEX ripristinato.
 
 ---
 
