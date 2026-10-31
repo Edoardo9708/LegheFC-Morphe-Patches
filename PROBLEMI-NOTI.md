@@ -104,6 +104,62 @@ Archivio delle problematiche già affrontate nei lavori di patching, analisi, bu
 
 ---
 
+## Problemi trasversali e casi Yahoo Finance — 31 ottobre 2026
+
+Queste voci provengono dal riepilogo operativo del 31 ottobre 2026. Raccoglie problemi effettivamente incontrati e rimedi provati. I percorsi locali dell'ambiente sono documentati nel file `NOTE-OPERATIVE-PC.md` sul PC, se disponibile (non è dato per presente nel repository). Ricontrollare versioni e dispositivi nelle nuove sessioni.
+
+### PC, strumenti e Git
+
+| Problema / sintomo | Causa riscontrata | Soluzione adottata |
+| --- | --- | --- |
+| `java` non trovato dalla shell | Java installato ma assente dal PATH. | Usare il percorso completo del `java.exe` già installato, indicato nelle note operative. |
+| Git segnala `dubious ownership` | Il proprietario della cartella differisce dall'utente del processo. | Per il repository verificato, usare `git -c safe.directory=C:/percorso/repository ...`, senza cambiare la configurazione globale. |
+| Git non può aggiornare il repository, oppure ADB/SDK non sono accessibili dalla sessione | Restrizioni del sandbox sui percorsi e sulle operazioni. | Richiedere l'esecuzione con permessi elevati tramite gli strumenti Codex per l'operazione autorizzata. Non reinstallare gli strumenti e non aggirare un rifiuto di approvazione. |
+| Errore Java apparentemente relativo a D8 / classe non trovata | Nel caso osservato, il processo non poteva leggere il JAR nell'Android SDK. | Ripetere con accesso autorizzato al JAR esistente; non assumere subito che D8 sia mancante o corrotto. |
+| Variabile PowerShell `$pid` non assegnabile | `$PID` è una variabile automatica di sola lettura; i nomi non distinguono maiuscole e minuscole. | Usare un nome come `$appPid`. |
+| Fast-forward Git bloccato da un file non tracciato che verrebbe sovrascritto | Un esperimento locale aveva lo stesso percorso di un file aggiunto upstream. | Verificare il contenuto, conservare il file fuori dal repository, poi effettuare il fast-forward. Nel caso osservato gli hash erano identici; verificato anche il file ricreato upstream. Non usare una pulizia indiscriminata. |
+| Build Gradle bloccata sul plugin `app.morphe.patches:1.3.4` | Plugin non risolvibile nell'ambiente disponibile. | Alternativa riuscita: compilatore Kotlin già incluso nella distribuzione Gradle, D8 dell'SDK, bundle `.mpp` locale e CLI del JAR Morphe installato. Il problema della build Gradle standard resta aperto: non dichiararla riuscita. |
+
+**Nota:** quest'ultimo caso è distinto dal problema GitHub Packages HTTP 401 documentato in SKI-010: le dipendenze e i percorsi di compilazione vanno verificati separatamente.
+
+### Android, file e installazione
+
+| Problema / sintomo | Causa riscontrata | Soluzione adottata |
+| --- | --- | --- |
+| File Quick Share non trovato sul PC | Il trasferimento era arrivato sul tablet. | Cercare sul dispositivo in `/sdcard/Download/Quick Share/`, quindi copiare con `adb pull`. Verificare sempre dove è stato ricevuto il file. |
+| Più dispositivi ADB collegati | Tablet USB e telefono wireless presenti insieme. | Eseguire `adb devices -l`, identificare il dispositivo e usare sempre `adb -s <seriale> ...`. Il seriale wireless va ricontrollato nelle nuove sessioni. |
+| Aggiornamento APK rifiutato per firma diversa | L'APK installato e quello nuovo erano firmati con chiavi differenti. | Controllare i certificati. Per le prove successive è stata mantenuta la stessa chiave, consentendo `adb install -r`. La prima sostituzione ha richiesto rimozione della sola installazione di test, dopo autorizzazione esplicita. Una firma diversa non permette di conservare i dati con un normale aggiornamento. |
+| Dubbio su base APK e split | L'originale era un archivio con base, ABI, lingua e densità; l'APK ricevuto per il test era già universale. | Ispezionare archivio, risorse e librerie prima dell'installazione. È stato verificato che l'APK universale conservasse i componenti necessari; non generalizzare che basti sempre `base.apk`. |
+| Logcat troppo ampio e contenente dati estranei | Raccolta dell'intero log del dispositivo. | Raccogliere per PID/tag, conservare lo stack trace completo del crash pertinente e oscurare dati personali. Le acquisizioni generali non necessarie sono state eliminate. |
+
+**Nota:** il problema di firma diversa ricorre anche in SKI-002; in questa voce è documentato in più il riutilizzo della medesima chiave per gli aggiornamenti successivi.
+
+### Bytecode e autenticazione: casi applicativi riutilizzabili
+
+#### Crash ART dopo un'iniezione Smali — risolto
+
+**Caso Yahoo A1:** `VerifyError` durante `Application.onCreate`. Nel DEX prodotto, `if-eqz` saltava all'indirizzo `0x0d`, dentro il blocco di logging: saltava la preparazione di una stringa e passava a `Log.i` un registro di tipo `Object`. Il verifier richiedeva `String` all'indirizzo `0x0f`.
+
+**Rimedio provato:** sostituire `addInstructions` con `addInstructionsWithLabels`; il salto risultante puntava a `0x14`, all'ingresso del percorso originale. Verificati DEX finale, tipi dei registri e stabilità sui dispositivi. La regola riutilizzabile è controllare il DEX generato, non soltanto il testo Smali della patch.
+
+**Riferimenti locali:** `morphe-data/yahoo-finance-tests/007-A1-launch-logcat.txt` e `022-A1-A2-bytecode.txt`.
+
+#### Accesso Google non funzionante dopo la firma dell'APK — risolto nel caso provato
+
+**Causa osservata:** i servizi Google ufficiali rifiutavano la coppia package/certificato OAuth dopo la nuova firma. Il primo tentativo con override di `Application.bindService` non intercettava il percorso effettivo dei client Google.
+
+**Rimedio provato:** usare il MicroG già installato, selezionare il provider credenziali Play Services incluso nell'app e instradare soltanto i due client Google Identity verso MicroG, dichiarando nei metadati il digest pubblico del certificato originale. L'utente ha confermato il login riuscito. Questa implementazione è specifica della versione analizzata: non è una soluzione da copiare alla cieca su qualsiasi app.
+
+#### Profilo GOLD ma annunci e contenuti ancora bloccati — diagnosi parziale
+
+**Causa verificata:** il livello mostrato nel profilo e la mappa delle autorizzazioni delle singole funzionalità sono distinti. Cambiare il livello locale non rende vere le autorizzazioni.
+
+**Esito:** per gli annunci è servita anche la patch dedicata `AdsFree`, funzionante nella combinazione provata dall'utente. Per le analisi, la diagnostica ha osservato HTTP 200 e 35 risultati `REQUIRES_UPGRADE`: i contenuti restano bloccati. HTTP 200 da solo non dimostra che la risposta contenga il contenuto premium completo; non è stata accertata la causa precisa di ogni pulsante «Mostra altro».
+
+**Stato:** problema delle analisi aperto, nessuno sblocco server dimostrato. Dettagli in `morphe-data/yahoo-finance-tests/039-A7-analysis-results.txt` e `040-analysis-findings.txt`.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
