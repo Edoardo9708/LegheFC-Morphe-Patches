@@ -168,8 +168,8 @@ Queste voci provengono dal riepilogo operativo del 31 ottobre 2026. Raccoglie pr
 | Git non può aggiornare il repository, oppure ADB/SDK non sono accessibili dalla sessione | Restrizioni del sandbox sui percorsi e sulle operazioni. | Richiedere l'esecuzione con permessi elevati tramite gli strumenti Codex per l'operazione autorizzata. Non reinstallare gli strumenti e non aggirare un rifiuto di approvazione. |
 | Errore Java apparentemente relativo a D8 / classe non trovata | Nel caso osservato, il processo non poteva leggere il JAR nell'Android SDK. | Ripetere con accesso autorizzato al JAR esistente; non assumere subito che D8 sia mancante o corrotto. |
 | Variabile PowerShell `$pid` non assegnabile | `$PID` è una variabile automatica di sola lettura; i nomi non distinguono maiuscole e minuscole. | Usare un nome come `$appPid`. |
-| Fast-forward Git bloccato da un file non tracciato che verrebbe sovrascritto | Un esperimento locale aveva lo stesso percorso di un file aggiunto upstream. | Verificare il contenuto, conservare il file fuori dal repository, poi effettuare il fast-forward. Nel caso osservato gli hash erano identici; verificato anche il file ricreato upstream. Non usare una pulizia indiscriminata. |
-| Build Gradle bloccata sul plugin `app.morphe.patches:1.3.4` | Plugin non risolvibile nell'ambiente disponibile. | Alternativa riuscita: compilatore Kotlin già incluso nella distribuzione Gradle, D8 dell'SDK, bundle `.mpp` locale e CLI del JAR Morphe installato. Il problema della build Gradle standard resta aperto: non dichiararla riuscita. |
+| Fast-forward Git bloccato da un file non tracciato che verrebbe sovrascritto | Nel worktree `morphe-f11-source`, `MicrogTokenF13Patch.kt` era presente come esperimento locale non tracciato, ma lo stesso percorso era stato aggiunto upstream. | Confrontati i blob (identici), conservata la copia in `commit-check/preserved-MicrogTokenF13Patch.kt`, eseguito il fast-forward e ricontrollato il file upstream. Gli altri file non tracciati sono rimasti intatti. Se i contenuti differiscono serve riconciliazione esplicita: **mai usare pulizie indiscriminate**. Stato: RISOLTO. |
+| Build Gradle bloccata sul plugin `app.morphe.patches:1.3.4` | Il plugin non era risolvibile nell'ambiente locale; configurazione/accesso al repository non corretti in modo definitivo. | WORKAROUND verificato con Yahoo Finance 26.21.2 e Morphe Desktop 1.20.0: `K2JVMCompiler` già distribuito con Gradle (classpath JAR Morphe), D8 dell'SDK, inserimento classi in bundle `.mpp` locale e applicazione delle sole patch selezionate tramite CLI Morphe. Quattro sorgenti Yahoo compilate e applicate; firma e installazione testate. Un errore D8 nella procedura dipendeva da **lettura negata del JAR esistente**, risolta con accesso autorizzato. La **build Gradle standard resta aperta**. |
 
 **Nota:** quest'ultimo caso è distinto dal problema GitHub Packages HTTP 401 documentato in SKI-010: le dipendenze e i percorsi di compilazione vanno verificati separatamente.
 
@@ -179,35 +179,45 @@ Queste voci provengono dal riepilogo operativo del 31 ottobre 2026. Raccoglie pr
 | --- | --- | --- |
 | File Quick Share non trovato sul PC | Il trasferimento era arrivato sul tablet. | Cercare sul dispositivo in `/sdcard/Download/Quick Share/`, quindi copiare con `adb pull`. Verificare sempre dove è stato ricevuto il file. |
 | Più dispositivi ADB collegati | Tablet USB e telefono wireless presenti insieme. | Eseguire `adb devices -l`, identificare il dispositivo e usare sempre `adb -s <seriale> ...`. Il seriale wireless va ricontrollato nelle nuove sessioni. |
-| Aggiornamento APK rifiutato per firma diversa | L'APK installato e quello nuovo erano firmati con chiavi differenti. | Controllare i certificati. Per le prove successive è stata mantenuta la stessa chiave, consentendo `adb install -r`. La prima sostituzione ha richiesto rimozione della sola installazione di test, dopo autorizzazione esplicita. Una firma diversa non permette di conservare i dati con un normale aggiornamento. |
+| Aggiornamento APK rifiutato per firma diversa | In Yahoo Finance A1 e A2 erano state usate chiavi diverse; la chiave privata di A1 non era disponibile. | Confrontati i certificati; verificata la natura temporanea della sola installazione di test; rimossa **solo dopo autorizzazione dell'utente**. Le build successive hanno riutilizzato una chiave di test costante e `adb install -r` ha preservato dati e login. Non è una procedura che permette di aggiornare direttamente l'app firmata da Yahoo o di conservare normalmente i dati tra firme incompatibili. Log: `012-A2-tablet-install.txt`, `031-A3-GOLD-phone-install.txt`, `034-A5-phone-install.txt`, `035-A6-phone-install.txt`, `038-A7-phone-install.txt`. |
 | Dubbio su base APK e split | L'originale era un archivio con base, ABI, lingua e densità; l'APK ricevuto per il test era già universale. | Ispezionare archivio, risorse e librerie prima dell'installazione. È stato verificato che l'APK universale conservasse i componenti necessari; non generalizzare che basti sempre `base.apk`. |
 | Logcat troppo ampio e contenente dati estranei | Raccolta dell'intero log del dispositivo. | Raccogliere per PID/tag, conservare lo stack trace completo del crash pertinente e oscurare dati personali. Le acquisizioni generali non necessarie sono state eliminate. |
 
 **Nota:** il problema di firma diversa ricorre anche in SKI-002; in questa voce è documentato in più il riutilizzo della medesima chiave per gli aggiornamenti successivi.
 
-### Bytecode e autenticazione: casi applicativi riutilizzabili
+### Yahoo Finance 26.21.2 (1360038759) — casi di bytecode, login e autorizzazioni
 
-#### Crash ART dopo un'iniezione Smali — risolto
+Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit storico `1d0bf53`. I log citati sono relativi a `morphe-data/yahoo-finance-tests/` sul PC, non necessariamente presenti in Git.
 
-**Caso Yahoo A1:** `VerifyError` durante `Application.onCreate`. Nel DEX prodotto, `if-eqz` saltava all'indirizzo `0x0d`, dentro il blocco di logging: saltava la preparazione di una stringa e passava a `Log.i` un registro di tipo `Object`. Il verifier richiedeva `String` all'indirizzo `0x0f`.
+#### YF-001 — Crash ART A1: salto Smali errato — RISOLTO
 
-**Rimedio provato:** sostituire `addInstructions` con `addInstructionsWithLabels`; il salto risultante puntava a `0x14`, all'ingresso del percorso originale. Verificati DEX finale, tipi dei registri e stabilità sui dispositivi. La regola riutilizzabile è controllare il DEX generato, non soltanto il testo Smali della patch.
+- **Sintomo:** crash in `Application.onCreate`; `VerifyError` per `com.yahoo.mobile.client.android.finance.subscription.a0.p(SubscriptionFeature)`: a `0x0f` il registro `v0` risultava `Object`, mentre `Log.i(String,String)` richiedeva `String`.
+- **Causa verificata nel DEX:** `if-eqz` introdotto con `addInstructions` saltava a `0x0d`, dentro il logging, anziché al confronto originale; così bypassava la preparazione della stringa. Il metodo aveva due registri coincidenti con i parametri: il riutilizzo era compatibile con il percorso originale, purché la destinazione fosse corretta.
+- **Tentativo fallito:** A1 installabile ma rifiutata dal verifier ART; compilare e installare **non** dimostra la correttezza dei tipi dopo i salti.
+- **Rimedio:** A2 usa `addInstructionsWithLabels` e salto del ramo non `AdsFree` a `0x14`, verso il controllo originale `HAS_ACCESS`. Solo `SubscriptionFeature$AdsFree` registra il marcatore e restituisce `true`. La patch verifica preventivamente registri, opcode e riferimenti, interrompendosi se la struttura originale è cambiata.
+- **Verifica:** crash A1 riprodotto su tablet; confronto bytecode A1/A2; test A2 su avvio, Home, Mercati, titolo e navigazione, con marcatori `YF-RemoveAds` e senza nuovi `VerifyError` nei log acquisiti. Successiva conferma utente della combinazione con MicroG.
+- **Limiti e riferimenti:** correzione per questa versione, **non** difetto generale di `addInstructions`. `YahooFinanceRemoveAdsPatch.kt`; log `007-A1-launch-logcat.txt`, `020-A2-app-process-logcat-final.txt`, `022-A1-A2-bytecode.txt`.
 
-**Riferimenti locali:** `morphe-data/yahoo-finance-tests/007-A1-launch-logcat.txt` e `022-A1-A2-bytecode.txt`.
+#### YF-002 — Login Google dopo rifirma: routing MicroG A5 — WORKAROUND
 
-#### Accesso Google non funzionante dopo la firma dell'APK — risolto nel caso provato
+- **Ambito/sintomo:** Yahoo Finance 26.21.2, telefono con ReVanced GmsCore `app.revanced.android.gms` 7.3.0; autenticazione non completata perché i servizi Google ufficiali rifiutavano la coppia package/certificato OAuth dell'APK rifirmato. Il provider credenziali della piattaforma non offriva il percorso MicroG richiesto.
+- **Tentativo fallito:** A4 selezionava un provider alternativo e sovrascriveva `Application.bindService`, ma non intercettava il binding effettivo dei client Identity (marcatori assenti).
+- **Rimedio specifico A5:** in `androidx.credentials.j.a(...)`, selezione locale del provider `CredentialProviderPlayServicesImpl` incluso nell'app usando il valore API 33; nei client `com.google.android.gms.internal.auth-api.h` e `.n`, routing delle action Identity signin/authorization verso `app.revanced.android.gms` senza dynamic lookup; in `com.google.android.gms.common.internal.g.r(int,IInterface)`, sostituzione di cinque scelte del package tramite `yfIdentityServicePackage`, limitando il routing ai due client Identity. Nel manifest, visibilità del package e metadato `app.revanced.android.gms.SPOOFED_PACKAGE_SIGNATURE` con digest **pubblico** del certificato originale verificato.
+- **Verifica:** compilazione, applicazione Morphe, firma e installazione; **login riuscito confermato dall'utente**, non coperto da test automatico di autenticazione.
+- **Limiti e riferimenti:** specifico di questo bytecode e dell'ambiente MicroG; non replicare automaticamente. `YahooFinanceMicrogLoginA5Patch.kt`; prototipo A4 `YahooFinanceMicrogLoginPatch.kt` **escluso dal commit**; directory locali `microg-a4/`, `microg-a5/`; log `034-A5-phone-install.txt`.
 
-**Causa osservata:** i servizi Google ufficiali rifiutavano la coppia package/certificato OAuth dopo la nuova firma. Il primo tentativo con override di `Application.bindService` non intercettava il percorso effettivo dei client Google.
+#### YF-003 — Profilo GOLD ma funzionalità bloccate — PARZIALMENTE RISOLTO
 
-**Rimedio provato:** usare il MicroG già installato, selezionare il provider credenziali Play Services incluso nell'app e instradare soltanto i due client Google Identity verso MicroG, dichiarando nei metadati il digest pubblico del certificato originale. L'utente ha confermato il login riuscito. Questa implementazione è specifica della versione analizzata: non è una soluzione da copiare alla cieca su qualsiasi app.
+- **Sintomo:** GOLD visualizzato tramite A3, ma annunci e analisi ancora bloccati; alcuni pulsanti «Mostra altro» non aprivano i contenuti.
+- **Causa verificata nel codice:** `subscription.a0.h(BESubscriptionFeature)` consulta la mappa delle autorizzazioni `SubscriptionState.f`, distinta dal livello `SubscriptionState.b`. A3 agiva sulle assegnazioni del livello nei costruttori di `subscription.y`, non sulla mappa; stato locale GOLD **non** implica accesso alle funzionalità. Può risultare `REQUIRES_UPGRADE`.
+- **Soluzione parziale:** per gli annunci ha funzionato la combinazione **A2 + A3 + A5 (build A6)**, confermata dall'utente. La diagnostica **passiva** A7 registra stati HTTP e valori originali di `a0.h` senza modificarli.
+- **Verifica A7:** abbonamenti HTTP 200; `quoteSummary/TSLA` 3 risposte HTTP 200; `finance/premium/insights/recent` HTTP 200; **35** risposte di controllo `REQUIRES_UPGRADE` dopo il recupero dell'abbonamento. Non osservati HTTP 401/403 o errori fatali nella raccolta. Non acquisiti payload, token, cookie o query string.
+- **Stato e limiti:** annunci rimossi nella combinazione testata; analisi ancora bloccate. HTTP 200 **non dimostra** contenuto Premium completo; non sono stati correlati i singoli pulsanti alle funzionalità e ai payload, né identificate le cause precise di ogni «Mostra altro». Non è dimostrato alcuno sblocco lato server.
+- **Riferimenti:** `YahooFinanceGoldTestPatch.kt`, `YahooFinanceAnalysisDiagnosticPatch.kt`; log `039-A7-analysis-results.txt` e `040-analysis-findings.txt`.
 
-#### Profilo GOLD ma annunci e contenuti ancora bloccati — diagnosi parziale
+**Verifiche ancora aperte Yahoo Finance:** accesso alle analisi e singoli «Mostra altro»; associazione tra pulsante, funzionalità e contenuto risposta; build Gradle standard del plugin Morphe; portabilità di A2/A3/A5/A7 ad altre versioni Yahoo o installazioni MicroG. Le risposte HTTP 200 escludono 401/403 soltanto nelle richieste osservate, non provano contenuti completi.
 
-**Causa verificata:** il livello mostrato nel profilo e la mappa delle autorizzazioni delle singole funzionalità sono distinti. Cambiare il livello locale non rende vere le autorizzazioni.
-
-**Esito:** per gli annunci è servita anche la patch dedicata `AdsFree`, funzionante nella combinazione provata dall'utente. Per le analisi, la diagnostica ha osservato HTTP 200 e 35 risultati `REQUIRES_UPGRADE`: i contenuti restano bloccati. HTTP 200 da solo non dimostra che la risposta contenga il contenuto premium completo; non è stata accertata la causa precisa di ogni pulsante «Mostra altro».
-
-**Stato:** problema delle analisi aperto, nessuno sblocco server dimostrato. Dettagli in `morphe-data/yahoo-finance-tests/039-A7-analysis-results.txt` e `040-analysis-findings.txt`.
+**Riferimenti alle altre voci:** l'installazione bloccata dalla firma differente e il workaround di compilazione Morphe sono già registrati nelle sezioni «Android, file e installazione» e «PC, strumenti e Git», come pure il fast-forward Git bloccato da un file non tracciato. Non duplicare queste casistiche.
 
 ---
 
