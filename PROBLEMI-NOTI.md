@@ -221,6 +221,52 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+## Prezzi Benzina — 3.26.10.10 (versionCode 312610100)
+
+- **Ambito dei test:** `org.vernazza.androidfuel`, Galaxy S23+ ARM64, Android 17.
+- **Versioni e riferimenti:** prove F10–F13 e A1, Frida Gadget 17.24.3, `frida-java-bridge` 7.0.13; commit [`e207587`](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/e207587c26168629896d99acea67d81b643b4f89), release `v1.6.0`.
+- **Nota:** i percorsi `morphe-test-*/` indicano artefatti/log locali, non necessariamente presenti nel repository. Non assimilare l'assenza di crash in una sessione a una prova di stabilità generale.
+
+### PB-001 — Crash ART intermittenti all'attivazione degli hook Java Frida — WORKAROUND
+
+- **Sintomo:** alcuni avvii F11/F12 terminano con `SIGSEGV`. Log F11 con `attempting to detach while still running code`, `GetOatMethodQuickCode`, `art_quick_to_interpreter_bridge+4`. Un processo fallisce prima di `METHOD LOOKUP OK`, un altro durante l'installazione dell'hook, senza callback osservate.
+- **Causa:** **non dimostrata**. I log circoscrivono il problema all'interazione nativa con ART durante avvio del Java bridge/attivazione hook; non dimostrano difetti nella funzione originale, conversione package o modifica di `PackageInfo`.
+- **Tentativi falliti:** F11: solo hook pass-through su `ApplicationPackageManager.getPackageInfo(String,int)`, logging nativo e nessuna sostituzione del risultato; crash ancora presenti. F12: inizializzazione anticipata tramite `PBApplication.<clinit>` e `Java.performNow`; ancora due crash.
+- **Workaround:** F13 ricostruita **dall'APK originale**, senza Gadget o agenti Frida di prove precedenti; modifica statica del percorso richiesta token Maps. Questo evita la dipendenza dagli hook Frida, **non ne risolve la causa**.
+- **Verifiche:** F11 ha avuto anche un avvio stabile: hook installato, callback terminate e heartbeat dopo 60 secondi con **76 chiamate** (conferma dell'utente), dunque il problema è intermittente. In F13 verificati assenza di `pbfrida` e mantenimento di opcode/riferimenti originali di `<clinit>` e `onCreate`. Nei log esaminati di F13 e F13+A1 nessun nuovo errore fatale.
+- **Limiti:** non è dimostrata un'incompatibilità generale Frida/Android 17; non effettuati confronti controllati tra release del Gadget/bridge o serie ripetute di avvii. Un test stabile F10/F11 non basta a escludere crash successivi.
+- **Riferimenti:** `morphe-test-f11/runtime-f11.log`, `crash-buffer.log`, `runtime-f11-latest.log`; `morphe-test-f12/crash-buffer-redacted.log`; `morphe-test-f13/no-frida-verification.txt`, `bytecode-verification.txt`.
+
+### PB-002 — Sostituzione locale del certificato insufficiente per Maps — WORKAROUND
+
+- **Sintomo:** `Google Android Maps SDK Authorization failure` persiste anche quando la diagnostica F12 stampa package e impronta SHA-1 del certificato originale.
+- **Causa verificata, ma non localizzata completamente:** modificare la risposta locale di `ApplicationPackageManager.getPackageInfo(String,int)` non basta nel flusso testato. La stampa del certificato osservata **dopo** il rifiuto non dimostra quale identità sia stata inviata nella richiesta; punto preciso del fallimento F12 ignoto.
+- **Tentativo fallito:** F12 anticipava l'hook e sostituiva `signatures` e/o `signingInfo` per il package target, con `GET_SIGNATURES` e `GET_SIGNING_CERTIFICATES`. L'ultimo avvio rimaneva attivo, ma Maps continuava a negare l'autorizzazione.
+- **Workaround F13:** `PBApplication.bindService(Intent,ServiceConnection,int)` riconosce **soltanto** il componente `com.google.android.gms/com.google.android.gms.maps.auth.ApiTokenService`; copia l'Intent e instrada il binding a `app.revanced.android.gms` preservando nome della classe, `ServiceConnection` e flag. Nel manifest: visibilità del package e `app.revanced.android.gms.SPOOFED_PACKAGE_SIGNATURE` con digest pubblico del certificato originale. **Renderer Maps originale**, libreria GmsCore non modificata.
+- **Verifiche:** `TOKEN BIND ROUTED`, `TOKEN BIND ACCEPTED`, `ApiTokenService.onBind`, `requestApiToken`, `requestApiToken success`. Processo attivo e nessun `Authorization failure` nei log F13 raccolti. Utente: «sembra funzionare». Uno screenshot disponibile mostrava un'altra app: **non è prova visiva della mappa**.
+- **Limiti:** valido per la versione indicata con ReVanced GmsCore `app.revanced.android.gms` **7.2.1** installato; firma effettiva dell'APK ancora quella di test. Non è dimostrato che altri interventi su F12 fossero impossibili, né la portabilità del workaround. Necessarie prove di nuova emissione token e uso mappa/marker/zoom/spostamento.
+- **Riferimenti:** `patches/src/main/kotlin/lab/prezzibenzina/patches/MicrogTokenF13Patch.kt`; `morphe-test-f12/maps-test-redacted.log`, `current-process-redacted.log`; `morphe-test-f13/runtime-redacted.log`, `manifest-verification.txt`; commit `e207587`.
+
+### PB-003 — Rimozione banner/interstitial con F13+A1 — PARZIALMENTE RISOLTO
+
+- **Obiettivo e sintomo:** disabilitare banner e interstitial mantenendo funzionante il percorso Maps modificato.
+- **Causa/controlli individuati:** `it.prezzibenzina.pb3.general.MySettings.showBannerAds(Context)` e `showInterstitialAds(Context)`. Non è dimostrato che **tutte** le superfici pubblicitarie dipendano da questi due metodi.
+- **Tentativi falliti:** non risultano tentativi falliti significativi della combinazione. Diagnostica D1 **non selezionata** assieme ad A1 perché modifica gli stessi metodi e ne richiede la forma originale.
+- **Soluzione A1:** verificare la forma attesa di entrambi i metodi, quindi inserire un ritorno anticipato `false` con helper diagnostici separati. Applicare **solo F13 e A1 all'APK originale** per non includere esperimenti precedenti.
+- **Verifiche:** patching, firma, bytecode e aggiornamento ADB riusciti. Log di entrambi i marcatori `FORCED RETURN = false` e inizializzazione Maps; esito riferito positivo dall'utente. **Nessuna nuova emissione token osservata** nella sessione F13+A1: dati mantenuti permettono l'uso della cache, quindi tale sessione non dimostra il rinnovo.
+- **Limiti:** dimostrata l'esecuzione dei due controlli modificati, non copertura visiva sistematica di ogni banner/interstitial. A1 non modifica acquisti, licenze, entitlement Premium o storico prezzi; nessuno sblocco Premium dimostrato.
+- **Riferimenti:** `patches/src/main/kotlin/lab/prezzibenzina/patches/RemoveAdsPatch.kt`, commit `e207587`; `morphe-test-f13-a1/runtime-redacted.log`, `runtime-errors.txt`, `a1-bytecode-verification.txt`, `f13-bytecode-verification.txt`, `installation-result.txt`.
+
+### Regole riutilizzabili e verifiche mancanti
+
+- Distinguere mediante marcatori **installazione hook, ingresso callback e chiamata originale**: un crash prima della callback non ne attribuisce la causa al corpo.
+- Un certificato stampato localmente non prova l'identità trasmessa al server. Distinguere inoltre APK verificato, comportamento runtime ed esperienza riferita dall'utente.
+- Per test combinati, partire dall'APK originale e selezionare esplicitamente le sole patch previste; non trascinare residui di esperimenti precedenti.
+- Il routing selettivo di `ApiTokenService` verso GmsCore è specifico di questa app/versione, non soluzione universale.
+- **Ancora aperto:** causa radice Frida/ART; ragione precisa dell'inefficacia del certificato F12; test ripetuti d'avvio e rinnovo token; utilizzo completo Maps (mappa, marker, zoom, spostamento); copertura di tutti gli annunci in F13+A1. Nessun accesso Premium dimostrato.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
