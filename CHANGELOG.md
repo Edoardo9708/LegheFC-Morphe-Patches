@@ -1,3 +1,9 @@
+## [1.9.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0-dev.1...v1.9.0-dev.2) (2026-11-01)
+
+### ✨ New Features
+
+* **minigore:** add experimental configurable coin multiplier (1-255) ([f071d7b](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/f071d7b083f1f254d876218830a54eeb6e8478d9))
+
 ## [1.9.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.8.0...v1.9.0-dev.1) (2026-10-31)
 
 ### 🐛 Bug Fixes
