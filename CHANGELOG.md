@@ -1,3 +1,10 @@
+## [1.9.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0-dev.3...v1.9.0-dev.4) (2026-11-01)
+
+### ✨ New Features
+
+* **minigore:** extend configurable native coin multiplier to x1000 ([dcfd9f4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/dcfd9f45a43791a40d87d08482b8e6d0c1686ed9))
+* **minigore:** include Android 17 debug and non-resizeable game screen in original-package patch ([1b24b81](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/1b24b815f6df06668172c05e64249d6455ef3564))
+
 ## [1.9.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0-dev.2...v1.9.0-dev.3) (2026-11-01)
 
 ### 🐛 Bug Fixes

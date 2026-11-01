@@ -38,7 +38,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.9.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.9.0-dev.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;26 patches total
+> **[v1.9.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.9.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;26 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -112,7 +112,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Minigore 2 - Moltiplicatore monete](#minigore-2-moltiplicatore-monete) | Moltiplicatore dei guadagni configurabile (1-255) in Minigore 2 v1.28. | • Moltiplicatore monete |
+| [Minigore 2 - Moltiplicatore monete](#minigore-2-moltiplicatore-monete) | Moltiplicatore delle monete configurabile da 1 a 1000 (Minigore 2 v1.28). | • Moltiplicatore monete |
 
 </details>
 
