@@ -1,3 +1,9 @@
+## [1.9.0-dev.3](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0-dev.2...v1.9.0-dev.3) (2026-11-01)
+
+### 🐛 Bug Fixes
+
+* **minigore:** show single original app in Morphe compatibility ([d39342f](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/d39342fa2d798448162588680ad251aa4d112828))
+
 ## [1.9.0-dev.2](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0-dev.1...v1.9.0-dev.2) (2026-11-01)
 
 ### ✨ New Features
