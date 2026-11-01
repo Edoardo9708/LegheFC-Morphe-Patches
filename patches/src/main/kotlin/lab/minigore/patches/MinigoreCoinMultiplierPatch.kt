@@ -156,7 +156,7 @@ private val minigoreAndroid17CompatibilityPatch = resourcePatch {
 @Suppress("unused")
 val minigoreCoinMultiplierPatch = rawResourcePatch(
     name = "Minigore 2 - Moltiplicatore monete",
-    description = "Moltiplicatore delle monete configurabile da 1 a 1000 (Minigore 2 v1.28).",
+    description = "Imposta il moltiplicatore delle monete guadagnate (x1-x1000) senza modificare prezzi o salvataggi. Include fix schermo Android 17 e debug per ripristino tramite ADB. Solo Minigore 2 v1.28 (28).",
     default = false
 ) {
     dependsOn(minigoreAndroid17CompatibilityPatch)
