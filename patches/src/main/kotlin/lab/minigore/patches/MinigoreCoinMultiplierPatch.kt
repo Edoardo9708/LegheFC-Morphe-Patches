@@ -12,7 +12,6 @@ import java.io.File
  * Screen compatibility and APK signing stay separate.
  */
 private const val ORIGINAL_PACKAGE = "net.mountainsheep.minigore2zombies"
-private const val PARALLEL_PACKAGE = "net.mountainsheep.minigore2zombiex"
 
 private data class NativeSite(
     val path: String,
@@ -80,11 +79,6 @@ val minigoreCoinMultiplierPatch = rawResourcePatch(
             name = "Minigore 2",
             packageName = ORIGINAL_PACKAGE,
             targets = listOf(AppTarget(version = "1.28"))
-        ),
-        Compatibility(
-            name = "Minigore 2 Morphe",
-            packageName = PARALLEL_PACKAGE,
-            targets = listOf(AppTarget(version = "1.28"))
         )
     )
 
@@ -102,8 +96,8 @@ val minigoreCoinMultiplierPatch = rawResourcePatch(
         require(factor in 1..255) { "Moltiplicatore non valido: $factor" }
         require(packageMetadata.versionName == "1.28" &&
             packageMetadata.versionCode == "28" &&
-            packageMetadata.packageName in setOf(ORIGINAL_PACKAGE, PARALLEL_PACKAGE)) {
-            "Minigore 2 v1.28 (28) originale o Morphe parallelo richiesto."
+            packageMetadata.packageName == ORIGINAL_PACKAGE) {
+            "Minigore 2 v1.28 (28) originale richiesto."
         }
 
         // Validate both native sites before writing either.
