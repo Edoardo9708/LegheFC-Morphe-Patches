@@ -1,6 +1,6 @@
 # Minigore 2 v1.28 — moltiplicatore configurabile (sperimentale)
 
-Package original: `net.mountainsheep.minigore2zombies`. Package della build parallela già testata sul telefono: `net.mountainsheep.minigore2zombiex`.
+Package supportato nel catalogo Morphe: `net.mountainsheep.minigore2zombies` (APK originale). La versione parallela già installata sul telefono (`net.mountainsheep.minigore2zombiex`) **non è più elencata come seconda app** e non viene alterata da questa modifica.
 
 Patch: `patches/src/main/kotlin/lab/minigore/patches/MinigoreCoinMultiplierPatch.kt`.
 
@@ -22,5 +22,7 @@ La logica equivalente è stata testata offline con Python per N = 1, 10, 25, 100
 **Nota sulla firma:** la patch non imposta la chiave del firmatario. Per installare sopra la versione parallela già in uso occorre la stessa chiave PKCS#12 salvata separatamente. Importarla come chiave principale in Morphe Manager potrebbe cambiare la firma delle *altre* app patchate; per questo, prima di procedere, esportare la chiave attuale del Manager o utilizzare lo script locale con la specifica chiave Minigore.
 
 **Nota grafica:** gli APK originari non contengono le correzioni di target/resize dell'edizione parallela. La patch nativa da sola non le produce.
+
+La patch cambia soltanto il moltiplicatore nativo per l'APK originale. Per rigenerare la **versione parallela** con i progressi esistenti occorrono separatamente il cambio di package, il fix schermo e la stessa chiave di firma: queste operazioni non fanno parte di questa patch Morphe.
 
 Non distribuire APK o keystore privati nel repository.
