@@ -4,14 +4,17 @@ import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.intOption
 import app.morphe.patcher.patch.rawResourcePatch
+import app.morphe.patcher.patch.resourcePatch
 import java.io.File
 import java.security.MessageDigest
+import org.w3c.dom.Element
 
 /**
  * Minigore 2 1.28 (28), ARMv7 and x86.
  * The score multiplier can be set from 1 to 1000.
  * ARM values > 255 use the verified Thumb trampoline and a 12-byte code cave.
- * Does not change app identifier, signing, screen settings, or saved progress.
+ * Keeps the original app identifier. Includes Android 17 screen and debug compatibility.
+ * Does not modify saved progress or app signing.
  */
 private const val PACKAGE_NAME = "net.mountainsheep.minigore2zombies"
 private const val ARM_PATH = "lib/armeabi-v7a/libminigore2.so"
@@ -112,12 +115,52 @@ private fun patchX86(source: ByteArray, multiplier: Int): ByteArray {
     return result
 }
 
+/**
+ * Mirror the tested Android 17 compatibility settings of the parallel Morphe APK:
+ * target SDK 25, debuggable app for run-as restore, non-resizeable game activity.
+ * Do not change the original Android package name or the game activity class.
+ */
+private val minigoreAndroid17CompatibilityPatch = resourcePatch {
+    execute {
+        document("AndroidManifest.xml").use { document ->
+            val ns = "http://schemas.android.com/apk/res/android"
+            val root = document.documentElement
+            require(root.getAttribute("package") == PACKAGE_NAME) {
+                "Minigore 2: unexpected manifest package."
+            }
+            val usesSdk = document.getElementsByTagName("uses-sdk")
+            require(usesSdk.length == 1) {
+                "Minigore 2: expected one uses-sdk manifest element."
+            }
+            (usesSdk.item(0) as Element).setAttributeNS(
+                ns, "android:targetSdkVersion", "25"
+            )
+            val apps = document.getElementsByTagName("application")
+            require(apps.length == 1) {
+                "Minigore 2: expected one application element."
+            }
+            val app = apps.item(0) as Element
+            app.setAttributeNS(ns, "android:debuggable", "true")
+
+            val activities = document.getElementsByTagName("activity")
+            val game = (0 until activities.length)
+                .map { activities.item(it) as Element }
+                .singleOrNull {
+                    it.getAttributeNS(ns, "name") == "$PACKAGE_NAME.xtPlay"
+                } ?: error("Minigore 2: original xtPlay activity missing.")
+            game.setAttributeNS(ns, "android:resizeableActivity", "false")
+        }
+    }
+}
+
 @Suppress("unused")
 val minigoreCoinMultiplierPatch = rawResourcePatch(
     name = "Minigore 2 - Moltiplicatore monete",
     description = "Moltiplicatore delle monete configurabile da 1 a 1000 (Minigore 2 v1.28).",
     default = false
 ) {
+    dependsOn(minigoreAndroid17CompatibilityPatch)
+
     // A single entry in Morphe's app catalog; no duplicate Morphe package.
     compatibleWith(
         Compatibility(
