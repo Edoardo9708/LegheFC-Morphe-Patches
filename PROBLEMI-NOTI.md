@@ -620,6 +620,82 @@ Le verifiche si riferiscono a **Morphe Desktop 1.20.0**, branch `dev`, commit st
 
 ---
 
+
+## Minigore 2 — versione 1.28 (28), Android 17 — 1 novembre 2026
+
+Ambito comune: `net.mountainsheep.minigore2zombies` (originale), `net.mountainsheep.minigore2zombiex` (copia parallela), Galaxy S23+ SM-S916B Android 17, Morphe Manager, ADB e librerie ARMv7/x86. L'utente ha riferito che la versione Morphe si avvia, il ripristino iniziale funziona e il fix grafico ha risolto il problema osservato. La successiva installazione delle due versioni e il ripristino con package originale risultano riferiti come completati; non sono stati raccolti log di gameplay per tutti i moltiplicatori.
+
+### MIN-001 — Salvataggi non visibili nella memoria esterna e run-as rifiutato — RISOLTO CON BACKUP
+
+- **Sintomo:** `Android/data/net.mountainsheep.minigore2zombies` risultava senza file; `run-as net.mountainsheep.minigore2zombies` rispondeva `package not debuggable`. L'APK originale aveva `targetSdk=23`, `versionName=1.28` e `ALLOW_BACKUP`.
+- **Causa verificata:** i dati utili si trovavano nella memoria privata dell'app, non nella cartella esterna controllata; l'APK originale non consentiva `run-as`. Non è stato determinato il percorso completo dei singoli file prima dell'estrazione.
+- **Tentativi e diagnosi:** `bmgr list transports` mostrava il trasporto Google e quello locale; `bmgr list sets` elencava set di backup del telefono e tablet. `dumpsys backup` collocava il package fra gli `Ever backed up`, ma questi elenchi da soli **non** dimostravano che i salvataggi fossero recuperabili. `bmgr backupnow --monitor net.mountainsheep.minigore2zombies` terminava con `Success` dopo circa 1,69 MB elaborati.
+- **Soluzione:** `adb backup -f minigore_original.ab -noapk -noshared net.mountainsheep.minigore2zombies` dal PC; archivio non cifrato da 811.760 byte, aperto e ispezionato, con `Minigore.dat`, `Minigore.bak` e salvataggi delle mappe. È stato creato un archivio contenente 26 file di salvataggio. In un successivo APK debuggable i dati sono stati trasferiti tramite `run-as`.
+- **Verifica e limiti:** presenza dei file nell'archivio e conferma dell'utente sul ripristino iniziale. `ALLOW_BACKUP` e il successo del trasporto Google **non** equivalgono da soli a un export utilizzabile; `adb backup` è deprecato e non garantito su tutte le versioni Android/app.
+- **Riferimenti:** `Minigore2_salvataggi_estratti.zip` e `minigore_original.ab` (artefatti della sessione, non versionati), `lab/minigore/README.md`. Distinto da SKI-001: qui è stato recuperato anche il backup dei dati privati.
+
+### MIN-002 — Firma differente e necessità della versione parallela — RISOLTO NEL CASO OSSERVATO
+
+- **Sintomo:** un APK patchato e rifirmato non poteva aggiornare la versione originale a parità di package.
+- **Causa verificata:** la firma dell'APK modificato era diversa da quella del gioco originale; Android verifica la continuità del certificato per l'aggiornamento.
+- **Tentativo non applicabile:** installare il patchato sopra l'originale mantenendo il package e la firma differente.
+- **Soluzione:** primo test con package parallelo `net.mountainsheep.minigore2zombiex`, firma Morphe di test e dati separati; successiva migrazione all'identificativo originale solo dopo backup e ripristino. Tutti gli aggiornamenti intermedi alla copia Morphe parallela conservavano la medesima chiave di firma.
+- **Verifica e limiti:** avvio della copia parallela confermato; estrazione e ripristino dei dati confermati nell'interazione. Non confondere il cambio package con una semplice rinomina dell'icona: sono installazioni Android indipendenti. Il repository non contiene la chiave privata della firma.
+- **Riferimenti:** APK della sessione `Minigore2-Morphe-*.apk` e `Minigore2-Original-Package-x1000.apk`; soluzione generale già discussa in SKI-002, qui applicata alla migrazione con dati privati.
+
+### MIN-003 — Debuggable dichiarato ma Android ignora il flag — RISOLTO
+
+- **Sintomo:** la prima versione con manifest modificato risultava non debuggable: `run-as` falliva e `dumpsys package` mostrava `flags` senza `DEBUGGABLE`.
+- **Causa osservata:** patch del manifest binario non efficace. Durante la correzione è stato individuato un problema di ordine degli attributi del manifest AXML; l'assenza del flag Android è verificata, mentre non è conservato in questo repository un confronto byte per byte che provi isolatamente il meccanismo di parsing.
+- **Tentativi falliti:** il solo controllo testuale/statico di `android:debuggable=true` nell'APK non bastava a verificare il flag effettivo letto dal Package Manager.
+- **Soluzione:** rigenerazione del manifest con attributo correttamente serializzato e medesima firma dell'APK parallelo. Nella patch Morphe usare `resourcePatch` e `setAttributeNS`, poi controllare il valore **sul dispositivo** con `dumpsys package` e `run-as <package> pwd`.
+- **Verifica e limiti:** versione Debug Fix usata nel successivo trasferimento dei salvataggi; il test decisivo resta l'effettivo `run-as` sul package installato, non la sola compilazione dell'APK.
+- **Riferimenti:** `Minigore2-Morphe-Debug-Fix.apk`; `patches/src/main/kotlin/lab/minigore/patches/MinigoreCoinMultiplierPatch.kt`.
+
+### MIN-004 — Controlli coperti dalla barra di navigazione — RISOLTO NEL DISPOSITIVO TESTATO
+
+- **Sintomo:** i comandi del vecchio gioco erano tagliati/coperti dalla navigation bar sul Galaxy S23+ Android 17 nella nuova build.
+- **Causa probabile:** differente gestione del ridimensionamento/finestra con target SDK più recente e attività considerata ridimensionabile; non sono state raccolte metriche WindowInsets per una prova causale completa.
+- **Tentativi falliti:** passaggio `targetSdk 26 → 25` da solo: l'utente ha riferito visualizzazione invariata.
+- **Soluzione:** aggiunta esplicita di `android:resizeableActivity=false` all'attività di gioco, oltre al target SDK 25 della build di compatibilità. La patch Morphe mantiene il package originale e applica queste impostazioni tramite risorse.
+- **Verifica e limiti:** utente ha confermato `Perfetto` dopo la variante Resize Fix; esito specifico del dispositivo, da ricontrollare su altre proporzioni display e versioni Android.
+- **Riferimenti:** `Minigore2-Morphe-Resize-Fix.apk`; `lab/minigore/README.md`.
+
+### MIN-005 — Limite dell'istruzione ARM a 255 e moltiplicatore x1000 — RISOLTO STATICAMENTE, RUNTIME PARZIALE
+
+- **Sintomo:** la prima patch aveva un moltiplicatore configurabile solo nell'intervallo 1–255, perché il sito ARM originale era modificato con istruzione Thumb `movs r2,#imm8`.
+- **Causa verificata:** il campo immediato dell'istruzione breve non può rappresentare 1000; la versione x86 non ha lo stesso limite (`mov edi,imm32`).
+- **Tentativo non sufficiente:** estendere il validatore Kotlin a 1000 senza modificare l'encoding nativo ARM avrebbe prodotto un valore errato.
+- **Soluzione:** per valori 256–1000, salto Thumb dal sito ARM `0xE46EE` a code cave `0x20538C` di 12 byte, `movw r2,#N`, istruzione di moltiplicazione originale e ritorno; per valori 1–255 resta la sostituzione breve. Su x86 modifica dell'immediato a 32 bit al sito `0x112AD0`. Verificare dimensione delle due librerie, hash SHA-256 con soli siti mascherati e bytes locali prima di scrivere; interruzione in caso di binario non previsto.
+- **Verifica e limiti:** confronto statico con APK x1000 funzionante per le istruzioni e gli hash; test manuali delle varianti x10 e x1000 nella sequenza riportata, ma nessun test esaustivo di overflow nei contatori a 32 bit, di ogni funzione di punteggio, o della versione x86 su dispositivo. La patch del repository è limitata a Minigore 2 1.28 (28).
+- **Riferimenti:** `patches/src/main/kotlin/lab/minigore/patches/MinigoreCoinMultiplierPatch.kt`; `lab/minigore/README.md`; commit `1b24b81` e `1d58617` su dev.
+
+### MIN-006 — Backup TAR a zero byte e comandi ADB errati su Windows — RISOLTO
+
+- **Sintomo:** tentativo di generare `MinigoreMorphe-current.tar` da aShell produceva 0 byte; sul PC `adb shell` segnalava `more than one device/emulator`, e il reindirizzamento con `%USERPROFILE%` in PowerShell generava percorso letterale inesistente.
+- **Cause verificate:** modalità di redirezione/percorso non compatibile con il contesto di esecuzione; duplicazione di target ADB osservata durante una prova. Non è provata con certezza la causa specifica dei 0 byte su aShell.
+- **Tentativi falliti:** scrittura del TAR da aShell in `/sdcard/Download`, invocazione `adb` senza selezione seriale e uso della sintassi di percorso CMD all'interno di PowerShell.
+- **Soluzione:** da Windows PowerShell invocare `cmd /c` per preservare byte del flusso TAR rediretto, selezionare esplicitamente il dispositivo con `adb -s <seriale>`, fermare il package parallelo ed eseguire `adb exec-out run-as net.mountainsheep.minigore2zombiex tar -cf - .` reindirizzando a file sul PC.
+- **Verifica:** `MinigoreMorphe-current.tar` di **5.668.864 byte**, contenente `./files/Minigore.dat` e `./files/Minigore.bak`; comando `tar -tf` completato con codice `0`. L'archivio appartiene alla **versione parallela**: non confonderlo con `minigore_original.ab`.
+- **Riferimenti:** transcript dei comandi ADB della sessione; `lab/minigore/README.md`.
+
+### MIN-007 — Doppia voce nel catalogo Morphe — RISOLTO
+
+- **Sintomo:** il Manager mostrava separatamente “Minigore 2” e “Minigore 2 Morphe”.
+- **Causa verificata:** la patch dichiarava due `Compatibility` per i package originale e parallelo.
+- **Soluzione:** limitare la compatibilità alla sola app originale `net.mountainsheep.minigore2zombies`; il package parallelo resta un artefatto di test non pubblicato come seconda app.
+- **Verifica e limiti:** struttura della patch verificata nel sorgente GitHub; la UI aggiornata del Manager dopo la pubblicazione non è ancora documentata da screenshot. La patch non riproduce automaticamente le vecchie firme APK.
+- **Riferimenti:** commit `d39342f` e `adbfcd5` su dev; sorgente patch e `lab/minigore/README.md`.
+
+### Verifiche residue Minigore 2
+
+- Distinguere **correttezza statico-binaria**, compilazione bundle Morphe, patching da Manager, installazione, avanzamento del gioco e persistenza dopo riavvio.
+- Non equiparare l'APK preparato manualmente al risultato della patch Morphe prima di confrontare effettivamente librerie, manifest e firma.
+- Verificare in CI la build del bundle Morphe e il catalogo con una sola app; l'esito sul dispositivo non sostituisce il controllo della pipeline di release.
+- Conservare backup `.ab` e `.tar` fuori dal repository insieme a eventuali chiavi di firma, senza pubblicare salvataggi o dati personali.
+
+---
+
 ## Modello per le prossime voci
 
 Usare un codice univoco (`APP-001`), nome dell'app e versione/build, sintomo osservabile, causa (**verificata** o **ipotizzata**), soluzione/tentativi falliti, modalità di verifica, risultato con limiti, eventuale commit/branch di riferimento. Documentare anche i workaround parziali e distinguere esplicitamente il funzionamento confermato dall'utente dalla sola esecuzione tecnica di una patch.
