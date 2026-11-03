@@ -10,12 +10,16 @@ Repository unico di patch indipendenti per piu applicazioni Android, compatibile
 
 | App | Pacchetto Android | Versione analizzata | Patch |
 | --- | --- | --- | --- |
+| **Musicolet** | in.krosbits.musicolet | 6.14.1 build540 ARM64 | Playlist collegate a cartelle, sperimentale |
 | **Leghe FC** | `it.quadronica.leghe` | 13.2.1 (445) | Avvio e nome **3 campo**, percentuali, formazione suggerita e comparatore |
 | **Minigore 2** | `net.mountainsheep.minigore2zombies` | 1.28 (28) | Guadagno monete configurabile da ×1 a ×1000, compatibilità Android 17 e fix interfaccia |
 | **Twilight** | `com.urbandroid.lux` | 14.32 (APKM) | Test sperimentale su `TrialFilter.isTrial()` e Logcat |
 | **Outdooractive** | `com.outdooractive.Outdooractive` | 3.23.20 | Diagnostica e test sperimentale dei getter di `Membership` |
 
 ### Stato dei test
+
+- **Musicolet:** creazione, selezione e aggiornamento dopo scansione provati sul telefono. La copertura dei comandi e il ripristino richiedono ulteriori verifiche. [Dettagli](lab/musicolet/README.md).
+
 
 - **Leghe FC:** le tre patch esistenti rimangono invariate; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
 - **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
