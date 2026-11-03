@@ -45,7 +45,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.9.0-dev.4](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.9.0-dev.4)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;26 patches total
+> **[v1.10.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.10.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;27 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -119,7 +119,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Minigore 2 - Moltiplicatore monete](#minigore-2-moltiplicatore-monete) | Moltiplicatore delle monete configurabile da 1 a 1000 (Minigore 2 v1.28). | • Moltiplicatore monete |
+| [Minigore 2 - Moltiplicatore monete](#minigore-2-moltiplicatore-monete) | Imposta il moltiplicatore delle monete guadagnate (x1-x1000) senza modificare prezzi o salvataggi. Include fix schermo Android 17 e debug per ripristino tramite ADB. Solo Minigore 2 v1.28 (28). | • Moltiplicatore monete |
 
 </details>
 
@@ -190,6 +190,21 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 |----------|----------------|-----------|
 | [Spotify - No-op control](#spotify-no-op-control) | Repackages the original APK without changing app code or resources. Use alone to isolate playback regressions. |  |
 | [Spotify - Previous button diagnostics](#spotify-previous-button-diagnostics) | Logs previous-track restrictions and command creation to ADB Logcat without changing playback. |  |
+
+</details>
+
+<details open>
+<summary>📦 Musicolet&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 🧪&nbsp;6.14.1 build540 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Sync folder playlists](#sync-folder-playlists) | Experimental Musicolet preview: choose a folder in the new and edit playlist screens. |  |
 
 </details>
 
