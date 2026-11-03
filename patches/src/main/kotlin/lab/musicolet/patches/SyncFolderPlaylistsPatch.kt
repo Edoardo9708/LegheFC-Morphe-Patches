@@ -18,7 +18,7 @@ private const val preview = "Lapp/morphe/musicolet/sync/FolderPlaylistEditorPrev
 @Suppress("unused")
 val syncFolderPlaylistsPatch = bytecodePatch(
     name = "Sync folder playlists",
-    description = "Create folder-linked playlists and add indexed tracks after scans. Existing-playlist folder selection is preview-only.",
+    description = "Experimental Musicolet preview: choose a folder in the new and edit playlist screens.",
     default = false
 ) {
     compatibleWith(
@@ -29,7 +29,7 @@ val syncFolderPlaylistsPatch = bytecodePatch(
                 AppTarget(
                     version = "6.14.1 build540",
                     versionCodes = mapOf(SupportedAbi.ARM64_V8A to 54000),
-                    isExperimental = false,
+                    isExperimental = true,
                     minSdk = 29
                 )
             )

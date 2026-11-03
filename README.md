@@ -10,27 +10,19 @@ Repository unico di patch indipendenti per piu applicazioni Android, compatibile
 
 | App | Pacchetto Android | Versione analizzata | Patch |
 | --- | --- | --- | --- |
-| **Musicolet** | `in.krosbits.musicolet` | 6.14.1 build540 ARM64 | Sync folder playlists: collega una nuova playlist a una cartella |
+| **Musicolet** | in.krosbits.musicolet | 6.14.1 build540 ARM64 | Playlist collegate a cartelle, sperimentale |
 | **Leghe FC** | `it.quadronica.leghe` | 13.2.1 (445) | Avvio e nome **3 campo**, percentuali, formazione suggerita e comparatore |
 | **Minigore 2** | `net.mountainsheep.minigore2zombies` | 1.28 (28) | Guadagno monete configurabile da ×1 a ×1000, compatibilità Android 17 e fix interfaccia |
 | **Twilight** | `com.urbandroid.lux` | 14.32 (APKM) | Test sperimentale su `TrialFilter.isTrial()` e Logcat |
 | **Outdooractive** | `com.outdooractive.Outdooractive` | 3.23.20 | Diagnostica e test sperimentale dei getter di `Membership` |
-| **DNS Changer** | `com.appplanex.dnschanger` | 3.0.0 | Force Pro test D2 |
-| **Flowx** | `com.enzuredigital.weatherbomb` | 4.650 | Test stato Gold locale |
-| **Fonometro** | `com.ktwapps.soundmeter` | 11.5 | Rimozione annunci |
-| **Prezzi Benzina** | `org.vernazza.androidfuel` | 3.26.10.10 | Routing Maps tramite GmsCore F13, Remove Ads A1 |
-| **Yahoo Finance** | `com.yahoo.mobile.client.android.finance` | 26.21.2 (1360038759) | Remove Ads A2, GOLD diagnostico A3, accesso Google microG A5, diagnostica analisi A7 |
 
 ### Stato dei test
 
-- **Musicolet:** collegamento playlist a cartella provato dall'utente sul telefono. La scelta di una nuova cartella dalla schermata di modifica resta una sola anteprima; la patch e facoltativa. [Dettagli](lab/musicolet/README.md).
+- **Musicolet:** creazione, selezione e aggiornamento dopo scansione provati sul telefono. La copertura dei comandi e il ripristino richiedono ulteriori verifiche. [Dettagli](lab/musicolet/README.md).
+
 
 - **Leghe FC:** le tre patch esistenti rimangono invariate; la patch per la formazione suggerita usa ancora dati dimostrativi. I nomi delle patch non garantiscono lo sblocco completo delle funzionalita.
 - **Twilight:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Twilight-Morphe-Patches). Il codice imposta a `false` il valore di ritorno di `isTrial()` (`const/4 v0, 0x0`) e registra il test in Logcat. Non e stato verificato il comportamento complessivo dell'app.
-**Prezzi Benzina:** F13 instrada il servizio del token Maps verso un GmsCore compatibile già installato; A1 interviene sui controlli per banner/interstitial. Il funzionamento è stato verificato dall'utente sulla versione 3.26.10.10; F13 richiede un ambiente GmsCore compatibile.
-
-- **Yahoo Finance:** Remove Ads A2 verificata su dispositivo; accesso Google via GmsCore A5 confermato. GOLD A3 simula solo il livello locale e non sblocca le funzioni server; A7 registra soltanto stati e risultati di accesso per la diagnostica. Tutte le patch sono disabilitate per default. [Resoconto prove](lab/yahoofinance/README.md).
-
 - **Outdooractive:** patch importata dal ramo `dev` del [repository originario](https://github.com/Edoardo9708/Outdooractive-Morphe-Patches). Il codice registra i valori originali ma **restituisce valori dimostrativi** (`1` per `isProUser`, `2` per `getLevel`). La pubblicazione sul canale stabile non certifica il corretto comportamento della patch nell'app.
 
 **Minigore 2:** la patch agisce sui guadagni, non sui prezzi degli upgrade. Il package rimane quello originale; l'APK rifirmato richiede una migrazione controllata dei dati. Il risultato dell'APK preparato manualmente non sostituisce la verifica del patching tramite Manager. [Dettagli tecnici](lab/minigore/README.md).
@@ -53,7 +45,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 ## Elenco automatico delle patch pubblicate
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.10.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.10.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;17 patches total
+> **[v1.10.0-dev.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/releases/tag/v1.10.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;27 patches total
 <details open>
 <summary>📦 DNS Changer&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
@@ -147,7 +139,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 Prezzi Benzina&nbsp;&nbsp;•&nbsp;&nbsp;10 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -157,7 +149,15 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Prezzi Benzina - Custom signer response F6 (ARM64)](#prezzi-benzina-custom-signer-response-f6-arm64) | Experimental: use a user-supplied public X.509 DER/Base64 certificate in the locally returned PackageInfo. Does not re-sign APK or alter server verification. Do not combine with F5. | • Custom signing certificate DER (Base64) |
+| [Prezzi Benzina - Entitlement diagnostics D1](#prezzi-benzina-entitlement-diagnostics-d1) | Logs original Premium, price history and ads decisions without modifying purchases or feature access. |  |
+| [Prezzi Benzina - Gadget only F7 (ARM64)](#prezzi-benzina-gadget-only-f7-arm64) | Experimental stability test: load Frida Gadget without Java bridge, Java hooks or certificate override. Does not fix Google Maps. Do not combine with F5/F6. |  |
+| [Prezzi Benzina - Java bridge only F8 (ARM64)](#prezzi-benzina-java-bridge-only-f8-arm64) | Experimental stability test: load Frida Gadget and run Java.perform only, without Java hooks or certificate override. Does not fix Maps. Do not combine with F5/F6/F7. |  |
+| [Prezzi Benzina - Method lookup only F10 (ARM64)](#prezzi-benzina-method-lookup-only-f10-arm64) | Experimental: resolve getPackageInfo(String,int) with Java.use, without installing any hook or modifying signatures. Do not combine with F5/F6/F7/F8/F9. |  |
+| [Prezzi Benzina - No-op PackageInfo hook F9 (ARM64)](#prezzi-benzina-no-op-packageinfo-hook-f9-arm64) | Experimental stability test: intercept getPackageInfo(String,int) but return original PackageInfo unchanged. No certificate modification. Does not fix Maps. Use F9 alone, not with F5-F8. |  |
+| [Prezzi Benzina - Personal Google Maps key M1](#prezzi-benzina-personal-google-maps-key-m1) | Replace the Maps SDK manifest API key with your own Google Cloud key. Enter it in patch options; no certificate spoofing. | • Your Google Maps API key |
 | [Prezzi Benzina - Remove ads A1](#prezzi-benzina-remove-ads-a1) | Test: disables banner and interstitial ads without changing Premium, licenses or in-app purchases. |  |
+| [Prezzi Benzina - Signature trace F5 (ARM64)](#prezzi-benzina-signature-trace-f5-arm64) | Experimental read-only inspection of returned PackageInfo signing certificates (SHA-1/SHA-256) and call stacks. No signature changes. |  |
 | [Prezzi Benzina - microG token routing F13](#prezzi-benzina-microg-token-routing-f13) | Local test: route only Maps ApiTokenService to the existing app.revanced.android.gms and declare the original public certificate digest. No Frida; use alone, not with F5-F12. |  |
 
 </details>
@@ -178,17 +178,33 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
+<summary>📦 Spotify&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 9.1.90.2270 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Spotify - No-op control](#spotify-no-op-control) | Repackages the original APK without changing app code or resources. Use alone to isolate playback regressions. |  |
+| [Spotify - Previous button diagnostics](#spotify-previous-button-diagnostics) | Logs previous-track restrictions and command creation to ADB Logcat without changing playback. |  |
+
+</details>
+
+<details open>
 <summary>📦 Musicolet&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 6.14.1 build540 |
+| 🧪&nbsp;6.14.1 build540 |
 | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Sync folder playlists](#sync-folder-playlists) | Create folder-linked playlists and add indexed tracks after scans. Existing-playlist folder selection is preview-only. |  |
+| [Sync folder playlists](#sync-folder-playlists) | Experimental Musicolet preview: choose a folder in the new and edit playlist screens. |  |
 
 </details>
 
