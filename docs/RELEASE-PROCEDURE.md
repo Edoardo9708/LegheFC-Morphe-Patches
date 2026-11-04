@@ -34,7 +34,7 @@ Repository: `Edoardo9708/LegheFC-Morphe-Patches`. Documento operativo per Codex 
 
 ## Sviluppo locale
 
-- Usa JDK 21, Android SDK condiviso e il wrapper Gradle del repository. GitHub Packages usa `gpr.user` / `gpr.key` nel Gradle home personale (per es. `C:\\Users\\edoar\\.gradle\\gradle.properties`), **non** nel repository.
+- Usa JDK 21, Android SDK condiviso e il wrapper Gradle del repository. GitHub Packages usa `gpr.user` / `gpr.key` nel Gradle home personale (per es. `C:\Users\edoar\.gradle\gradle.properties`), **non** nel repository.
 - Un `GRADLE_USER_HOME` alternativo senza credenziali puo causare errori di risoluzione del plugin `app.morphe.patches`. Non copiare i token nei report o nel codice.
-- Per verificare una patch in PowerShell dalla radice del repository, con `JAVA_HOME`, `ANDROID_HOME` e `GRADLE_USER_HOME` correttamente configurati, esegui `.\gradlew.bat :patches:buildAndroid --offline --no-daemon` (senza spazio iniziale); se mancano dipendenze nella cache, ripeti senza `--offline`. La compilazione locale non sostituisce la build del workflow di release.
+- Per verificare una patch in PowerShell dalla radice del repository, con `JAVA_HOME`, `ANDROID_HOME` e `GRADLE_USER_HOME` correttamente configurati, esegui `.\gradlew.bat :patches:buildAndroid --offline --no-daemon`; se mancano dipendenze nella cache, ripeti senza `--offline`. La compilazione locale non sostituisce la build del workflow di release.
 - Prima di cambiare workflow e versioni, consulta i problemi noti e verifica se esiste gia una procedura funzionante.
