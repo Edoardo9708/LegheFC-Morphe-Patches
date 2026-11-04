@@ -14,7 +14,7 @@ Repository: `Edoardo9708/LegheFC-Morphe-Patches`. Documento operativo per Codex 
 1. Confronta `main...ramo-release`: devono comparire soltanto i file dell'app scelta e la documentazione strettamente correlata. Non copiare in blocco la storia o le modifiche di `dev`.
 2. Verifica che `patches/src/main/kotlin` e le estensioni delle altre app siano invariati. Nessuna patch Spotify nella versione stabile, salvo decisione esplicita successiva.
 3. Controlla `default`, target, ABI, versionCode e `isExperimental` della patch. Non promuovere a stabile funzioni non collaudate; documenta chiaramente quelle parziali.
-4. Verifica la build con il workflow GitHub del ramo e gli eventuali test mirati appropriati. Non fondere con build fallita.
+4. **Prima della PR, compila localmente** con il wrapper Gradle del repository e verifica l'esito; esegui i test mirati appropriati. La pipeline GitHub ricompila indipendentemente prima della pubblicazione. Non fondere con build locale o CI fallita.
 5. Assicurati che la PR non contenga modifiche a credenziali, firme, chiavi, artefatti temporanei o versioni di altre app.
 
 ## Pubblicazione
@@ -36,4 +36,5 @@ Repository: `Edoardo9708/LegheFC-Morphe-Patches`. Documento operativo per Codex 
 
 - Usa JDK 21, Android SDK condiviso e il wrapper Gradle del repository. GitHub Packages usa `gpr.user` / `gpr.key` nel Gradle home personale (per es. `C:\\Users\\edoar\\.gradle\\gradle.properties`), **non** nel repository.
 - Un `GRADLE_USER_HOME` alternativo senza credenziali puo causare errori di risoluzione del plugin `app.morphe.patches`. Non copiare i token nei report o nel codice.
+- Per verificare una patch in PowerShell dalla radice del repository, con `JAVA_HOME`, `ANDROID_HOME` e `GRADLE_USER_HOME` correttamente configurati, esegui `.\gradlew.bat :patches:buildAndroid --offline --no-daemon` (senza spazio iniziale); se mancano dipendenze nella cache, ripeti senza `--offline`. La compilazione locale non sostituisce la build del workflow di release.
 - Prima di cambiare workflow e versioni, consulta i problemi noti e verifica se esiste gia una procedura funzionante.
