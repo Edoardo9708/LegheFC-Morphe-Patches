@@ -9,6 +9,15 @@ Repository: `Edoardo9708/LegheFC-Morphe-Patches`. Documento operativo per Codex 
 - Non usare il merge generale `dev -> main` (es. PR #11) per pubblicare una sola patch quando `dev` contiene modifiche non autorizzate, incluse quelle Spotify.
 - Per una release selettiva: crea un ramo **dall'ultimo `main`**, porta solo i file e le dipendenze strettamente necessarie per l'app scelta, e apri una PR verso `main`.
 
+## Sviluppo di una nuova patch: branch locale
+
+1. Prima di iniziare **ogni nuova patch**, individua il repository e verifica `git status`, branch e worktree. Se ci sono modifiche locali non correlate, preservale: non eseguire `reset --hard`, `clean` o checkout che le sovrascrivano.
+2. Crea un **branch locale dedicato** (per esempio `feature/musicolet-sync-playlists`), normalmente a partire da `dev`. Se il worktree attuale contiene lavoro da preservare, usa un worktree separato o concorda prima una strategia non distruttiva. Non lavorare direttamente su `main` o `dev`.
+3. Mantieni le modifiche isolate alla singola applicazione/patch e alle dipendenze strettamente necessarie. Prima di ogni commit controlla `git diff` e `git status`; aggiungi allo staging **soltanto i percorsi pertinenti** (per esempio `git add -- <percorsi>`, non `git add .` indiscriminato).
+4. Quando il codice e i test mirati sono pronti, crea **commit locali** con messaggi convenzionali. Non includere modifiche preesistenti di altre patch, report o file non pertinenti. Un commit non equivale a push, merge o release.
+5. Esegui **push, PR, merge o pubblicazione solo quando esplicitamente richiesti**. La prima pubblicazione del lavoro di sviluppo puo essere verso `dev` come pre-release, mantenendo `main` invariato.
+6. Per pubblicare una patch collaudata su `main`, usa la **release selettiva** descritta sotto: crea un ramo dall'ultimo `main` e trasferisci soltanto i file/commit pertinenti, verificando che le altre patch siano identiche. Non fondere in blocco `dev`.
+
 ## Verifiche obbligatorie prima del merge
 
 1. Confronta `main...ramo-release`: devono comparire soltanto i file dell'app scelta e la documentazione strettamente correlata. Non copiare in blocco la storia o le modifiche di `dev`.
