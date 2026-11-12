@@ -1,3 +1,9 @@
+## [1.10.1](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.10.0...v1.10.1) (2026-11-12)
+
+### 🐛 Bug Fixes
+
+* **leghefc:** update demo patch for 13.2.3 ([eb39e6a](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/commit/eb39e6aa5c32cf49294dbd44950f047325c7f3f5))
+
 ## [1.10.0](https://github.com/Edoardo9708/LegheFC-Morphe-Patches/compare/v1.9.0...v1.10.0) (2026-11-03)
 
 ### ✨ New Features
