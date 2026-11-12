@@ -9,9 +9,9 @@ import app.morphe.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.Opcode
 
 /**
- * Leghe FC 13.2.1 (build 445): imposta Lkqgs.B = true.
+ * Leghe FC 13.2.3: imposta LsVY.Ddz = true.
  *
- * La patch modifica il campo B nel costruttore, dopo la scrittura
+ * La patch modifica il campo Ddz nel costruttore, dopo la scrittura
  * originale, e poi stampa il risultato nel Logcat (LegheFC-B).
  * Non e' una diagnostica di sola lettura.
  * Non modifica le collezioni A/C.
@@ -26,13 +26,13 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
         Compatibility(
             name = "Leghe FC",
             packageName = "it.quadronica.leghe",
-            targets = listOf(AppTarget(version = "13.2.1"))
+            targets = listOf(AppTarget(version = "13.2.3"))
         )
     )
 
     execute {
         val method = Fingerprint(
-            definingClass = "Lkqgs;",
+            definingClass = "LsVY;",
             name = "<init>"
         ).method
 
@@ -52,9 +52,9 @@ val booleanFieldDiagnosticPatch = bytecodePatch(
                 iput-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
                 iget-boolean p2, p1, Landroid/util/MutableBoolean;->value:Z
 
-                iput-boolean p2, p0, Lkqgs;->B:Z
+                iput-boolean p2, p0, LsVY;->Ddz:Z
             
-                iget-boolean p2, p0, Lkqgs;->B:Z
+                iget-boolean p2, p0, LsVY;->Ddz:Z
                 invoke-static {p2}, Ljava/lang/String;->valueOf(Z)Ljava/lang/String;
                 move-result-object p2
                 const-string p1, "B = "
