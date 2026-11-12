@@ -95,7 +95,7 @@
           "signatures": null,
           "targets": [
             {
-              "version": "13.2.1",
+              "version": "13.2.3",
               "versionCodes": null,
               "isExperimental": false,
               "minSdk": null,
@@ -147,7 +147,7 @@
           "signatures": null,
           "targets": [
             {
-              "version": "13.2.1",
+              "version": "13.2.3",
               "versionCodes": null,
               "isExperimental": false,
               "minSdk": null,

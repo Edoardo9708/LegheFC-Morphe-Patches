@@ -97,7 +97,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 
 **🎯 Supported versions:**
 
-| 13.2.1 |
+| 13.2.3 |
 | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
