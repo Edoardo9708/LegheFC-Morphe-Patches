@@ -107,6 +107,32 @@
       "options": []
     },
     {
+      "name": "Leghe FC - Ignora aggiornamento obbligatorio [LAB 13.2.3]",
+      "description": "LAB: neutralizza l'esito locale del confronto di versione; non modifica API o versionCode.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "it.quadronica.leghe",
+          "name": "Leghe FC",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "13.2.3",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Leghe FC - Sblocca formazione suggerita e comparatore",
       "description": "Diagnostica formazione suggerita e confronto fra giocatori (dati dimostrativi).",
       "default": false,

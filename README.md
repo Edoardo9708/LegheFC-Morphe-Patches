@@ -92,7 +92,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 </details>
 
 <details open>
-<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 Leghe FC&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -103,6 +103,7 @@ Il codice delle diverse app e separato per package sotto `patches/src/main/kotli
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Leghe FC - Avvio e nome 3 campo](#leghe-fc-avvio-e-nome-3-campo) | Corregge l'avvio dell'app e la rinomina in 3 campo. |  |
+| [Leghe FC - Ignora aggiornamento obbligatorio [LAB 13.2.3]](#leghe-fc-ignora-aggiornamento-obbligatorio-lab-13-2-3) | LAB: neutralizza l'esito locale del confronto di versione; non modifica API o versionCode. |  |
 | [Leghe FC - Sblocca formazione suggerita e comparatore](#leghe-fc-sblocca-formazione-suggerita-e-comparatore) | Diagnostica formazione suggerita e confronto fra giocatori (dati dimostrativi). |  |
 | [Leghe FC - Sblocca percentuali](#leghe-fc-sblocca-percentuali) | Mostra le percentuali utili per scegliere chi schierare. |  |
 
