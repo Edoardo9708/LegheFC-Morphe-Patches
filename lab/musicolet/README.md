@@ -1,8 +1,6 @@
 # Musicolet 6.14.1 build540
 
-**Sync folder playlists** è una patch facoltativa per `in.krosbits.musicolet` ARM64, versionCode 54000, Android 10+. La funzione principale è stata provata dall'utente su dispositivo. La creazione importa i brani indicizzati dalla cartella; la scansione aggiunge i nuovi brani. Il selettore nell'editor di una playlist esistente resta un'anteprima, senza modifica del collegamento. Il catalogo JSON ufficiale viene generato dalla pipeline di release.
-
-I risultati e le note sottostanti documentano prove intermedie storiche; non rappresentano necessariamente lo stato del collaudo attuale.
+**Sync folder playlists** è una patch facoltativa e sperimentale per `in.krosbits.musicolet` ARM64, versionCode 54000, Android 10+. Il codice è sul branch `feature/musicolet-folder-playlists`. La voce sperimentale è nel README. Il catalogo JSON ufficiale viene generato dalla pipeline di release.
 
 ## Anteprima
 
