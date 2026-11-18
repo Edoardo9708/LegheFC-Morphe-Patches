@@ -1,0 +1,43 @@
+name: PB Premium T1 isolated compilation
+
+on:
+  push:
+    branches:
+      - test/pb-premium-t1-build-20261118
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    name: Compile test bundle and upload ZIP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build MPP and generate patch manifest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ./gradlew generatePatchesList --no-daemon
+      - name: Verify T1 present in compiled bundle
+        run: |
+          set -euo pipefail
+          grep -Fq '"Prezzi Benzina - Premium boolean TRUE T1 (LOCAL TEST)"' patches-list.json
+          find patches/build/libs -maxdepth 1 -name '*.mpp' -size +100k -print
+          ls -lah patches/build/libs/*.mpp
+      - name: Upload compiled MPP in ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: PB-Premium-T1-LOCAL-compiled
+          path: patches/build/libs/*.mpp
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
